@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Garaj</title>
+        <link rel="icon"  href="/favicon.ico?v=2" />
+        <meta
+            name="description"
+            content="IMB - Your go-to app for all your IMB management needs. Streamline your operations with ease."
+        />
+        <meta
+            name="keywords"
+            content="IMB, IMB Management, Transport, Logistics, Fleet Management"
+        />
+        <meta name="author" content="Your Name or Company" />
+        <meta property="og:title" content="IMB" />
+        <meta
+            property="og:description"
+            content="IMB - Your go-to app for all your IMB management needs. Streamline your operations with ease."
+        />
+        <meta property="og:image" content="/logo.svg" />
+        <meta property="og:url" content="https://imbtruck.uz" />
+        <script>
+            (function () {
+                const theme = localStorage.getItem("vite-theme");
+                const themColor = localStorage.getItem("themeColor");
+                if (theme === "dark") {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>
