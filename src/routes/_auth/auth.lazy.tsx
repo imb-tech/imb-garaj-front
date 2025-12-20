@@ -5,7 +5,6 @@ import { usePost } from "@/hooks/usePost"
 import { handleFormError } from "@/lib/show-form-errors"
 import { createLazyFileRoute } from "@tanstack/react-router"
 import { Truck } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 export const Route = createLazyFileRoute("/_auth/auth")({
@@ -17,107 +16,22 @@ type Form = {
     password: string
 }
 
-export function getDeviceInfo() {
-    const ua = navigator.userAgent
-
-    let device = "Kompyuter"
-    if (/Mobile|Android|iPhone|iPad/i.test(ua)) device = "Telefon"
-    if (/Tablet|iPad/i.test(ua)) device = "Planshet"
-
-    let browser = "Noma’lum"
-    if (ua.includes("Edg")) browser = "Edge"
-    else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera"
-    else if (ua.includes("Chrome") && !ua.includes("Edg")) browser = "Chrome"
-    else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari"
-    else if (ua.includes("Firefox")) browser = "Firefox"
-
-    let os = "Noma’lum"
-    if (ua.includes("Windows")) os = "Windows"
-    else if (ua.includes("Android")) os = "Android"
-    else if (ua.includes("Mac OS")) os = "Mac"
-    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
-    else if (ua.includes("Linux")) os = "Linux"
-
-    return { device, browser, os }
-}
-
 function AuthComponent() {
     const { mutate, isPending } = usePost()
-
-    const [locationAllowed, setLocationAllowed] = useState<boolean | null>(null)
-    const [location, setLocation] = useState<{
-        lat: number
-        lon: number
-    } | null>(null)
-
-    useEffect(() => {
-        if (!("geolocation" in navigator)) {
-            setLocationAllowed(false)
-            return
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setLocationAllowed(true)
-                setLocation({
-                    lat: pos.coords.latitude,
-                    lon: pos.coords.longitude,
-                })
-                navigator.geolocation.clearWatch(0)
-            },
-            (err) => {
-                console.warn("Joylashuvga ruxsat berilmadi:", err.message)
-                setLocationAllowed(false)
-            },
-            { enableHighAccuracy: true, timeout: 10000 },
-        )
-    }, [])
 
     const form = useForm<Form>({
         disabled: isPending,
     })
 
     const onSubmit = form.handleSubmit((data) => {
-        if (!locationAllowed) {
-            alert("Iltimos, tizimga kirish uchun joylashuvga ruxsat bering.")
-            return
-        }
-
         mutate(LOGIN, data, {
             onSuccess(res) {
                 localStorage.setItem("token", res.access)
-                localStorage.setItem("user_id", res.id)
                 window.location.href = "/"
             },
             onError: (error) => handleFormError(error, form),
         })
     })
-
-    if (!locationAllowed) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-center p-8">
-                <div>
-                    <h2 className="text-2xl font-bold mb-4 text-red-600">
-                        Joylashuvga ruxsat talab qilinadi
-                    </h2>
-                    <p className="text-gray-300 mb-4">
-                        Siz joylashuvga kirishga ruxsat bermagansiz. Iltimos,
-                        brauzer sozlamalariga kirib ruxsatni yoqing.
-                    </p>
-                    <p className="text-gray-300 text-sm mb-4">
-                        Chrome uchun: <br />
-                        <strong>
-                            Settings → Privacy and Security → Site Settings →
-                            Location
-                        </strong>
-                    </p>
-                </div>
-            </div>
-        )
-    }
-
-    console.log(location)
-    console.log(getDeviceInfo())
 
     return (
         <div className="min-h-screen flex bg-white">

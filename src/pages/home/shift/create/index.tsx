@@ -13,8 +13,8 @@ import { useQueryClient } from "@tanstack/react-query"
 interface ShiftFormData {
     driver: number | string // adjust to number if IDs are numbers
     vehicle: number | string
-    scheduled_delivery_date: Date
-    shift_type: number | string
+    start: Date
+    type: number | string
 }
 
 const AddShift = () => {
@@ -28,10 +28,8 @@ const AddShift = () => {
         defaultValues: {
             driver: currentShift?.driver ?? "",
             vehicle: currentShift?.vehicle ?? "",
-            scheduled_delivery_date: currentShift?.scheduled_delivery_date
-                ? new Date(currentShift.scheduled_delivery_date)
-                : new Date(),
-            shift_type: currentShift?.shift_type ?? "",
+            start: currentShift?.start,
+            type: currentShift?.type ?? "",
         },
     })
 
@@ -57,7 +55,6 @@ const AddShift = () => {
     const onSubmit = (data: ShiftFormData) => {
         const formattedData = {
             ...data,
-            scheduled_delivery_date: data.scheduled_delivery_date.toISOString().split('T')[0], // or full ISO if backend expects
         }
 
         if (currentShift?.id) {
@@ -78,6 +75,8 @@ const AddShift = () => {
                     { label: "Boltavoy", value: "1" }, // adjust value to match backend (string or number)
                     { label: "Teshavoy", value: "2" },
                 ]}
+                   valueKey="value"
+                labelKey="label"
                 placeholder="Haydovchi tanlang"
             />
 
@@ -91,6 +90,8 @@ const AddShift = () => {
                     { label: "Van", value: "2" },
                     { label: "Box", value: "3" },
                 ]}
+                valueKey="value"
+                labelKey="label"
                 placeholder="Mashina tanlang"
             />
 
@@ -98,19 +99,21 @@ const AddShift = () => {
                 required
                 label="Reja qilingan yetkazib berish sanasi"
                 control={control}
-                name="scheduled_delivery_date"
+                name="start"
                 placeholder="Sanani tanlang"
             />
 
             <FormCombobox
                 required
                 label="Reys turi"
-                name="shift_type"
+                name="type"
                 control={control}
                 options={[
                     { label: "Oddiy", value: "1" },
                     { label: "Bo'sh", value: "2" },
                 ]}
+                   valueKey="value"
+                labelKey="label"
                 placeholder="Reys turini tanlang"
             />
 

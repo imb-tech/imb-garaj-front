@@ -195,7 +195,7 @@ export const TASKLY_UPLOAD = TASKLY + "upload"
 export const USERS = "users"
 
 /** ===== AUTH ===== */
-export const LOGIN = USERS + "/login/admin"
+export const LOGIN = "auth/login"
 export const USERS_LOGIN_BY_ROLE = USERS + "/login/{role}"
 
 export const USERS_ADMIN_GETME = USERS + "/admin-getme"
@@ -242,4 +242,4 @@ export const AGENTS_ORDERS_ROLLBACK = "agents/orders/rollback"
 
 // SHifts. 
 
-export const SHIFTS = "shifts"
+export const SHIFTS = "managers/trips"

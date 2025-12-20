@@ -14,27 +14,35 @@ export const useCostCols = () => {
         ),
       },
       {
-        header: "Mashina raqami",
-        accessorKey: "vehicle_number",
+        header: "Mashina",
+        accessorKey: "vehicle",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.vehicle_number}</span>
+          <span>{row.original.vehicle}</span>
+        ),
+      },
+      {
+        header: "Haydovchi",
+        accessorKey: "driver",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <span>{row.original.driver}</span>
         ),
       },
       {
         header: "Boshlangan sana",
-        accessorKey: "start_date",
+        accessorKey: "start",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.start_date}</span>
+          <span>{row.original.start}</span>
         ),
       },
       {
         header: "Reys turi",
-        accessorKey: "shift_type",
+        accessorKey: "type",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.shift_type}</span>
+          <span>{row.original.type}</span>
         ),
       },
     ],

@@ -24,43 +24,29 @@ type CardMain = {
     income_perc: number
 }
 
+type ShiftRow = {
+  id: number|string;
+  created: string; // ISO datetime string
+  updated: string; // ISO datetime string
+  status: number;
+  type: number;
+  start: string; // YYYY-MM-DD date string
+  end: string | null; // YYYY-MM-DD or null if ongoing
+  driver: number; // driver ID
+  vehicle: number; // vehicle ID
+}
+
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
     const { getData, setData, clearKey } = useGlobalStore()
     const { openModal: openCreateModal, closeModal: closeCreateModal } = useModal("create")
     const { openModal: openDeleteModal } = useModal("delete")
 
-    const currentShift = getData<any>(SHIFTS) // Adjust type if you have ShiftType
+    const currentShift = getData<ShiftRow>(SHIFTS) 
 
-    // Example static data (replace with real API later)
-    const { data: shiftData, isLoading } = useGet<any>(SHIFTS, {
-        // params: search if needed
-    })
 
-    // Or use static for now
-    const data = [
-        {
-            id: 4731,
-            vehicle_number: "01 369 JKA",
-            transport_type: "Fura",
-            driver: "Abdulla Qodirov",
-            shift_count: 4,
-            distance_km: 170,
-            fuel_per_100km: 25,
-            mileage_km: 170000,
-            income: 1500000,
-            expenses: 1200000,
-            profit: 100000,
-            start_date: "2024-11-01",
-            shift_type: "Ichki",
-        },
-        // ... more
-    ]
+    const { data, isLoading } = useGet<ListResponse<ShiftRow>>(SHIFTS)
 
-    const allData = Array.from({ length: 26 }, (_, i) => ({
-        ...data[i % data.length],
-        id: 4731 + i, // make unique ids
-    }))
 
     const columns = useCostCols()
 
@@ -96,7 +82,7 @@ const ShiftStatisticMain = () => {
             <DataTable
                 loading={isLoading}
                 columns={columns}
-                data={allData}
+                data={data?.results}
                 numeration
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}

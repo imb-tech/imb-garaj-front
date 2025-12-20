@@ -24,6 +24,9 @@ import { Route as MainShiftShiftDetailIndexImport } from './routes/_main/_shift/
 const MainTransportLazyImport = createFileRoute('/_main/transport')()
 const MainDashboardLazyImport = createFileRoute('/_main/dashboard')()
 const AuthAuthLazyImport = createFileRoute('/_auth/auth')()
+const MainSettingsLocationsIndexLazyImport = createFileRoute(
+  '/_main/_settings/locations/',
+)()
 
 // Create/Update Routes
 
@@ -60,6 +63,16 @@ const AuthAuthLazyRoute = AuthAuthLazyImport.update({
   path: '/auth',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/auth.lazy').then((d) => d.Route))
+
+const MainSettingsLocationsIndexLazyRoute =
+  MainSettingsLocationsIndexLazyImport.update({
+    path: '/locations/',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/_settings/locations/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 const MainShiftShiftIndexRoute = MainShiftShiftIndexImport.update({
   path: '/shift/',
@@ -131,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainShiftShiftIndexImport
       parentRoute: typeof MainImport
     }
+    '/_main/_settings/locations/': {
+      id: '/_main/_settings/locations/'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof MainSettingsLocationsIndexLazyImport
+      parentRoute: typeof MainImport
+    }
   }
 }
 
@@ -152,6 +172,7 @@ interface MainRouteChildren {
   MainIndexRoute: typeof MainIndexRoute
   MainShiftShiftDetailIndexRoute: typeof MainShiftShiftDetailIndexRoute
   MainShiftShiftIndexRoute: typeof MainShiftShiftIndexRoute
+  MainSettingsLocationsIndexLazyRoute: typeof MainSettingsLocationsIndexLazyRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
@@ -160,6 +181,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainIndexRoute: MainIndexRoute,
   MainShiftShiftDetailIndexRoute: MainShiftShiftDetailIndexRoute,
   MainShiftShiftIndexRoute: MainShiftShiftIndexRoute,
+  MainSettingsLocationsIndexLazyRoute: MainSettingsLocationsIndexLazyRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
@@ -172,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
   '/shift-detail': typeof MainShiftShiftDetailIndexRoute
   '/shift': typeof MainShiftShiftIndexRoute
+  '/locations': typeof MainSettingsLocationsIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -182,6 +205,7 @@ export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
   '/shift-detail': typeof MainShiftShiftDetailIndexRoute
   '/shift': typeof MainShiftShiftIndexRoute
+  '/locations': typeof MainSettingsLocationsIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -194,6 +218,7 @@ export interface FileRoutesById {
   '/_main/': typeof MainIndexRoute
   '/_main/_shift/shift-detail/': typeof MainShiftShiftDetailIndexRoute
   '/_main/_shift/shift/': typeof MainShiftShiftIndexRoute
+  '/_main/_settings/locations/': typeof MainSettingsLocationsIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -206,6 +231,7 @@ export interface FileRouteTypes {
     | '/'
     | '/shift-detail'
     | '/shift'
+    | '/locations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -215,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/shift-detail'
     | '/shift'
+    | '/locations'
   id:
     | '__root__'
     | '/_auth'
@@ -225,6 +252,7 @@ export interface FileRouteTypes {
     | '/_main/'
     | '/_main/_shift/shift-detail/'
     | '/_main/_shift/shift/'
+    | '/_main/_settings/locations/'
   fileRoutesById: FileRoutesById
 }
 
@@ -267,7 +295,8 @@ export const routeTree = rootRoute
         "/_main/transport",
         "/_main/",
         "/_main/_shift/shift-detail/",
-        "/_main/_shift/shift/"
+        "/_main/_shift/shift/",
+        "/_main/_settings/locations/"
       ]
     },
     "/_auth/auth": {
@@ -292,6 +321,10 @@ export const routeTree = rootRoute
     },
     "/_main/_shift/shift/": {
       "filePath": "_main/_shift/shift/index.tsx",
+      "parent": "/_main"
+    },
+    "/_main/_settings/locations/": {
+      "filePath": "_main/_settings/locations/index.lazy.tsx",
       "parent": "/_main"
     }
   }
