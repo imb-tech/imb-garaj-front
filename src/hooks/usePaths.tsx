@@ -1,5 +1,5 @@
 import { useLocation } from "@tanstack/react-router"
-import { ListOrdered, Truck } from "lucide-react"
+import { ListOrdered, Settings, Truck } from "lucide-react"
 import { ReactNode, useMemo } from "react"
 
 export interface MenuItem {
@@ -127,6 +127,43 @@ export const useItems = () =>
                 icon: <Truck width={18} />,
                 path: "/transport",
             },
+              {
+                label: "Sozlamalar",
+                icon: <Settings width={18} />,
+                path: "/settings/locations",
+                items: [
+                    {
+                        label: "Manzillar",
+                        path: "/settings/locations",
+                    },
+                    {
+                        label: "Foydalanuvchilar",
+                        path: "/settings/users",
+                    },
+                    {
+                        label: "Rollar",
+                        path: "/settings/roles",
+                    },
+                    // {
+                    //     label: "Ekspeditorlar",
+                    //     path: "/settings/freight-forwarders",
+                    // },
+                     {
+                        label: "Xaridorlar",
+                        path: "/settings/customers",
+                    },
+                    {
+                        label: "To'lov turlari",
+                        path: "/settings/payment-types",
+                    },
+                  
+                    {
+                        label: "Mijozlar",
+                        path: "/settings/customers",
+                    },
+                ],
+            },
+
         ],
         [],
     )
