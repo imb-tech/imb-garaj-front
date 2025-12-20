@@ -11,7 +11,7 @@ import AddCustomersModal from "./add-customers"
 import { useColumnsCustomersTable } from "./customers-cols"
 
 const Customers = () => {
-    const search = useSearch({ from: "/_main/settings/customers" })
+    const search = useSearch({ strict: false })
     const { data, isLoading } = useGet<ListResponse<CustomersType>>(
         SETTINGS_CUSTOMERS,
         {

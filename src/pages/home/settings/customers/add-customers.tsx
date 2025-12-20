@@ -15,7 +15,6 @@ import { Clock, Map, MapPin } from "lucide-react"
 import { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { MapComponent } from "../map"
 
 const AddCustomersModal = () => {
     const queryClient = useQueryClient()
@@ -507,7 +506,6 @@ const AddCustomersModal = () => {
 
                     <div className="flex items-center justify-end lg:col-span-2">
                         <Button
-                            variant={"default2"}
                             className="min-w-36"
                             type="submit"
                             loading={isPending}
@@ -531,7 +529,7 @@ const AddCustomersModal = () => {
                 modalKey="map"
             >
                 <div className="space-y-4">
-                    <MapComponent
+                    {/* <MapComponent
                         coordinates={
                             currentMapType === "main" ? coordinates : (
                                 loadingCoordinates
@@ -553,7 +551,7 @@ const AddCustomersModal = () => {
                         searchPlaceholder="Manzilni qidirish..."
                         mapHeight="500px"
                         className="rounded-lg"
-                    />
+                    /> */}
                     <div className="flex items-center justify-between pt-4 border-t">
                         <div className="text-sm">
                             <div className="font-medium text-foreground">
@@ -567,7 +565,6 @@ const AddCustomersModal = () => {
                         </div>
                         <Button
                             type="button"
-                            variant="default2"
                             onClick={handleMapSelection}
                             disabled={
                                 currentMapType === "main" ? !currentAddress : (

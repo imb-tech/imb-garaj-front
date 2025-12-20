@@ -130,19 +130,19 @@ export const useItems = () =>
               {
                 label: "Sozlamalar",
                 icon: <Settings width={18} />,
-                path: "/settings/locations",
+                path: "/locations",
                 items: [
                     {
                         label: "Manzillar",
-                        path: "/settings/locations",
+                        path: "/locations",
                     },
                     {
                         label: "Foydalanuvchilar",
-                        path: "/settings/users",
+                        path: "/users",
                     },
                     {
                         label: "Rollar",
-                        path: "/settings/roles",
+                        path: "/roles",
                     },
                     // {
                     //     label: "Ekspeditorlar",
@@ -150,16 +150,16 @@ export const useItems = () =>
                     // },
                      {
                         label: "Xaridorlar",
-                        path: "/settings/customers",
+                        path: "/customers",
                     },
                     {
                         label: "To'lov turlari",
-                        path: "/settings/payment-types",
+                        path: "/payment-types",
                     },
                   
                     {
                         label: "Mijozlar",
-                        path: "/settings/customers",
+                        path: "/customers",
                     },
                 ],
             },
