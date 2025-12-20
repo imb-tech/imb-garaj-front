@@ -237,3 +237,9 @@ export const AGENTS_ORDERS = "agents/orders/unpaid"
 export const AGENTS_ORDERS_PAY = "agents/orders/pay"
 export const AGENTS_ORDERS_HISTORY = "agents/orders/history"
 export const AGENTS_ORDERS_ROLLBACK = "agents/orders/rollback"
+
+
+
+// SHifts. 
+
+export const SHIFTS = "shifts"

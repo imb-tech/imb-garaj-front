@@ -120,7 +120,7 @@ export const useItems = () =>
             {
                 label: "Reyslar",
                 icon: <Truck width={18} />,
-                path: "/truck",
+                path: "/shift",
             },
               {
                 label: "Transport Info",

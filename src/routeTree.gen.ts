@@ -16,16 +16,14 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as MainImport } from './routes/_main'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as MainIndexImport } from './routes/_main/index'
-import { Route as MainTrucksTruckDetailIdImport } from './routes/_main/_trucks/truck-detail/$id'
+import { Route as MainShiftShiftIndexImport } from './routes/_main/_shift/shift/index'
+import { Route as MainShiftShiftDetailIndexImport } from './routes/_main/_shift/shift-detail/index'
 
 // Create Virtual Routes
 
 const MainTransportLazyImport = createFileRoute('/_main/transport')()
 const MainDashboardLazyImport = createFileRoute('/_main/dashboard')()
 const AuthAuthLazyImport = createFileRoute('/_auth/auth')()
-const MainTrucksTruckIndexLazyImport = createFileRoute(
-  '/_main/_trucks/truck/',
-)()
 
 // Create/Update Routes
 
@@ -63,15 +61,13 @@ const AuthAuthLazyRoute = AuthAuthLazyImport.update({
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/auth.lazy').then((d) => d.Route))
 
-const MainTrucksTruckIndexLazyRoute = MainTrucksTruckIndexLazyImport.update({
-  path: '/truck/',
+const MainShiftShiftIndexRoute = MainShiftShiftIndexImport.update({
+  path: '/shift/',
   getParentRoute: () => MainRoute,
-} as any).lazy(() =>
-  import('./routes/_main/_trucks/truck/index.lazy').then((d) => d.Route),
-)
+} as any)
 
-const MainTrucksTruckDetailIdRoute = MainTrucksTruckDetailIdImport.update({
-  path: '/truck-detail/$id',
+const MainShiftShiftDetailIndexRoute = MainShiftShiftDetailIndexImport.update({
+  path: '/shift-detail/',
   getParentRoute: () => MainRoute,
 } as any)
 
@@ -121,18 +117,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexImport
       parentRoute: typeof MainImport
     }
-    '/_main/_trucks/truck-detail/$id': {
-      id: '/_main/_trucks/truck-detail/$id'
-      path: '/truck-detail/$id'
-      fullPath: '/truck-detail/$id'
-      preLoaderRoute: typeof MainTrucksTruckDetailIdImport
+    '/_main/_shift/shift-detail/': {
+      id: '/_main/_shift/shift-detail/'
+      path: '/shift-detail'
+      fullPath: '/shift-detail'
+      preLoaderRoute: typeof MainShiftShiftDetailIndexImport
       parentRoute: typeof MainImport
     }
-    '/_main/_trucks/truck/': {
-      id: '/_main/_trucks/truck/'
-      path: '/truck'
-      fullPath: '/truck'
-      preLoaderRoute: typeof MainTrucksTruckIndexLazyImport
+    '/_main/_shift/shift/': {
+      id: '/_main/_shift/shift/'
+      path: '/shift'
+      fullPath: '/shift'
+      preLoaderRoute: typeof MainShiftShiftIndexImport
       parentRoute: typeof MainImport
     }
   }
@@ -154,16 +150,16 @@ interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainTransportLazyRoute: typeof MainTransportLazyRoute
   MainIndexRoute: typeof MainIndexRoute
-  MainTrucksTruckDetailIdRoute: typeof MainTrucksTruckDetailIdRoute
-  MainTrucksTruckIndexLazyRoute: typeof MainTrucksTruckIndexLazyRoute
+  MainShiftShiftDetailIndexRoute: typeof MainShiftShiftDetailIndexRoute
+  MainShiftShiftIndexRoute: typeof MainShiftShiftIndexRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainTransportLazyRoute: MainTransportLazyRoute,
   MainIndexRoute: MainIndexRoute,
-  MainTrucksTruckDetailIdRoute: MainTrucksTruckDetailIdRoute,
-  MainTrucksTruckIndexLazyRoute: MainTrucksTruckIndexLazyRoute,
+  MainShiftShiftDetailIndexRoute: MainShiftShiftDetailIndexRoute,
+  MainShiftShiftIndexRoute: MainShiftShiftIndexRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
@@ -174,8 +170,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-  '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-  '/truck': typeof MainTrucksTruckIndexLazyRoute
+  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
+  '/shift': typeof MainShiftShiftIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -184,8 +180,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-  '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-  '/truck': typeof MainTrucksTruckIndexLazyRoute
+  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
+  '/shift': typeof MainShiftShiftIndexRoute
 }
 
 export interface FileRoutesById {
@@ -196,8 +192,8 @@ export interface FileRoutesById {
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/transport': typeof MainTransportLazyRoute
   '/_main/': typeof MainIndexRoute
-  '/_main/_trucks/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-  '/_main/_trucks/truck/': typeof MainTrucksTruckIndexLazyRoute
+  '/_main/_shift/shift-detail/': typeof MainShiftShiftDetailIndexRoute
+  '/_main/_shift/shift/': typeof MainShiftShiftIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -208,8 +204,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-    | '/truck-detail/$id'
-    | '/truck'
+    | '/shift-detail'
+    | '/shift'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -217,8 +213,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-    | '/truck-detail/$id'
-    | '/truck'
+    | '/shift-detail'
+    | '/shift'
   id:
     | '__root__'
     | '/_auth'
@@ -227,8 +223,8 @@ export interface FileRouteTypes {
     | '/_main/dashboard'
     | '/_main/transport'
     | '/_main/'
-    | '/_main/_trucks/truck-detail/$id'
-    | '/_main/_trucks/truck/'
+    | '/_main/_shift/shift-detail/'
+    | '/_main/_shift/shift/'
   fileRoutesById: FileRoutesById
 }
 
@@ -270,8 +266,8 @@ export const routeTree = rootRoute
         "/_main/dashboard",
         "/_main/transport",
         "/_main/",
-        "/_main/_trucks/truck-detail/$id",
-        "/_main/_trucks/truck/"
+        "/_main/_shift/shift-detail/",
+        "/_main/_shift/shift/"
       ]
     },
     "/_auth/auth": {
@@ -290,12 +286,12 @@ export const routeTree = rootRoute
       "filePath": "_main/index.tsx",
       "parent": "/_main"
     },
-    "/_main/_trucks/truck-detail/$id": {
-      "filePath": "_main/_trucks/truck-detail/$id.tsx",
+    "/_main/_shift/shift-detail/": {
+      "filePath": "_main/_shift/shift-detail/index.tsx",
       "parent": "/_main"
     },
-    "/_main/_trucks/truck/": {
-      "filePath": "_main/_trucks/truck/index.lazy.tsx",
+    "/_main/_shift/shift/": {
+      "filePath": "_main/_shift/shift/index.tsx",
       "parent": "/_main"
     }
   }
