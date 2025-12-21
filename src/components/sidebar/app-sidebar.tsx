@@ -1,11 +1,13 @@
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Link } from "@tanstack/react-router"
 import * as React from "react"
 import { NavMain } from "./nav-main"
+import { NavUser } from "./nav-user"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
@@ -23,6 +25,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent className="lg:pt-16">
                 <NavMain />
             </SidebarContent>
+
+            <SidebarFooter>
+                <NavUser />
+            </SidebarFooter>
         </Sidebar>
     )
 }
