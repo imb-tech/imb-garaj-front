@@ -11,24 +11,11 @@ type PaginationProps = {
 }
 
 type User = {
-    id: number
+    uuid: string
+    full_name: string
+    phone: string | null
+    actions: unknown | null
     username: string
-    first_name: string
-    last_name: string
-    profile_photo: string
-    modules: {
-        id: number
-        name: string
-        title: string
-        key: TPermissions[number]
-    }[]
-    manager_codes: number[]
-    agent_codes: number[]
-    phone_number: string
-    telegram_id: number
-    role_name: string
-    has_exam: boolean
-    bot_url: string
 }
 
 type MonthCalProps = {
