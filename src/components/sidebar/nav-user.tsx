@@ -42,7 +42,7 @@ export function NavUser() {
                         >
                             <Avatar
                                 className={cn(
-                                    "h-8 w-8 rounded-lg grayscale",
+                                    "h-8 w-8 rounded-lg bg-primary/10",
                                     isMobile && "h-10 w-10",
                                 )}
                             >
@@ -51,14 +51,14 @@ export function NavUser() {
                                     alt={user?.full_name}
                                 />
                                 <AvatarFallback className="rounded-lg uppercase">
-                                    {user?.full_name?.slice(0, 2)}
+                                    {user?.full_name?.slice(0, 2) || "SA"}
                                 </AvatarFallback>
                             </Avatar>
                             {!isMobile && (
                                 <>
                                     <div className="lg:grid hidden flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-medium">
-                                            {user?.full_name}
+                                            {user?.full_name || "Super Admin"}
                                         </span>
                                         <span className="text-muted-foreground truncate text-xs">
                                             {user?.phone}
@@ -88,7 +88,7 @@ export function NavUser() {
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-medium">
-                                        {user?.full_name}
+                                        {user?.full_name || "Super Admin"}
                                     </span>
                                     <span className="text-muted-foreground truncate text-xs">
                                         {user?.phone}
