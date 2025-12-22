@@ -18,7 +18,6 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as MainIndexImport } from './routes/_main/index'
 import { Route as MainShiftShiftIndexImport } from './routes/_main/_shift/shift/index'
 import { Route as MainShiftShiftDetailIndexImport } from './routes/_main/_shift/shift-detail/index'
-import { Route as MainSettingsRolesIndexImport } from './routes/_main/_settings/roles/index'
 
 // Create Virtual Routes
 
@@ -27,6 +26,9 @@ const MainDashboardLazyImport = createFileRoute('/_main/dashboard')()
 const AuthAuthLazyImport = createFileRoute('/_auth/auth')()
 const MainSettingsUsersIndexLazyImport = createFileRoute(
   '/_main/_settings/users/',
+)()
+const MainSettingsRolesIndexLazyImport = createFileRoute(
+  '/_main/_settings/roles/',
 )()
 const MainSettingsPaymentTypesIndexLazyImport = createFileRoute(
   '/_main/_settings/payment-types/',
@@ -83,6 +85,15 @@ const MainSettingsUsersIndexLazyRoute = MainSettingsUsersIndexLazyImport.update(
   import('./routes/_main/_settings/users/index.lazy').then((d) => d.Route),
 )
 
+const MainSettingsRolesIndexLazyRoute = MainSettingsRolesIndexLazyImport.update(
+  {
+    path: '/roles/',
+    getParentRoute: () => MainRoute,
+  } as any,
+).lazy(() =>
+  import('./routes/_main/_settings/roles/index.lazy').then((d) => d.Route),
+)
+
 const MainSettingsPaymentTypesIndexLazyRoute =
   MainSettingsPaymentTypesIndexLazyImport.update({
     path: '/payment-types/',
@@ -120,11 +131,6 @@ const MainShiftShiftIndexRoute = MainShiftShiftIndexImport.update({
 
 const MainShiftShiftDetailIndexRoute = MainShiftShiftDetailIndexImport.update({
   path: '/shift-detail/',
-  getParentRoute: () => MainRoute,
-} as any)
-
-const MainSettingsRolesIndexRoute = MainSettingsRolesIndexImport.update({
-  path: '/roles/',
   getParentRoute: () => MainRoute,
 } as any)
 
@@ -174,13 +180,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexImport
       parentRoute: typeof MainImport
     }
-    '/_main/_settings/roles/': {
-      id: '/_main/_settings/roles/'
-      path: '/roles'
-      fullPath: '/roles'
-      preLoaderRoute: typeof MainSettingsRolesIndexImport
-      parentRoute: typeof MainImport
-    }
     '/_main/_shift/shift-detail/': {
       id: '/_main/_shift/shift-detail/'
       path: '/shift-detail'
@@ -216,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSettingsPaymentTypesIndexLazyImport
       parentRoute: typeof MainImport
     }
+    '/_main/_settings/roles/': {
+      id: '/_main/_settings/roles/'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof MainSettingsRolesIndexLazyImport
+      parentRoute: typeof MainImport
+    }
     '/_main/_settings/users/': {
       id: '/_main/_settings/users/'
       path: '/users'
@@ -242,12 +248,12 @@ interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainTransportLazyRoute: typeof MainTransportLazyRoute
   MainIndexRoute: typeof MainIndexRoute
-  MainSettingsRolesIndexRoute: typeof MainSettingsRolesIndexRoute
   MainShiftShiftDetailIndexRoute: typeof MainShiftShiftDetailIndexRoute
   MainShiftShiftIndexRoute: typeof MainShiftShiftIndexRoute
   MainSettingsCustomersIndexLazyRoute: typeof MainSettingsCustomersIndexLazyRoute
   MainSettingsLocationsIndexLazyRoute: typeof MainSettingsLocationsIndexLazyRoute
   MainSettingsPaymentTypesIndexLazyRoute: typeof MainSettingsPaymentTypesIndexLazyRoute
+  MainSettingsRolesIndexLazyRoute: typeof MainSettingsRolesIndexLazyRoute
   MainSettingsUsersIndexLazyRoute: typeof MainSettingsUsersIndexLazyRoute
 }
 
@@ -255,13 +261,13 @@ const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainTransportLazyRoute: MainTransportLazyRoute,
   MainIndexRoute: MainIndexRoute,
-  MainSettingsRolesIndexRoute: MainSettingsRolesIndexRoute,
   MainShiftShiftDetailIndexRoute: MainShiftShiftDetailIndexRoute,
   MainShiftShiftIndexRoute: MainShiftShiftIndexRoute,
   MainSettingsCustomersIndexLazyRoute: MainSettingsCustomersIndexLazyRoute,
   MainSettingsLocationsIndexLazyRoute: MainSettingsLocationsIndexLazyRoute,
   MainSettingsPaymentTypesIndexLazyRoute:
     MainSettingsPaymentTypesIndexLazyRoute,
+  MainSettingsRolesIndexLazyRoute: MainSettingsRolesIndexLazyRoute,
   MainSettingsUsersIndexLazyRoute: MainSettingsUsersIndexLazyRoute,
 }
 
@@ -273,12 +279,12 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-  '/roles': typeof MainSettingsRolesIndexRoute
   '/shift-detail': typeof MainShiftShiftDetailIndexRoute
   '/shift': typeof MainShiftShiftIndexRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
   '/payment-types': typeof MainSettingsPaymentTypesIndexLazyRoute
+  '/roles': typeof MainSettingsRolesIndexLazyRoute
   '/users': typeof MainSettingsUsersIndexLazyRoute
 }
 
@@ -288,12 +294,12 @@ export interface FileRoutesByTo {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-  '/roles': typeof MainSettingsRolesIndexRoute
   '/shift-detail': typeof MainShiftShiftDetailIndexRoute
   '/shift': typeof MainShiftShiftIndexRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
   '/payment-types': typeof MainSettingsPaymentTypesIndexLazyRoute
+  '/roles': typeof MainSettingsRolesIndexLazyRoute
   '/users': typeof MainSettingsUsersIndexLazyRoute
 }
 
@@ -305,12 +311,12 @@ export interface FileRoutesById {
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/transport': typeof MainTransportLazyRoute
   '/_main/': typeof MainIndexRoute
-  '/_main/_settings/roles/': typeof MainSettingsRolesIndexRoute
   '/_main/_shift/shift-detail/': typeof MainShiftShiftDetailIndexRoute
   '/_main/_shift/shift/': typeof MainShiftShiftIndexRoute
   '/_main/_settings/customers/': typeof MainSettingsCustomersIndexLazyRoute
   '/_main/_settings/locations/': typeof MainSettingsLocationsIndexLazyRoute
   '/_main/_settings/payment-types/': typeof MainSettingsPaymentTypesIndexLazyRoute
+  '/_main/_settings/roles/': typeof MainSettingsRolesIndexLazyRoute
   '/_main/_settings/users/': typeof MainSettingsUsersIndexLazyRoute
 }
 
@@ -322,12 +328,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-    | '/roles'
     | '/shift-detail'
     | '/shift'
     | '/customers'
     | '/locations'
     | '/payment-types'
+    | '/roles'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -336,12 +342,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-    | '/roles'
     | '/shift-detail'
     | '/shift'
     | '/customers'
     | '/locations'
     | '/payment-types'
+    | '/roles'
     | '/users'
   id:
     | '__root__'
@@ -351,12 +357,12 @@ export interface FileRouteTypes {
     | '/_main/dashboard'
     | '/_main/transport'
     | '/_main/'
-    | '/_main/_settings/roles/'
     | '/_main/_shift/shift-detail/'
     | '/_main/_shift/shift/'
     | '/_main/_settings/customers/'
     | '/_main/_settings/locations/'
     | '/_main/_settings/payment-types/'
+    | '/_main/_settings/roles/'
     | '/_main/_settings/users/'
   fileRoutesById: FileRoutesById
 }
@@ -399,12 +405,12 @@ export const routeTree = rootRoute
         "/_main/dashboard",
         "/_main/transport",
         "/_main/",
-        "/_main/_settings/roles/",
         "/_main/_shift/shift-detail/",
         "/_main/_shift/shift/",
         "/_main/_settings/customers/",
         "/_main/_settings/locations/",
         "/_main/_settings/payment-types/",
+        "/_main/_settings/roles/",
         "/_main/_settings/users/"
       ]
     },
@@ -422,10 +428,6 @@ export const routeTree = rootRoute
     },
     "/_main/": {
       "filePath": "_main/index.tsx",
-      "parent": "/_main"
-    },
-    "/_main/_settings/roles/": {
-      "filePath": "_main/_settings/roles/index.tsx",
       "parent": "/_main"
     },
     "/_main/_shift/shift-detail/": {
@@ -446,6 +448,10 @@ export const routeTree = rootRoute
     },
     "/_main/_settings/payment-types/": {
       "filePath": "_main/_settings/payment-types/index.lazy.tsx",
+      "parent": "/_main"
+    },
+    "/_main/_settings/roles/": {
+      "filePath": "_main/_settings/roles/index.lazy.tsx",
       "parent": "/_main"
     },
     "/_main/_settings/users/": {

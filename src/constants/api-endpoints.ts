@@ -10,3 +10,10 @@ export const SHIFTS = "hr/"
 export const LOGIN="auth/login"
 export const PROFILE="/"
 
+
+
+/** ===== SETTINGS ===== */
+
+export const SETTINGS_ROLES = "users/roles"
+
+
