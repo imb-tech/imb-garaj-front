@@ -8,23 +8,29 @@ import { useGlobalStore } from "@/store/global-store"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
-import { TRIPS } from "@/constants/api-endpoints"
+import { TRIPS, TRIPS_ORDERS } from "@/constants/api-endpoints"
+import { useGet } from "@/hooks/useGet"
 
 
 
-const AddShift = () => {
+
+const AddTripOrders = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create")
+    const currentTripOrder = getData<TripsOrders & { id?: number }>(TRIPS_ORDERS)
+    const { data: districtsData } = useGet<DistrictType>(TRIPS_ORDERS, {
+        params: {
+            model_name: "district"
+        }
+    })
 
-    const currentShift = getData<TripFormData & { id?: number }>(TRIPS)
 
-    const form = useForm<TripFormData>({
+    const form = useForm<TripsOrders>({
         defaultValues: {
-            driver: currentShift?.driver ?? "",
-            vehicle: currentShift?.vehicle ?? "",
-            start: currentShift?.start,
-            type: currentShift?.type ?? "",
+            loading: currentTripOrder?.loading,
+            unloading: currentTripOrder?.unloading,
+            trip: currentTripOrder?.trip
         },
     })
 
@@ -32,14 +38,14 @@ const AddShift = () => {
 
     const onSuccess = () => {
         toast.success(
-            currentShift?.id
-                ? "Reys tahrirlandi!"
-                : "Reys qo'shildi!",
+            currentTripOrder?.id
+                ? "Buyurtma tahrirlandi!"
+                : "Buyurtma qo'shildi!",
         )
         reset()
-        clearKey(TRIPS)
+        clearKey(TRIPS_ORDERS)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [TRIPS] })
+        queryClient.refetchQueries({ queryKey: [TRIPS_ORDERS] })
     }
 
     const { mutate: create, isPending: creating } = usePost({ onSuccess })
@@ -47,15 +53,15 @@ const AddShift = () => {
 
     const isPending = creating || updating
 
-    const onSubmit = (data: TripFormData) => {
+    const onSubmit = (data: TripsOrders) => {
         const formattedData = {
             ...data,
         }
 
-        if (currentShift?.id) {
-            update(`${TRIPS}/${currentShift.id}`, formattedData)
+        if (currentTripOrder?.id) {
+            update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
         } else {
-            create(TRIPS, formattedData)
+            create(TRIPS_ORDERS, formattedData)
         }
     }
 
@@ -63,68 +69,37 @@ const AddShift = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
             <FormCombobox
                 required
-                label="Haydovchi"
-                name="driver"
+                label="Yuklash manzili"
+                name="loading"
                 control={control}
-                options={[
-                    { label: "Boltavoy", value: "1" }, // adjust value to match backend (string or number)
-                    { label: "Teshavoy", value: "2" },
-                ]}
-                   valueKey="value"
-                labelKey="label"
-                placeholder="Haydovchi tanlang"
-            />
-
-            <FormCombobox
-                required
-                label="Mashina"
-                name="vehicle"
-                control={control}
-                options={[
-                    { label: "Truck", value: "1" },
-                    { label: "Van", value: "2" },
-                    { label: "Box", value: "3" },
-                ]}
+                options={districtsData}
                 valueKey="value"
                 labelKey="label"
-                placeholder="Mashina tanlang"
+                placeholder="Hududni tanlang"
             />
-
-            <FormDatePicker
-                required
-                label="Reja qilingan yetkazib berish sanasi"
-                control={control}
-                name="start"
-                placeholder="Sanani tanlang"
-            />
-
             <FormCombobox
                 required
-                label="Reys turi"
-                name="type"
+                label="Yuk tushirish manzili"
+                name="unloading"
                 control={control}
-                options={[
-                    { label: "Oddiy", value: "1" },
-                    { label: "Bo'sh", value: "2" },
-                ]}
-                   valueKey="value"
+                options={districtsData}
+                valueKey="value"
                 labelKey="label"
-                placeholder="Reys turini tanlang"
+                placeholder="Hududni tanlang"
+            />
+            <FormCombobox
+                required
+                label="Yuk tushirish manzili"
+                name="unloading"
+                control={control}
+                options={districtsData}
+                valueKey="value"
+                labelKey="label"
+                placeholder="Hududni tanlang"
             />
 
             <div className="col-span-2 flex justify-end gap-4 pt-4">
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                        reset()
-                        clearKey(TRIPS)
-                        closeModal()
-                    }}
-                    disabled={isPending}
-                >
-                    Bekor qilish
-                </Button>
+
 
                 <Button
                     type="submit"
@@ -138,4 +113,4 @@ const AddShift = () => {
     )
 }
 
-export default AddShift
+export default AddTripOrders

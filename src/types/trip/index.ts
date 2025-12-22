@@ -48,3 +48,25 @@ type CargoItem = {
   updated: string; 
   name: string;
 };
+
+type TripsOrders = {
+  id?:string|number
+  loading: number
+  unloading: number
+  trip: number
+}
+
+type DistrictType ={
+  name:string,
+  id:number|number
+}
+
+type TripOrdersRow = {
+  id: number
+  created: string // ISO datetime
+  updated: string
+  loading: number
+  unloading: number
+  trip: number
+  cargo_type: number | null
+}
