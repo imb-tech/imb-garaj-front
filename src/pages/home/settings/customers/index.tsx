@@ -50,10 +50,10 @@ const Customers = () => {
                     />
                 }
             />
-            <DeleteModal path={SETTINGS_CUSTOMERS} id={item?.uuid} />
+            <DeleteModal path={SETTINGS_CUSTOMERS} id={item?.id} />
             <Modal
-                size="max-w-4xl"
-                title={`Mijoz ${item?.uuid ? "tahrirlash" : "qo'shish"}`}
+                size="max-w-2xl"
+                title={`Mijoz ${item?.id ? "tahrirlash" : "qo'shish"}`}
                 modalKey={"create"}
             >
                 <AddCustomersModal />

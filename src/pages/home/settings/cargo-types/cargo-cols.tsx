@@ -1,67 +1,68 @@
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
-import { SETTINGS_USERS } from "@/constants/api-endpoints"
+import { SETTINGS_CARGO_TYPE } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
+import { useColumnsCargoTable } from "."
 import TableHeader from "../table-header"
-import AddUserModal from "./add-users"
-import { useColumnsUsersTable } from "./users-cols"
+import AddCargoModal from "./add-cargo"
 
-const UsersPage = () => {
-    const { data, isLoading } = useGet<ListResponse<UserType>>(SETTINGS_USERS)
+const  CargoPage = () => {
+    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const { data, isLoading } = useGet<ListResponse<RolesType>>(
+        SETTINGS_CARGO_TYPE,
+        // {
+        //     params: search,
+        // },
+    )
     const { getData, setData } = useGlobalStore()
-    const item = getData<UserType>(SETTINGS_USERS)
+    const item = getData<RolesType>(SETTINGS_CARGO_TYPE)
 
     const { openModal: openDeleteModal } = useModal("delete")
     const { openModal: openCreateModal } = useModal(`create`)
-    const columns = useColumnsUsersTable()
+    const columns = useColumnsCargoTable()
 
-    const handleDelete = (row: { original: UserType }) => {
-        setData(SETTINGS_USERS, row.original)
+    const handleDelete = (row: { original: RolesType }) => {
+        setData(SETTINGS_CARGO_TYPE, row.original)
         openDeleteModal()
     }
-    const handleEdit = (item: UserType) => {
-        setData(SETTINGS_USERS, item)
+    const handleEdit = (item: RolesType) => {
+        setData(SETTINGS_CARGO_TYPE, item)
         openCreateModal()
     }
     return (
         <>
             <DataTable
-                numeration
                 loading={isLoading}
                 columns={columns}
                 data={data?.results}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
+                numeration
                 paginationProps={{
                     totalPages: data?.total_pages,
                 }}
                 head={
                     <TableHeader
-                        fileName="Haydovchilar"
+                        fileName="Yuk"
                         url="excel"
-                        storeKey={SETTINGS_USERS}
+                        storeKey={SETTINGS_CARGO_TYPE}
                     />
                 }
             />
-            <DeleteModal
-                path={SETTINGS_USERS}
-                refetchKeys={[SETTINGS_USERS]}
-                id={item?.id}
-            />
+            <DeleteModal path={SETTINGS_CARGO_TYPE} id={item?.id} />
             <Modal
-                size="max-w-2xl"
                 title={
-                    item?.id ? " Haydovchini tahrirlash" : " Haydovchi qo'shish"
+                    item?.id ? "Yuk turini tahrirlash" : " Yuk turini  qo'shish"
                 }
                 modalKey="create"
             >
-                <AddUserModal />
+                <AddCargoModal />
             </Modal>
         </>
     )
 }
 
-export default UsersPage
+export default  CargoPage

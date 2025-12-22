@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
-export const useColumnsRolesTable = () => {
+export const useColumnsCargoTable = () => {
     return useMemo<ColumnDef<RolesType>[]>(
         () => [
             {

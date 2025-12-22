@@ -122,12 +122,12 @@ export const useItems = () =>
                 icon: <Truck width={18} />,
                 path: "/shift",
             },
-              {
+            {
                 label: "Transport Info",
                 icon: <Truck width={18} />,
                 path: "/transport",
             },
-              {
+            {
                 label: "Sozlamalar",
                 icon: <Settings width={18} />,
                 path: "/locations",
@@ -144,26 +144,29 @@ export const useItems = () =>
                         label: "Rollar",
                         path: "/roles",
                     },
-                    // {
-                    //     label: "Ekspeditorlar",
-                    //     path: "/settings/freight-forwarders",
-                    // },
-                     {
-                        label: "Xaridorlar",
+                    {
+                        label: "Mijozlar",
                         path: "/customers",
+                    },
+                    {
+                        label: "Mashina turlari",
+                        path: "/vehicle-types",
+                    },
+
+                    {
+                        label: "Yuk turi",
+                        path: "/cargo-types",
                     },
                     {
                         label: "To'lov turlari",
                         path: "/payment-types",
                     },
-                  
                     {
-                        label: "Mijozlar",
-                        path: "/customers",
+                        label: "Xarajat turlari",
+                        path: "/expense-types",
                     },
                 ],
             },
-
         ],
         [],
     )
