@@ -7,14 +7,22 @@ export const SELECTABLE_USERS = "hr/"
 export const CLIENTS_AVAILABLE = "hr/"
 export const MANAGERS_ORDERS_CREATE = "hr/"
 export const MANAGERS_ORDERS_NEW = "hr/"
-export const SHIFTS = "trips"
+export const TRIPS = "trips"
 export const LOGIN="auth/login"
 export const PROFILE="/"
 
 
+export const VEHICLES="vehicles"
+
 
 /** ===== SETTINGS ===== */
-
+export const SETTINGS_CARGO_TYPES="common/cargo-types"
+export const SETTINGS_SELECTABLE_VEHICLE_TYPE = "common/selectable/vehicle-type"
 export const SETTINGS_ROLES = "users/roles"
+export const SETTINGS_SELECTABLE_USERS = "common/selectable/user"
+
+
+
+
 
 

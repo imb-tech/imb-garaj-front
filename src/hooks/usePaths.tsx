@@ -102,10 +102,15 @@ export const useItems = () =>
                 icon: <ListOrdered width={18} />,
                 path: "/dashboard",
             },
+             {
+                label: "Transport",
+                icon: <Truck width={18} />,
+                path: "/truck",
+            },
             {
                 label: "Reyslar",
                 icon: <Truck width={18} />,
-                path: "/shift",
+                path: "/trip",
             },
             {
                 label: "Transport Info",

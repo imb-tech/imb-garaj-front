@@ -1,7 +1,6 @@
 import { FormCombobox } from "@/components/form/combobox"
 import { FormDatePicker } from "@/components/form/date-picker"
 import { Button } from "@/components/ui/button"
-import { SHIFTS } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -9,22 +8,18 @@ import { useGlobalStore } from "@/store/global-store"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
+import { TRIPS } from "@/constants/api-endpoints"
 
-interface ShiftFormData {
-    driver: number | string // adjust to number if IDs are numbers
-    vehicle: number | string
-    start: Date
-    type: number | string
-}
+
 
 const AddShift = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create")
 
-    const currentShift = getData<ShiftFormData & { id?: number }>(SHIFTS)
+    const currentShift = getData<TripFormData & { id?: number }>(TRIPS)
 
-    const form = useForm<ShiftFormData>({
+    const form = useForm<TripFormData>({
         defaultValues: {
             driver: currentShift?.driver ?? "",
             vehicle: currentShift?.vehicle ?? "",
@@ -42,9 +37,9 @@ const AddShift = () => {
                 : "Reys qo'shildi!",
         )
         reset()
-        clearKey(SHIFTS)
+        clearKey(TRIPS)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [SHIFTS] })
+        queryClient.refetchQueries({ queryKey: [TRIPS] })
     }
 
     const { mutate: create, isPending: creating } = usePost({ onSuccess })
@@ -52,15 +47,15 @@ const AddShift = () => {
 
     const isPending = creating || updating
 
-    const onSubmit = (data: ShiftFormData) => {
+    const onSubmit = (data: TripFormData) => {
         const formattedData = {
             ...data,
         }
 
         if (currentShift?.id) {
-            update(`${SHIFTS}/${currentShift.id}`, formattedData)
+            update(`${TRIPS}/${currentShift.id}`, formattedData)
         } else {
-            create(SHIFTS, formattedData)
+            create(TRIPS, formattedData)
         }
     }
 
@@ -123,7 +118,7 @@ const AddShift = () => {
                     variant="outline"
                     onClick={() => {
                         reset()
-                        clearKey(SHIFTS)
+                        clearKey(TRIPS)
                         closeModal()
                     }}
                     disabled={isPending}

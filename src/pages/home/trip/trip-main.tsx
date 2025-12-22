@@ -2,39 +2,17 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
 import Modal from "@/components/custom/modal"
-import { SHIFTS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate } from "@tanstack/react-router"
 import { formatMoney } from "@/lib/format-money"
 import { useCostCols } from "./cols"
-
-import AddShift from "./create"
 import DeleteModal from "@/components/custom/delete-modal"
+import { TRIPS } from "@/constants/api-endpoints"
+import AddTrip from "./create"
 
-type CardMain = {
-    current_balance: number
-    current_balance_perc: number
-    difference: number
-    difference_perc: number
-    expenses: number
-    expense_perc: number
-    incomes: number
-    income_perc: number
-}
 
-type ShiftRow = {
-  id: number|string;
-  created: string; // ISO datetime string
-  updated: string; // ISO datetime string
-  status: number;
-  type: number;
-  start: string; // YYYY-MM-DD date string
-  end: string | null; // YYYY-MM-DD or null if ongoing
-  driver: number; // driver ID
-  vehicle: number; // vehicle ID
-}
 
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
@@ -42,26 +20,26 @@ const ShiftStatisticMain = () => {
     const { openModal: openCreateModal, closeModal: closeCreateModal } = useModal("create")
     const { openModal: openDeleteModal } = useModal("delete")
 
-    const currentShift = getData<ShiftRow>(SHIFTS) 
+    const currentTrip = getData<TripRow>(TRIPS) 
 
 
-    const { data, isLoading } = useGet<ListResponse<ShiftRow>>(SHIFTS)
+    const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS)
 
 
     const columns = useCostCols()
 
     const handleCreate = () => {
-        clearKey(SHIFTS)
+        clearKey(TRIPS)
         openCreateModal()
     }
 
     const handleEdit = (item: any) => {
-        setData(SHIFTS, item)
+        setData(TRIPS, item)
         openCreateModal()
     }
 
        const handleDelete = (row: { original:any}) => {
-        setData(SHIFTS, row.original)
+        setData(TRIPS, row.original)
         openDeleteModal()
     }
 
@@ -86,12 +64,12 @@ const ShiftStatisticMain = () => {
                 numeration
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
-                // onRowClick={(row) =>
-                //     navigate({ to: "/shift-detail/$id", params: { id: row.original.id.toString() } })
-                // }
+                onRowClick={() =>
+                    navigate({ to: "/trip-orders/$id", params: { id: "2" } })
+                }
                 head={
                     <div className="flex items-center gap-3 mb-3">
-                        <h1 className="text-xl">Transportlar ro'yxati</h1>
+                        <h1 className="text-xl">Reyslar ro'yxati</h1>
                         <Badge className="text-sm">{formatMoney(25)}</Badge>
                     </div>
                 }
@@ -104,14 +82,14 @@ const ShiftStatisticMain = () => {
                 modalKey="create"
                 size="max-w-2xl"
                 classNameTitle="font-medium text-xl"
-                title={`Reys ${currentShift?.id ? "tahrirlash" : "qo'shish"}`}
+                title={`Reys ${currentTrip?.id ? "tahrirlash" : "qo'shish"}`}
             >
                 <div className="max-h-[80vh] overflow-y-auto p-0.5">
-                    <AddShift />
+                    <AddTrip />
                 </div>
             </Modal>
 
-                        <DeleteModal path={SHIFTS} id={currentShift?.id} />
+                        <DeleteModal path={TRIPS} id={currentTrip?.id} />
 
         </div>
     )
