@@ -17,11 +17,6 @@ import { Route as MainImport } from './routes/_main'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as MainIndexImport } from './routes/_main/index'
 import { Route as MainShiftShiftIndexImport } from './routes/_main/_shift/shift/index'
-<<<<<<< HEAD
-import { Route as MainSettingsRolesIndexImport } from './routes/_main/_settings/roles/index'
-=======
-import { Route as MainShiftShiftDetailIndexImport } from './routes/_main/_shift/shift-detail/index'
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
 
 // Create Virtual Routes
 
@@ -141,16 +136,6 @@ const MainShiftShiftIndexRoute = MainShiftShiftIndexImport.update({
   getParentRoute: () => MainRoute,
 } as any)
 
-<<<<<<< HEAD
-const MainSettingsRolesIndexRoute = MainSettingsRolesIndexImport.update({
-  path: '/roles/',
-=======
-const MainShiftShiftDetailIndexRoute = MainShiftShiftDetailIndexImport.update({
-  path: '/shift-detail/',
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
-  getParentRoute: () => MainRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -197,26 +182,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexImport
       parentRoute: typeof MainImport
     }
-<<<<<<< HEAD
     '/_main/trip-orders/': {
       id: '/_main/trip-orders/'
       path: '/trip-orders'
       fullPath: '/trip-orders'
       preLoaderRoute: typeof MainTripOrdersIndexLazyImport
-      parentRoute: typeof MainImport
-    }
-    '/_main/_settings/roles/': {
-      id: '/_main/_settings/roles/'
-      path: '/roles'
-      fullPath: '/roles'
-      preLoaderRoute: typeof MainSettingsRolesIndexImport
-=======
-    '/_main/_shift/shift-detail/': {
-      id: '/_main/_shift/shift-detail/'
-      path: '/shift-detail'
-      fullPath: '/shift-detail'
-      preLoaderRoute: typeof MainShiftShiftDetailIndexImport
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
       parentRoute: typeof MainImport
     }
     '/_main/_shift/shift/': {
@@ -280,12 +250,7 @@ interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainTransportLazyRoute: typeof MainTransportLazyRoute
   MainIndexRoute: typeof MainIndexRoute
-<<<<<<< HEAD
   MainTripOrdersIndexLazyRoute: typeof MainTripOrdersIndexLazyRoute
-  MainSettingsRolesIndexRoute: typeof MainSettingsRolesIndexRoute
-=======
-  MainShiftShiftDetailIndexRoute: typeof MainShiftShiftDetailIndexRoute
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
   MainShiftShiftIndexRoute: typeof MainShiftShiftIndexRoute
   MainSettingsCustomersIndexLazyRoute: typeof MainSettingsCustomersIndexLazyRoute
   MainSettingsLocationsIndexLazyRoute: typeof MainSettingsLocationsIndexLazyRoute
@@ -298,12 +263,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainTransportLazyRoute: MainTransportLazyRoute,
   MainIndexRoute: MainIndexRoute,
-<<<<<<< HEAD
   MainTripOrdersIndexLazyRoute: MainTripOrdersIndexLazyRoute,
-  MainSettingsRolesIndexRoute: MainSettingsRolesIndexRoute,
-=======
-  MainShiftShiftDetailIndexRoute: MainShiftShiftDetailIndexRoute,
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
   MainShiftShiftIndexRoute: MainShiftShiftIndexRoute,
   MainSettingsCustomersIndexLazyRoute: MainSettingsCustomersIndexLazyRoute,
   MainSettingsLocationsIndexLazyRoute: MainSettingsLocationsIndexLazyRoute,
@@ -321,12 +281,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/trip-orders': typeof MainTripOrdersIndexLazyRoute
-  '/roles': typeof MainSettingsRolesIndexRoute
-=======
-  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
   '/shift': typeof MainShiftShiftIndexRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
@@ -341,12 +296,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof MainDashboardLazyRoute
   '/transport': typeof MainTransportLazyRoute
   '/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/trip-orders': typeof MainTripOrdersIndexLazyRoute
-  '/roles': typeof MainSettingsRolesIndexRoute
-=======
-  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
   '/shift': typeof MainShiftShiftIndexRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
@@ -363,12 +313,7 @@ export interface FileRoutesById {
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/transport': typeof MainTransportLazyRoute
   '/_main/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/_main/trip-orders/': typeof MainTripOrdersIndexLazyRoute
-  '/_main/_settings/roles/': typeof MainSettingsRolesIndexRoute
-=======
-  '/_main/_shift/shift-detail/': typeof MainShiftShiftDetailIndexRoute
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
   '/_main/_shift/shift/': typeof MainShiftShiftIndexRoute
   '/_main/_settings/customers/': typeof MainSettingsCustomersIndexLazyRoute
   '/_main/_settings/locations/': typeof MainSettingsLocationsIndexLazyRoute
@@ -385,12 +330,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-<<<<<<< HEAD
     | '/trip-orders'
-    | '/roles'
-=======
-    | '/shift-detail'
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
     | '/shift'
     | '/customers'
     | '/locations'
@@ -404,12 +344,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/transport'
     | '/'
-<<<<<<< HEAD
     | '/trip-orders'
-    | '/roles'
-=======
-    | '/shift-detail'
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
     | '/shift'
     | '/customers'
     | '/locations'
@@ -424,12 +359,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard'
     | '/_main/transport'
     | '/_main/'
-<<<<<<< HEAD
     | '/_main/trip-orders/'
-    | '/_main/_settings/roles/'
-=======
-    | '/_main/_shift/shift-detail/'
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
     | '/_main/_shift/shift/'
     | '/_main/_settings/customers/'
     | '/_main/_settings/locations/'
@@ -477,12 +407,7 @@ export const routeTree = rootRoute
         "/_main/dashboard",
         "/_main/transport",
         "/_main/",
-<<<<<<< HEAD
         "/_main/trip-orders/",
-        "/_main/_settings/roles/",
-=======
-        "/_main/_shift/shift-detail/",
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
         "/_main/_shift/shift/",
         "/_main/_settings/customers/",
         "/_main/_settings/locations/",
@@ -507,17 +432,8 @@ export const routeTree = rootRoute
       "filePath": "_main/index.tsx",
       "parent": "/_main"
     },
-<<<<<<< HEAD
     "/_main/trip-orders/": {
       "filePath": "_main/trip-orders/index.lazy.tsx",
-      "parent": "/_main"
-    },
-    "/_main/_settings/roles/": {
-      "filePath": "_main/_settings/roles/index.tsx",
-=======
-    "/_main/_shift/shift-detail/": {
-      "filePath": "_main/_shift/shift-detail/index.tsx",
->>>>>>> 0b07a93fdaccfe36e1d38ef91792c6957d157ba9
       "parent": "/_main"
     },
     "/_main/_shift/shift/": {
