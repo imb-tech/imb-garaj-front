@@ -1,6 +1,14 @@
+import { useUser } from "@/constants/useUser"
 import { useLocation } from "@tanstack/react-router"
 import { ListOrdered, Settings, Truck } from "lucide-react"
 import { ReactNode, useMemo } from "react"
+
+export interface MenuItem {
+    label: string
+    icon?: ReactNode
+    path: string
+    items?: MenuItem[]
+}
 
 export interface MenuItem {
     label: string
@@ -14,44 +22,47 @@ const filterMenuItems = (
     allowedModules: string[],
 ): MenuItem[] => {
     return items.reduce<MenuItem[]>((acc, item) => {
-        const isModuleAllowed = allowedModules.includes(item.label)
-        const hasVisibleSubItems = item.items?.some(
-            (sub) =>
-                allowedModules.includes(sub.label) ||
-                sub.items?.some((subsub) =>
-                    allowedModules.includes(subsub.label),
-                ),
-        )
+        const filteredItem: MenuItem = { ...item }
 
-        if (isModuleAllowed || hasVisibleSubItems) {
-            const filteredItem: MenuItem = { ...item }
-
-            if (item.items) {
-                filteredItem.items = filterMenuItems(item.items, allowedModules)
+        if (item.items) {
+            filteredItem.items = filterMenuItems(item.items, allowedModules)
+            if (filteredItem.items.length > 0) {
+                filteredItem.path = filteredItem.items[0].path
             }
-
-            acc.push(filteredItem)
         }
 
+        // const isAllowed =
+        //     (item.allowKey &&
+        //         allowedModules.includes(item.allowKey as Action)) ||
+        //     (filteredItem.items && filteredItem.items.length > 0)
+
+        // if (isAllowed) {
+        // }
+
+        acc.push(filteredItem)
         return acc
     }, [])
 }
 
-const findChildPaths = (items: MenuItem[], currentPath: string): MenuItem[] => {
-    for (const firstLevelItem of items) {
-        if (!firstLevelItem.items) continue
+const findChildPaths = (items: MenuItem[], pathname: string): MenuItem[] => {
+    for (const item of items) {
+        if (pathname === item.path || pathname.startsWith(item.path + "/")) {
+            return item.items ?? []
+        }
 
-        for (const secondLevelItem of firstLevelItem.items) {
-            if (!secondLevelItem.items) continue
-
-            for (const thirdLevelItem of secondLevelItem.items) {
-                if (thirdLevelItem.path === currentPath) {
-                    return secondLevelItem.items
-                }
+        if (item.items) {
+            const hasMatchingChild = item.items.some(
+                (subItem) =>
+                    pathname === subItem.path ||
+                    pathname.startsWith(subItem.path + "/"),
+            )
+            if (hasMatchingChild) {
+                return item.items
             }
 
-            if (secondLevelItem.path === currentPath) {
-                return secondLevelItem.items
+            const found = findChildPaths(item.items, pathname)
+            if (found.length > 0) {
+                return found
             }
         }
     }
@@ -59,37 +70,17 @@ const findChildPaths = (items: MenuItem[], currentPath: string): MenuItem[] => {
     return []
 }
 
-const getAllPaths = (filteredItems: MenuItem[]) =>
-    filteredItems?.flatMap((item) =>
-        item.items ? item.items.map((i) => i.path) : [item.path],
-    ) || []
-
-const getAllLabels = (items: MenuItem[]): string[] => {
-    const result: string[] = []
-
-    const traverse = (items: MenuItem[]) => {
-        for (const item of items) {
-            result.push(item.label)
-            if (item.items?.length) {
-                traverse(item.items)
-            }
-        }
-    }
-
-    traverse(items)
-    return result
-}
-
 export const usePaths = () => {
-    const pathname = useLocation().pathname
+    const { pathname } = useLocation()
+    const { actions } = useUser()
+
+    const safeActions: string[] = actions ?? []
 
     const items = useItems()
 
-    const allLabels = getAllLabels(items)
-
     const filteredItems = useMemo(
-        () => filterMenuItems(items, allLabels),
-        [items, allLabels],
+        () => filterMenuItems(items, safeActions),
+        [items, safeActions],
     )
 
     const childPaths = useMemo(
@@ -97,14 +88,8 @@ export const usePaths = () => {
         [filteredItems, pathname],
     )
 
-    const allPaths = useMemo(() => getAllPaths(filteredItems), [filteredItems])
-
-    const addOrder = allLabels.includes("Buyurtmalar")
-
     return {
         childPaths,
-        allPaths,
-        addOrder,
         filteredItems,
     }
 }
@@ -122,12 +107,12 @@ export const useItems = () =>
                 icon: <Truck width={18} />,
                 path: "/shift",
             },
-              {
+            {
                 label: "Transport Info",
                 icon: <Truck width={18} />,
                 path: "/transport",
             },
-              {
+            {
                 label: "Sozlamalar",
                 icon: <Settings width={18} />,
                 path: "/locations",
@@ -148,7 +133,7 @@ export const useItems = () =>
                     //     label: "Ekspeditorlar",
                     //     path: "/settings/freight-forwarders",
                     // },
-                     {
+                    {
                         label: "Xaridorlar",
                         path: "/customers",
                     },
@@ -156,14 +141,13 @@ export const useItems = () =>
                         label: "To'lov turlari",
                         path: "/payment-types",
                     },
-                  
+
                     {
                         label: "Mijozlar",
                         path: "/customers",
                     },
                 ],
             },
-
         ],
         [],
     )
