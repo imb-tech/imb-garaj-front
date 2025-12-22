@@ -7,4 +7,6 @@ export const CLIENTS_AVAILABLE = "hr/"
 export const MANAGERS_ORDERS_CREATE = "hr/"
 export const MANAGERS_ORDERS_NEW = "hr/"
 export const SHIFTS = "hr/"
+export const LOGIN="auth/login"
+export const PROFILE="/"
 

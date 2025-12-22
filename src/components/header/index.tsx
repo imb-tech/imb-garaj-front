@@ -1,11 +1,17 @@
+import { usePaths } from "@/hooks/usePaths"
 import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { useLocation, useNavigate } from "@tanstack/react-router"
+import { NavUser } from "../sidebar/nav-user"
 import { SidebarTrigger, useSidebar } from "../ui/sidebar"
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ThemeColorToggle } from "./color-toggle"
 
-const Header = ({ type }: { type?: string }) => {
+const Header = () => {
     const { open } = useSidebar()
+    const { pathname } = useLocation()
+    const navigate = useNavigate()
+    const { childPaths } = usePaths()
+    const { isMobile } = useSidebar()
 
     return (
         <header className="p-2 gap-4 flex items-center justify-between bg-card border-b border-border max-w-full box-border">
@@ -17,28 +23,32 @@ const Header = ({ type }: { type?: string }) => {
                     )}
                 >
                     <SidebarTrigger className="text-gray-500 dark:text-white" />
-                    <h1 className="font-bold text-primary text-2xl ">GARAJ</h1>
+                    <h1 className="font-bold text-primary text-2xl ">
+                        DISTRIBUTION
+                    </h1>
                 </div>
+                {!!childPaths.length && (
+                    <Tabs
+                        className="hidden xl:flex overflow-x-auto custom-scrollbar max-w-full"
+                        value={pathname}
+                        onValueChange={(path) => navigate({ to: path })}
+                    >
+                        <TabsList className="gap-2 bg-transparent ">
+                            {childPaths?.map((link) => (
+                                <TabsTrigger key={link.label} value={link.path}>
+                                    {link.icon} {link.label}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </Tabs>
+                )}
             </div>
 
             <hgroup className="flex items-center gap-2 sm:gap-4">
                 <div className="flex sm:gap-2">
                     <ThemeColorToggle />
                 </div>
-                <DropdownMenu>
-                    <div className="relative h-10">
-                        <DropdownMenuTrigger className="!outline-none">
-                            <Avatar className="relative overflow-hidden">
-                                <AvatarImage
-                                    src={undefined}
-                                    alt="user img"
-                                    className="object-cover"
-                                />
-                                <AvatarFallback>SA</AvatarFallback>
-                            </Avatar>
-                        </DropdownMenuTrigger>
-                    </div>
-                </DropdownMenu>
+                {isMobile && <NavUser />}
             </hgroup>
         </header>
     )
