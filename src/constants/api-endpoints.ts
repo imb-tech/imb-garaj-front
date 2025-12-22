@@ -18,6 +18,7 @@ export const SETTINGS_CUSTOMERS = "common/clients"
 export const SETTINTS_PAYMENT_TYPE= "common/payment-types"
 export const SETTINGS_VEHICLE_TYPE ="common/vehicle-types"
 export const SETTINGS_CARGO_TYPE = "common/cargo-types"
+export const SETTINGS_EXPENSES = "common/expense-types"
 
 
 

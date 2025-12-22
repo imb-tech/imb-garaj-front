@@ -1,7 +1,7 @@
 import { FormCombobox } from "@/components/form/combobox"
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
-import { SETTINGS_VEHICLE_TYPE } from "@/constants/api-endpoints"
+import { SETTINGS_EXPENSES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -10,13 +10,21 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
- 
+export enum ExpenseTypeEnum {
+    TRUCK = 1,
+    ORDER = 2,
+}
+
+export const EXPENSE_TYPE_OPTIONS = [
+    { label: "Yuk mashinasi uchun", value: ExpenseTypeEnum.TRUCK },
+    { label: "Buyurtma uchun", value: ExpenseTypeEnum.ORDER },
+]
 
 const AddExpensesModal = () => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
-    const currentRole = getData<VehicleRoleType>(SETTINGS_VEHICLE_TYPE)
+    const currentRole = getData<VehicleRoleType>(SETTINGS_EXPENSES)
 
     const form = useForm<VehicleRoleType>({
         defaultValues: currentRole,
@@ -29,9 +37,9 @@ const AddExpensesModal = () => {
             `Xarajat muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
-        clearKey(SETTINGS_VEHICLE_TYPE)
+        clearKey(SETTINGS_EXPENSES)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [SETTINGS_VEHICLE_TYPE] })
+        queryClient.refetchQueries({ queryKey: [SETTINGS_EXPENSES] })
     }
 
     const { mutate: postMutate, isPending: isPendingCreate } = usePost({
@@ -45,10 +53,15 @@ const AddExpensesModal = () => {
     const isPending = isPendingCreate || isPendingUpdate
 
     const onSubmit = (values: VehicleRoleType) => {
+        const payload = {
+            ...values,
+            type: Number(String(values.type).replaceAll('"', "")),
+        }
+
         if (currentRole?.id) {
-            updateMutate(`${SETTINGS_VEHICLE_TYPE}/${currentRole.id}`, values)
+            updateMutate(`${SETTINGS_EXPENSES}/${currentRole.id}`, payload)
         } else {
-            postMutate(SETTINGS_VEHICLE_TYPE, values)
+            postMutate(SETTINGS_EXPENSES, payload)
         }
     }
 
@@ -68,7 +81,7 @@ const AddExpensesModal = () => {
                     required
                     name="type"
                     label="Xarajat turi"
-                    options={[]}
+                    options={EXPENSE_TYPE_OPTIONS}
                     control={form.control}
                     labelKey="label"
                     valueKey="value"
