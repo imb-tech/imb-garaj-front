@@ -1,4 +1,3 @@
-import { CopyButton } from "@/lib/copy-button"
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
@@ -10,7 +9,7 @@ export const useCostCols = () => {
         accessorKey: "id",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{CopyButton(row.original.id)}</span>
+          <span>{row.original.id}</span>
         ),
       },
       {
