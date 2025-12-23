@@ -1,6 +1,6 @@
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
-import { SETTINGS_ROLES } from "@/constants/api-endpoints"
+import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -9,11 +9,11 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-const  AddRolesModal = () => {
+const AddCountriesModal = () => {
     const queryClient = useQueryClient()
-    const { closeModal } = useModal("create")
+    const { closeModal } = useModal("country-modal")
     const { getData, clearKey } = useGlobalStore()
-    const currentRole = getData<RolesType>(SETTINGS_ROLES)
+    const currentRole = getData<RolesType>(SETTINGS_COUNTRIES)
 
     const form = useForm<RolesType>({
         defaultValues: currentRole,
@@ -23,12 +23,12 @@ const  AddRolesModal = () => {
 
     const onSuccess = () => {
         toast.success(
-            `Rol muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
+            `Davlat muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
-        clearKey(SETTINGS_ROLES)
+        clearKey(SETTINGS_COUNTRIES)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [SETTINGS_ROLES] })
+        queryClient.refetchQueries({ queryKey: [SETTINGS_COUNTRIES] })
     }
 
     const { mutate: postMutate, isPending: isPendingCreate } = usePost({
@@ -43,15 +43,15 @@ const  AddRolesModal = () => {
 
     const onSubmit = (values: RolesType) => {
         if (currentRole?.id) {
-            updateMutate(`${SETTINGS_ROLES}/${currentRole.id}`, values)
+            updateMutate(`${SETTINGS_COUNTRIES}/${currentRole.id}`, values)
         } else {
-            postMutate(SETTINGS_ROLES, values)
+            postMutate(SETTINGS_COUNTRIES, values)
         }
     }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <FormInput required name="name" label="Rol turi" methods={form} />
+            <FormInput required name="name" label="Davlat" methods={form} />
 
             <div className="flex items-center justify-end  mt-3">
                 <Button
@@ -66,4 +66,4 @@ const  AddRolesModal = () => {
     )
 }
 
-export default  AddRolesModal
+export default AddCountriesModal

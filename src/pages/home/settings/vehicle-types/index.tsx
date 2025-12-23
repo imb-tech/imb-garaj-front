@@ -1,67 +1,68 @@
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
-import { SETTINGS_USERS } from "@/constants/api-endpoints"
+import {  SETTINGS_VEHICLE_TYPE } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
+import { useSearch } from "@tanstack/react-router"
 import TableHeader from "../table-header"
-import AddUserModal from "./add-users"
-import { useColumnsUsersTable } from "./users-cols"
+import AddVehicleModal from "./add-vehicle"
+import { useColumnsVehicleTable } from "./vehicle-cols"
+ 
 
-const UsersPage = () => {
-    const { data, isLoading } = useGet<ListResponse<UserType>>(SETTINGS_USERS)
+const  VehicleTypePage = () => {
+    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const { data, isLoading } = useGet<ListResponse< VehicleRoleType>>(
+         SETTINGS_VEHICLE_TYPE,
+        // {
+        //     params: search,
+        // },
+    )
     const { getData, setData } = useGlobalStore()
-    const item = getData<UserType>(SETTINGS_USERS)
+    const item = getData< VehicleRoleType>( SETTINGS_VEHICLE_TYPE)
 
     const { openModal: openDeleteModal } = useModal("delete")
     const { openModal: openCreateModal } = useModal(`create`)
-    const columns = useColumnsUsersTable()
+    const columns =  useColumnsVehicleTable()
 
-    const handleDelete = (row: { original: UserType }) => {
-        setData(SETTINGS_USERS, row.original)
+    const handleDelete = (row: { original:  VehicleRoleType }) => {
+        setData( SETTINGS_VEHICLE_TYPE, row.original)
         openDeleteModal()
     }
-    const handleEdit = (item: UserType) => {
-        setData(SETTINGS_USERS, item)
+    const handleEdit = (item:  VehicleRoleType) => {
+        setData( SETTINGS_VEHICLE_TYPE, item)
         openCreateModal()
     }
     return (
         <>
             <DataTable
-                numeration
                 loading={isLoading}
                 columns={columns}
                 data={data?.results}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
+                numeration
                 paginationProps={{
                     totalPages: data?.total_pages,
                 }}
                 head={
                     <TableHeader
-                        fileName="Haydovchilar"
+                        fileName="Rollar"
                         url="excel"
-                        storeKey={SETTINGS_USERS}
+                        storeKey={ SETTINGS_VEHICLE_TYPE}
                     />
                 }
             />
-            <DeleteModal
-                path={SETTINGS_USERS}
-                refetchKeys={[SETTINGS_USERS]}
-                id={item?.id}
-            />
+            <DeleteModal path={ SETTINGS_VEHICLE_TYPE} id={item?.id} />
             <Modal
-                size="max-w-2xl"
-                title={
-                    item?.id ? " Haydovchini tahrirlash" : " Haydovchi qo'shish"
-                }
+                title={item?.id ? "Avtomobil turinni tahrirlash" : " Avtomobil qo'shish"}
                 modalKey="create"
             >
-                <AddUserModal />
+                 <AddVehicleModal/>
             </Modal>
         </>
     )
 }
 
-export default UsersPage
+export default  VehicleTypePage

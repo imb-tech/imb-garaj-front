@@ -1,6 +1,6 @@
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
-import { SETTINGS_ROLES } from "@/constants/api-endpoints"
+import { SETTINTS_PAYMENT_TYPE } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -9,26 +9,26 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-const  AddRolesModal = () => {
+const AddPaymentTypeModal = () => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
-    const currentRole = getData<RolesType>(SETTINGS_ROLES)
+    const currentPayment = getData<RolesType>(SETTINTS_PAYMENT_TYPE)
 
     const form = useForm<RolesType>({
-        defaultValues: currentRole,
+        defaultValues: currentPayment,
     })
 
     const { handleSubmit, reset } = form
 
     const onSuccess = () => {
         toast.success(
-            `Rol muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
+            `To'lov turi muvaffaqiyatli ${currentPayment?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
-        clearKey(SETTINGS_ROLES)
+        clearKey(SETTINTS_PAYMENT_TYPE)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [SETTINGS_ROLES] })
+        queryClient.refetchQueries({ queryKey: [SETTINTS_PAYMENT_TYPE] })
     }
 
     const { mutate: postMutate, isPending: isPendingCreate } = usePost({
@@ -42,16 +42,24 @@ const  AddRolesModal = () => {
     const isPending = isPendingCreate || isPendingUpdate
 
     const onSubmit = (values: RolesType) => {
-        if (currentRole?.id) {
-            updateMutate(`${SETTINGS_ROLES}/${currentRole.id}`, values)
+        if (currentPayment?.id) {
+            updateMutate(
+                `${SETTINTS_PAYMENT_TYPE}/${currentPayment.id}`,
+                values,
+            )
         } else {
-            postMutate(SETTINGS_ROLES, values)
+            postMutate(SETTINTS_PAYMENT_TYPE, values)
         }
     }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <FormInput required name="name" label="Rol turi" methods={form} />
+            <FormInput
+                required
+                name="name"
+                label="To'lov turi"
+                methods={form}
+            />
 
             <div className="flex items-center justify-end  mt-3">
                 <Button
@@ -66,4 +74,4 @@ const  AddRolesModal = () => {
     )
 }
 
-export default  AddRolesModal
+export default AddPaymentTypeModal

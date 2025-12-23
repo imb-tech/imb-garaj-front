@@ -143,13 +143,21 @@ export const useItems = () =>
                         path: "/customers",
                     },
                     {
-                        label: "To'lov turlari",
-                        path: "/payment-types",
+                        label: "Mashina turlari",
+                        path: "/vehicle-types",
                     },
 
                     {
-                        label: "Mijozlar",
-                        path: "/customers",
+                        label: "Yuk turi",
+                        path: "/cargo-types",
+                    },
+                    {
+                        label: "To'lov turlari",
+                        path: "/payment-types",
+                    },
+                    {
+                        label: "Xarajat turlari",
+                        path: "/expense-types",
                     },
                 ],
             },

@@ -56,23 +56,19 @@ type TExcelPassword = {
     password: string
 }
 
-
-
 type OptionResType = {
     id: number
     name: string
     created_at: string
     update_at: string
-    type:string
+    type: string
 }
-
 
 type SearchParamsProvinces = {
     provinces_search?: string
     provinces_page_size?: number
     provinces_page?: number
 }
-
 
 // DistrictsType
 
@@ -83,33 +79,25 @@ type DistrictsType = {
     created_at: string
 }
 
-
 type SearchParamsDistricts = {
     districts_search?: string
     districts_page_size?: number
     districts_page?: number
 }
 
-
-
-
-
-
-// Hr 
-
+// Hr
 
 type StatusType = {
     face: string
-    id: number,
-    full_name: string,
+    id: number
+    full_name: string
     user: string
-    start: string,
+    start: string
     end: string
-    comment: string,
-    response_comment: string,
+    comment: string
+    response_comment: string
     status: string | number
 }
-
 
 type PenaltyRule = {
     start: string
@@ -132,7 +120,6 @@ type FormValuesFines = {
     is_absent: boolean
 }
 
-
 type ShiftRule = {
     day: number
     work_day: boolean
@@ -150,7 +137,6 @@ type FormValuesShift = {
     days: number
     shift_days: ShiftRule[]
 }
-
 
 type FormValuesSchedule = {
     id: number
@@ -173,15 +159,14 @@ type RangeDateItem = {
 
 type MonthlySucheduleHuman = {
     face?: string
-    id: number;
-    phone_number: string | number;
-    role_name: string;
-    salary: number | string | undefined;
+    id: number
+    phone_number: string | number
+    role_name: string
+    salary: number | string | undefined
     full_name?: string
     shift_name?: string
     salary_type?: string
-};
-
+}
 
 type Department = {
     id: number
@@ -191,16 +176,34 @@ type Department = {
 }
 
 type Position = {
-  id: number;
-  name: string;
-  salary: number
-  fine: number
-  shift: number
-  fine_name?: string
-  shift_name?: string
-  count: number
-  start?:string
-  department: number
-  department_name: string
-  company_name: string
-};
+    id: number
+    name: string
+    salary: number
+    fine: number
+    shift: number
+    fine_name?: string
+    shift_name?: string
+    count: number
+    start?: string
+    department: number
+    department_name: string
+    company_name: string
+}
+
+type CustomersType = {
+    id: number
+    name: string
+    phone_number: string
+}
+type UserType = {
+    id: number
+    password: string
+    is_superuser: boolean
+    username: string
+    first_name: string
+    last_name: string
+    is_staff: boolean
+    is_active: boolean
+    role: number
+    role_name:string
+}

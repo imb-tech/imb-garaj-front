@@ -1,6 +1,5 @@
 /** ===== HR ===== */
 
-export const SETTINGS_CUSTOMERS = "hr/"
 export const CLIENT_CODES = "hr/"
 export const SELECTABLE_FILTER = "hr/"
 export const SELECTABLE_USERS = "hr/"
@@ -9,17 +8,26 @@ export const MANAGERS_ORDERS_CREATE = "hr/"
 export const MANAGERS_ORDERS_NEW = "hr/"
 export const TRIPS = "trips"
 export const TRIPS_ORDERS = "trips/orders"
-export const LOGIN="auth/login"
-export const PROFILE="/"
 
 
-export const VEHICLES="vehicles"
-
+export const VEHICLES = "vehicles"
+export const SHIFTS = "hr/"
+export const LOGIN = "auth/login"
+export const PROFILE = "/"
 
 /** ===== SETTINGS ===== */
-export const SETTINGS_CARGO_TYPES="common/cargo-types"
-export const SETTINGS_SELECTABLE_VEHICLE_TYPE = "common/selectable/vehicle-type"
+export const SETTINGS_USERS = "users"
 export const SETTINGS_ROLES = "users/roles"
+export const SETTINGS_CUSTOMERS = "common/clients"
+export const SETTINTS_PAYMENT_TYPE = "common/payment-types"
+export const SETTINGS_VEHICLE_TYPE = "common/vehicle-types"
+export const SETTINGS_CARGO_TYPE = "common/cargo-types"
+export const SETTINGS_EXPENSES = "common/expense-types"
+export const SETTINGS_COUNTRIES = "common/countries"
+export const SETTINGS_REGIONS = "common/regions"
+export const SETTINGS_DISTRICTS = "common/districts"
+export const SETTINGS_CARGO_TYPES = "common/cargo-types"
+export const SETTINGS_SELECTABLE_VEHICLE_TYPE = "common/selectable/vehicle-type"
 export const SETTINGS_SELECTABLE_USERS = "common/selectable/user"
 export const SETTINGS_SELECTABLE_CLIENT = 'common/selectable/client'
 export const SETTINGS_SELECTABLE_DISTRICT = 'common/selectable/district'
