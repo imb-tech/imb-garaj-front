@@ -28,7 +28,7 @@ const AddTripOrders = () => {
     const currentTripOrder = getData<TripOrdersRow & { id?: number }>(TRIPS_ORDERS)
     const params = useParams({ strict: false },)
     const tripId = params?.id
-    
+
     const { data: districtsData } = useGet<DistrictType[]>(SETTINGS_SELECTABLE_DISTRICT, {
         params: {
             model_name: "district"
@@ -81,35 +81,37 @@ const AddTripOrders = () => {
 
     const isPending = creating || updating
 
-    const onSubmit = (data: TripOrdersRow) => {
-        const {
-            currency,
-            currency_course,
-            amount,
-            payment_type,
-            ...rest
-        } = data
+   const onSubmit = (data: TripOrdersRow) => {
+    const {
+        currency,
+        currency_course,
+        amount,
+        payment_type,
+        ...rest
+    } = data
 
-        const formattedData = {
-            ...rest,
-            trip: tripId,
-            payments: [
-                {
-                    currency,
-                    currency_course: String(currency_course),
-                    amount: String(amount),
-                    payment_type,
-                },
-            ],
-        }
-
-        if (currentTripOrder?.id) {
-            update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
-        } else {
-            create(TRIPS_ORDERS, formattedData)
-        }
+    const payment: any = {
+        currency,
+        amount: String(amount),
+        payment_type,
     }
 
+    if (currency === 2) {
+        payment.currency_course = String(currency_course)
+    }
+
+    const formattedData = {
+        ...rest,
+        trip: tripId,
+        payments: [payment],
+    }
+
+    if (currentTripOrder?.id) {
+        update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
+    } else {
+        create(TRIPS_ORDERS, formattedData)
+    }
+}
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
@@ -201,7 +203,6 @@ const AddTripOrders = () => {
             />
             {selectedCurrency === 2 && (
                 <FormNumberInput
-                    required
                     thousandSeparator=" "
                     name="currency_course"
                     label="Valyuta kursi"
