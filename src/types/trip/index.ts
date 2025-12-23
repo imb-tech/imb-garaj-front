@@ -1,38 +1,41 @@
 interface TripFormData {
-    driver: number | string // adjust to number if IDs are numbers
-    vehicle: number | string
-    start: Date
-    type: number | string
+  driver: number | string 
+  vehicle: number | string
+  start: Date
+  type: number | string
 }
 
 
 type CardMain = {
-    current_balance: number
-    current_balance_perc: number
-    difference: number
-    difference_perc: number
-    expenses: number
-    expense_perc: number
-    incomes: number
-    income_perc: number
+  current_balance: number
+  current_balance_perc: number
+  difference: number
+  difference_perc: number
+  expenses: number
+  expense_perc: number
+  incomes: number
+  income_perc: number
 }
 
 type TripRow = {
-  id: number|string;
-  created: string; // ISO datetime string
-  updated: string; // ISO datetime string
+  vehicle_number: string | number
+  driver_name: string | number
+  orders_count: string | number
+  id: number | string;
+  created: string;
+  updated: string;
   status: number;
   type: number;
-  start: string; // YYYY-MM-DD date string
-  end: string | null; // YYYY-MM-DD or null if ongoing
-  driver: number; // driver ID
-  vehicle: number; // vehicle ID
+  start: string;
+  end: string | null;
+  driver: number;
+  vehicle: number;
 }
 
-type Truck ={
+type Truck = {
   id: number;
-  created: string; // ISO 8601 datetime string
-  updated: string; // ISO 8601 datetime string
+  created: string;
+  updated: string;
   truck_number: string;
   truck_passport: string;
   trailer_number: string | null;
@@ -44,29 +47,47 @@ type Truck ={
 
 type CargoItem = {
   id: number;
-  created: string; 
-  updated: string; 
+  created: string;
+  updated: string;
   name: string;
 };
 
 type TripsOrders = {
-  id?:string|number
+  id?: string | number
   loading: number
   unloading: number
   trip: number
 }
 
-type DistrictType ={
-  name:string,
-  id:number|number
+type DistrictType = {
+  name: string,
+  id: number | number
 }
 
 type TripOrdersRow = {
+  cargo_type_name: string
+  loading_name: string
+  unloading_name: string
   id: number
-  created: string // ISO datetime
+  created: string
   updated: string
   loading: number
   unloading: number
   trip: number
-  cargo_type: number | null
+  cargo_type: string | number
+  date: string | number
+  client: string
+  payment_type: string | number
+  currency: number | number,
+  currency_course: number | string,
+  amount: number | string,
+  type: number | string
+ payments: [
+  {
+    currency: number
+    currency_course: string
+    amount: string
+  }
+]
+
 }

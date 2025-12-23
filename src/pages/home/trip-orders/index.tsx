@@ -5,7 +5,7 @@ import Modal from "@/components/custom/modal"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useMatch, useNavigate } from "@tanstack/react-router"
+import { useMatch, useNavigate, useSearch } from "@tanstack/react-router"
 import { formatMoney } from "@/lib/format-money"
 import { useCostCols } from "./cols"
 import DeleteModal from "@/components/custom/delete-modal"
@@ -21,17 +21,15 @@ const TripOrderMain = () => {
   const { openModal: openDeleteModal } = useModal("delete")
   const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
-  const match = useMatch({
-    from: "/_main/_trip/trip-orders/$id",
-    shouldThrow: false,
-  })
+  const search = useSearch({ strict:false },)
+  const tripId = search?.id
 
-  const tripId = match?.params?.id
   const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(TRIPS_ORDERS, {
     params: {
       trip: tripId,
     },
   })
+
 
 
   const columns = useCostCols()
@@ -41,18 +39,18 @@ const TripOrderMain = () => {
     openCreateModal()
   }
 
-  const handleEdit = (item:TripsOrders) => {
+  const handleEdit = (item: TripOrdersRow) => {
     setData(TRIPS_ORDERS, item)
     openCreateModal()
   }
 
-  const handleDelete = (row: { original:TripsOrders }) => {
+  const handleDelete = (row: { original: TripOrdersRow }) => {
     setData(TRIPS_ORDERS, row.original)
     openDeleteModal()
   }
 
-  const handleRowClick = (row: { original: TripsOrders }) => {
-    const id = row.original.id
+  const handleRowClick = (item: TripOrdersRow) => {
+    const id = item?.id
     if (!id) return
     navigate({
       to: "/trip-orders/$id",
@@ -93,7 +91,7 @@ const TripOrderMain = () => {
         modalKey="create"
         size="max-w-2xl"
         classNameTitle="font-medium text-xl"
-        title={`Reys ${currentTripsOrder?.id ? "tahrirlash" : "qo'shish"}`}
+        title={`Buyurtma ${currentTripsOrder?.id ? "tahrirlash" : "qo'shish"}`}
       >
         <div className="max-h-[80vh] overflow-y-auto p-0.5">
           <AddTripOrders />
