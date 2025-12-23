@@ -19,24 +19,19 @@ const AddTrip = () => {
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create")
     const { data: vehicleData } = useGet<ListResponse<Truck>>(VEHICLES)
-    const { data: driversData } = useGet<ListResponse<CargoItem>>(SETTINGS_SELECTABLE_USERS, {
+    const { data: driversData } = useGet<ListResponse<any>>(SETTINGS_SELECTABLE_USERS, {
         params: {
             role: "1"
         }
     })
 
-
-
-
-
     const currentShift = getData<TripFormData & { id?: number }>(TRIPS)
 
     const form = useForm<TripFormData>({
         defaultValues: {
-            driver: currentShift?.driver ?? "",
-            vehicle: currentShift?.vehicle ?? "",
+            driver: currentShift?.driver,
+            vehicle: currentShift?.vehicle,
             start: currentShift?.start,
-            type: currentShift?.type ?? "",
         },
     })
 
@@ -111,7 +106,7 @@ const AddTrip = () => {
                     label="Haydovchi"
                     name="driver"
                     control={control}
-                    options={driversData}
+                    options={driversData?.results}
                     valueKey="id"
                     labelKey="first_name"
                     placeholder="Haydovchi tanlang"
