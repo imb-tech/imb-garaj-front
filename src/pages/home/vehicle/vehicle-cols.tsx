@@ -6,7 +6,7 @@ export const useColumnsRolesTable = () => {
         () => [
             {
                 accessorKey: "name",
-                header: "Rol turi",
+                header: "F.I.O",
                 enableSorting: true,
             },
         ],

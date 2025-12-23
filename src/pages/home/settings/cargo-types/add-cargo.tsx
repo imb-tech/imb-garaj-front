@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-const  AddRolesModal = () => {
+const AddCargoModal = () => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
@@ -23,7 +23,7 @@ const  AddRolesModal = () => {
 
     const onSuccess = () => {
         toast.success(
-            `Rol muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
+            `Yuk turi muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
         clearKey(SETTINGS_ROLES)
@@ -51,7 +51,7 @@ const  AddRolesModal = () => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <FormInput required name="name" label="Rol turi" methods={form} />
+            <FormInput required name="name" label="Yuk turi" methods={form} />
 
             <div className="flex items-center justify-end  mt-3">
                 <Button
@@ -66,4 +66,4 @@ const  AddRolesModal = () => {
     )
 }
 
-export default  AddRolesModal
+export default AddCargoModal

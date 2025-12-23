@@ -1,13 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
-export const useColumnsRolesTable = () => {
+export const useColumnsCountriesTable = () => {
     return useMemo<ColumnDef<RolesType>[]>(
         () => [
             {
-                accessorKey: "name",
-                header: "Rol turi",
-                enableSorting: true,
+                header: "№",
+            },
+            {
+                header: "Davlat nomi",
             },
         ],
         [],
