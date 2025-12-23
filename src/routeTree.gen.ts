@@ -25,16 +25,13 @@ const MainVehicleLazyImport = createFileRoute('/_main/vehicle')()
 const MainTransportLazyImport = createFileRoute('/_main/transport')()
 const MainDashboardLazyImport = createFileRoute('/_main/dashboard')()
 const AuthAuthLazyImport = createFileRoute('/_auth/auth')()
-<<<<<<< HEAD
 const MainTrucksTruckIndexLazyImport = createFileRoute(
   '/_main/_trucks/truck/',
 )()
 const MainTripTripIndexLazyImport = createFileRoute('/_main/_trip/trip/')()
-=======
 const MainSettingsVehicleTypesIndexLazyImport = createFileRoute(
   '/_main/_settings/vehicle-types/',
 )()
->>>>>>> origin/sevara
 const MainSettingsUsersIndexLazyImport = createFileRoute(
   '/_main/_settings/users/',
 )()
@@ -98,7 +95,6 @@ const AuthAuthLazyRoute = AuthAuthLazyImport.update({
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/auth.lazy').then((d) => d.Route))
 
-<<<<<<< HEAD
 const MainTrucksTruckIndexLazyRoute = MainTrucksTruckIndexLazyImport.update({
   path: '/truck/',
   getParentRoute: () => MainRoute,
@@ -112,7 +108,7 @@ const MainTripTripIndexLazyRoute = MainTripTripIndexLazyImport.update({
 } as any).lazy(() =>
   import('./routes/_main/_trip/trip/index.lazy').then((d) => d.Route),
 )
-=======
+
 const MainSettingsVehicleTypesIndexLazyRoute =
   MainSettingsVehicleTypesIndexLazyImport.update({
     path: '/vehicle-types/',
@@ -122,7 +118,6 @@ const MainSettingsVehicleTypesIndexLazyRoute =
       (d) => d.Route,
     ),
   )
->>>>>>> origin/sevara
 
 const MainSettingsUsersIndexLazyRoute = MainSettingsUsersIndexLazyImport.update(
   {
@@ -182,10 +177,6 @@ const MainSettingsCustomersIndexLazyRoute =
     ),
   )
 
-<<<<<<< HEAD
-const MainTrucksTruckDetailIdRoute = MainTrucksTruckDetailIdImport.update({
-  path: '/truck-detail/$id',
-=======
 const MainSettingsCargoTypesIndexLazyRoute =
   MainSettingsCargoTypesIndexLazyImport.update({
     path: '/cargo-types/',
@@ -196,9 +187,8 @@ const MainSettingsCargoTypesIndexLazyRoute =
     ),
   )
 
-const MainShiftShiftIndexRoute = MainShiftShiftIndexImport.update({
-  path: '/shift/',
->>>>>>> origin/sevara
+const MainTrucksTruckDetailIdRoute = MainTrucksTruckDetailIdImport.update({
+  path: '/truck-detail/$id',
   getParentRoute: () => MainRoute,
 } as any)
 
@@ -323,7 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSettingsUsersIndexLazyImport
       parentRoute: typeof MainImport
     }
-<<<<<<< HEAD
+    '/_main/_settings/vehicle-types/': {
+      id: '/_main/_settings/vehicle-types/'
+      path: '/vehicle-types'
+      fullPath: '/vehicle-types'
+      preLoaderRoute: typeof MainSettingsVehicleTypesIndexLazyImport
+      parentRoute: typeof MainImport
+    }
     '/_main/_trip/trip/': {
       id: '/_main/_trip/trip/'
       path: '/trip'
@@ -336,13 +332,6 @@ declare module '@tanstack/react-router' {
       path: '/truck'
       fullPath: '/truck'
       preLoaderRoute: typeof MainTrucksTruckIndexLazyImport
-=======
-    '/_main/_settings/vehicle-types/': {
-      id: '/_main/_settings/vehicle-types/'
-      path: '/vehicle-types'
-      fullPath: '/vehicle-types'
-      preLoaderRoute: typeof MainSettingsVehicleTypesIndexLazyImport
->>>>>>> origin/sevara
       parentRoute: typeof MainImport
     }
   }
@@ -365,26 +354,18 @@ interface MainRouteChildren {
   MainTransportLazyRoute: typeof MainTransportLazyRoute
   MainVehicleLazyRoute: typeof MainVehicleLazyRoute
   MainIndexRoute: typeof MainIndexRoute
-<<<<<<< HEAD
   MainTripTripOrdersIdRoute: typeof MainTripTripOrdersIdRoute
   MainTrucksTruckDetailIdRoute: typeof MainTrucksTruckDetailIdRoute
-=======
-  MainShiftShiftDetailIndexRoute: typeof MainShiftShiftDetailIndexRoute
-  MainShiftShiftIndexRoute: typeof MainShiftShiftIndexRoute
   MainSettingsCargoTypesIndexLazyRoute: typeof MainSettingsCargoTypesIndexLazyRoute
->>>>>>> origin/sevara
   MainSettingsCustomersIndexLazyRoute: typeof MainSettingsCustomersIndexLazyRoute
   MainSettingsExpenseTypesIndexLazyRoute: typeof MainSettingsExpenseTypesIndexLazyRoute
   MainSettingsLocationsIndexLazyRoute: typeof MainSettingsLocationsIndexLazyRoute
   MainSettingsPaymentTypesIndexLazyRoute: typeof MainSettingsPaymentTypesIndexLazyRoute
   MainSettingsRolesIndexLazyRoute: typeof MainSettingsRolesIndexLazyRoute
   MainSettingsUsersIndexLazyRoute: typeof MainSettingsUsersIndexLazyRoute
-<<<<<<< HEAD
+  MainSettingsVehicleTypesIndexLazyRoute: typeof MainSettingsVehicleTypesIndexLazyRoute
   MainTripTripIndexLazyRoute: typeof MainTripTripIndexLazyRoute
   MainTrucksTruckIndexLazyRoute: typeof MainTrucksTruckIndexLazyRoute
-=======
-  MainSettingsVehicleTypesIndexLazyRoute: typeof MainSettingsVehicleTypesIndexLazyRoute
->>>>>>> origin/sevara
 }
 
 const MainRouteChildren: MainRouteChildren = {
@@ -392,14 +373,9 @@ const MainRouteChildren: MainRouteChildren = {
   MainTransportLazyRoute: MainTransportLazyRoute,
   MainVehicleLazyRoute: MainVehicleLazyRoute,
   MainIndexRoute: MainIndexRoute,
-<<<<<<< HEAD
   MainTripTripOrdersIdRoute: MainTripTripOrdersIdRoute,
   MainTrucksTruckDetailIdRoute: MainTrucksTruckDetailIdRoute,
-=======
-  MainShiftShiftDetailIndexRoute: MainShiftShiftDetailIndexRoute,
-  MainShiftShiftIndexRoute: MainShiftShiftIndexRoute,
   MainSettingsCargoTypesIndexLazyRoute: MainSettingsCargoTypesIndexLazyRoute,
->>>>>>> origin/sevara
   MainSettingsCustomersIndexLazyRoute: MainSettingsCustomersIndexLazyRoute,
   MainSettingsExpenseTypesIndexLazyRoute:
     MainSettingsExpenseTypesIndexLazyRoute,
@@ -408,13 +384,10 @@ const MainRouteChildren: MainRouteChildren = {
     MainSettingsPaymentTypesIndexLazyRoute,
   MainSettingsRolesIndexLazyRoute: MainSettingsRolesIndexLazyRoute,
   MainSettingsUsersIndexLazyRoute: MainSettingsUsersIndexLazyRoute,
-<<<<<<< HEAD
-  MainTripTripIndexLazyRoute: MainTripTripIndexLazyRoute,
-  MainTrucksTruckIndexLazyRoute: MainTrucksTruckIndexLazyRoute,
-=======
   MainSettingsVehicleTypesIndexLazyRoute:
     MainSettingsVehicleTypesIndexLazyRoute,
->>>>>>> origin/sevara
+  MainTripTripIndexLazyRoute: MainTripTripIndexLazyRoute,
+  MainTrucksTruckIndexLazyRoute: MainTrucksTruckIndexLazyRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
@@ -426,26 +399,18 @@ export interface FileRoutesByFullPath {
   '/transport': typeof MainTransportLazyRoute
   '/vehicle': typeof MainVehicleLazyRoute
   '/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/trip-orders/$id': typeof MainTripTripOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-=======
-  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
-  '/shift': typeof MainShiftShiftIndexRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
->>>>>>> origin/sevara
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/expense-types': typeof MainSettingsExpenseTypesIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
   '/payment-types': typeof MainSettingsPaymentTypesIndexLazyRoute
   '/roles': typeof MainSettingsRolesIndexLazyRoute
   '/users': typeof MainSettingsUsersIndexLazyRoute
-<<<<<<< HEAD
+  '/vehicle-types': typeof MainSettingsVehicleTypesIndexLazyRoute
   '/trip': typeof MainTripTripIndexLazyRoute
   '/truck': typeof MainTrucksTruckIndexLazyRoute
-=======
-  '/vehicle-types': typeof MainSettingsVehicleTypesIndexLazyRoute
->>>>>>> origin/sevara
 }
 
 export interface FileRoutesByTo {
@@ -455,26 +420,18 @@ export interface FileRoutesByTo {
   '/transport': typeof MainTransportLazyRoute
   '/vehicle': typeof MainVehicleLazyRoute
   '/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/trip-orders/$id': typeof MainTripTripOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-=======
-  '/shift-detail': typeof MainShiftShiftDetailIndexRoute
-  '/shift': typeof MainShiftShiftIndexRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
->>>>>>> origin/sevara
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
   '/expense-types': typeof MainSettingsExpenseTypesIndexLazyRoute
   '/locations': typeof MainSettingsLocationsIndexLazyRoute
   '/payment-types': typeof MainSettingsPaymentTypesIndexLazyRoute
   '/roles': typeof MainSettingsRolesIndexLazyRoute
   '/users': typeof MainSettingsUsersIndexLazyRoute
-<<<<<<< HEAD
+  '/vehicle-types': typeof MainSettingsVehicleTypesIndexLazyRoute
   '/trip': typeof MainTripTripIndexLazyRoute
   '/truck': typeof MainTrucksTruckIndexLazyRoute
-=======
-  '/vehicle-types': typeof MainSettingsVehicleTypesIndexLazyRoute
->>>>>>> origin/sevara
 }
 
 export interface FileRoutesById {
@@ -486,26 +443,18 @@ export interface FileRoutesById {
   '/_main/transport': typeof MainTransportLazyRoute
   '/_main/vehicle': typeof MainVehicleLazyRoute
   '/_main/': typeof MainIndexRoute
-<<<<<<< HEAD
   '/_main/_trip/trip-orders/$id': typeof MainTripTripOrdersIdRoute
   '/_main/_trucks/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
-=======
-  '/_main/_shift/shift-detail/': typeof MainShiftShiftDetailIndexRoute
-  '/_main/_shift/shift/': typeof MainShiftShiftIndexRoute
   '/_main/_settings/cargo-types/': typeof MainSettingsCargoTypesIndexLazyRoute
->>>>>>> origin/sevara
   '/_main/_settings/customers/': typeof MainSettingsCustomersIndexLazyRoute
   '/_main/_settings/expense-types/': typeof MainSettingsExpenseTypesIndexLazyRoute
   '/_main/_settings/locations/': typeof MainSettingsLocationsIndexLazyRoute
   '/_main/_settings/payment-types/': typeof MainSettingsPaymentTypesIndexLazyRoute
   '/_main/_settings/roles/': typeof MainSettingsRolesIndexLazyRoute
   '/_main/_settings/users/': typeof MainSettingsUsersIndexLazyRoute
-<<<<<<< HEAD
+  '/_main/_settings/vehicle-types/': typeof MainSettingsVehicleTypesIndexLazyRoute
   '/_main/_trip/trip/': typeof MainTripTripIndexLazyRoute
   '/_main/_trucks/truck/': typeof MainTrucksTruckIndexLazyRoute
-=======
-  '/_main/_settings/vehicle-types/': typeof MainSettingsVehicleTypesIndexLazyRoute
->>>>>>> origin/sevara
 }
 
 export interface FileRouteTypes {
@@ -517,26 +466,18 @@ export interface FileRouteTypes {
     | '/transport'
     | '/vehicle'
     | '/'
-<<<<<<< HEAD
     | '/trip-orders/$id'
     | '/truck-detail/$id'
-=======
-    | '/shift-detail'
-    | '/shift'
     | '/cargo-types'
->>>>>>> origin/sevara
     | '/customers'
     | '/expense-types'
     | '/locations'
     | '/payment-types'
     | '/roles'
     | '/users'
-<<<<<<< HEAD
+    | '/vehicle-types'
     | '/trip'
     | '/truck'
-=======
-    | '/vehicle-types'
->>>>>>> origin/sevara
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
@@ -545,26 +486,18 @@ export interface FileRouteTypes {
     | '/transport'
     | '/vehicle'
     | '/'
-<<<<<<< HEAD
     | '/trip-orders/$id'
     | '/truck-detail/$id'
-=======
-    | '/shift-detail'
-    | '/shift'
     | '/cargo-types'
->>>>>>> origin/sevara
     | '/customers'
     | '/expense-types'
     | '/locations'
     | '/payment-types'
     | '/roles'
     | '/users'
-<<<<<<< HEAD
+    | '/vehicle-types'
     | '/trip'
     | '/truck'
-=======
-    | '/vehicle-types'
->>>>>>> origin/sevara
   id:
     | '__root__'
     | '/_auth'
@@ -574,26 +507,18 @@ export interface FileRouteTypes {
     | '/_main/transport'
     | '/_main/vehicle'
     | '/_main/'
-<<<<<<< HEAD
     | '/_main/_trip/trip-orders/$id'
     | '/_main/_trucks/truck-detail/$id'
-=======
-    | '/_main/_shift/shift-detail/'
-    | '/_main/_shift/shift/'
     | '/_main/_settings/cargo-types/'
->>>>>>> origin/sevara
     | '/_main/_settings/customers/'
     | '/_main/_settings/expense-types/'
     | '/_main/_settings/locations/'
     | '/_main/_settings/payment-types/'
     | '/_main/_settings/roles/'
     | '/_main/_settings/users/'
-<<<<<<< HEAD
+    | '/_main/_settings/vehicle-types/'
     | '/_main/_trip/trip/'
     | '/_main/_trucks/truck/'
-=======
-    | '/_main/_settings/vehicle-types/'
->>>>>>> origin/sevara
   fileRoutesById: FileRoutesById
 }
 
@@ -636,26 +561,18 @@ export const routeTree = rootRoute
         "/_main/transport",
         "/_main/vehicle",
         "/_main/",
-<<<<<<< HEAD
         "/_main/_trip/trip-orders/$id",
         "/_main/_trucks/truck-detail/$id",
-=======
-        "/_main/_shift/shift-detail/",
-        "/_main/_shift/shift/",
         "/_main/_settings/cargo-types/",
->>>>>>> origin/sevara
         "/_main/_settings/customers/",
         "/_main/_settings/expense-types/",
         "/_main/_settings/locations/",
         "/_main/_settings/payment-types/",
         "/_main/_settings/roles/",
         "/_main/_settings/users/",
-<<<<<<< HEAD
+        "/_main/_settings/vehicle-types/",
         "/_main/_trip/trip/",
         "/_main/_trucks/truck/"
-=======
-        "/_main/_settings/vehicle-types/"
->>>>>>> origin/sevara
       ]
     },
     "/_auth/auth": {
@@ -714,17 +631,16 @@ export const routeTree = rootRoute
       "filePath": "_main/_settings/users/index.lazy.tsx",
       "parent": "/_main"
     },
-<<<<<<< HEAD
+    "/_main/_settings/vehicle-types/": {
+      "filePath": "_main/_settings/vehicle-types/index.lazy.tsx",
+      "parent": "/_main"
+    },
     "/_main/_trip/trip/": {
       "filePath": "_main/_trip/trip/index.lazy.tsx",
       "parent": "/_main"
     },
     "/_main/_trucks/truck/": {
       "filePath": "_main/_trucks/truck/index.lazy.tsx",
-=======
-    "/_main/_settings/vehicle-types/": {
-      "filePath": "_main/_settings/vehicle-types/index.lazy.tsx",
->>>>>>> origin/sevara
       "parent": "/_main"
     }
   }
