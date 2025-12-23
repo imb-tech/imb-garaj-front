@@ -20,3 +20,4 @@ export const SETTINGS_EXPENSES = "common/expense-types"
 export const SETTINGS_COUNTRIES = "common/countries"
 export const SETTINGS_REGIONS = "common/regions"
 export const SETTINGS_DISTRICTS = "common/districts"
+ 

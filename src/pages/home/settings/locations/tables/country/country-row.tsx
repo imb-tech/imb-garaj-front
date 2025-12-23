@@ -9,8 +9,8 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate } from "@tanstack/react-router"
 import { ChevronDown, MoreVertical, Pencil, Trash2 } from "lucide-react"
+import { useState } from "react"
 import { CountriesDetailRow } from "../table-detail"
 
 interface CountryRowTableType {
@@ -24,12 +24,10 @@ export const CountryRowTable = ({
     index,
     colSpan,
 }: CountryRowTableType) => {
-    // const search = useSearch({ from: "/_main/_settings/locations/" })
     const { setData } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("country-modal")
     const { openModal: openDeleteModal } = useModal("delete")
-    // const { country, ...otherSearchParams } = search
-    const navigate = useNavigate()
+    const [isExpanded, setIsExpanded] = useState(false)
 
     const cols = [
         {
@@ -38,11 +36,7 @@ export const CountryRowTable = ({
     ]
 
     const handleRowClick = () => {
-        // const hasId = country === String(countries.id)
-
-        navigate({
-            to: "/locations",
-        })
+        setIsExpanded(!isExpanded)
     }
 
     const handleEdit = (e: React.MouseEvent) => {
@@ -62,17 +56,13 @@ export const CountryRowTable = ({
     return (
         <>
             <TableRow
-                className={`cursor-pointer ${String(countries.id) ? "bg-secondary" : ""}`}
+                className={`cursor-pointer ${isExpanded ? "bg-secondary" : ""}`}
                 onClick={handleRowClick}
             >
                 <TableCell>{index + 1}</TableCell>
 
                 {cols.map((cell, i) => (
-                    <TableCell key={i}>
-                        <div className="flex items-center gap-[5px] bg-secondary whitespace-nowrap rounded-lg px-3 py-2">
-                            {cell?.value}
-                        </div>
-                    </TableCell>
+                    <TableCell key={i}>{cell?.value}</TableCell>
                 ))}
 
                 <TableCell className="p-0 text-right">
@@ -114,20 +104,21 @@ export const CountryRowTable = ({
                         }}
                     >
                         <ChevronDown
-                            className={`h-5 w-5 transition-transform 
-                                 "rotate-180"
-                                :   ""
+                            className={`h-5 w-5 transition-transform ${
+                                isExpanded ? "rotate-180" : ""
                             }`}
                         />
                     </Button>
                 </TableCell>
             </TableRow>
 
-            <TableRow>
-                <TableCell colSpan={totalColSpan} className="p-0">
-                    <CountriesDetailRow countries={countries} />
-                </TableCell>
-            </TableRow>
+            {isExpanded && (
+                <TableRow>
+                    <TableCell colSpan={totalColSpan} className="p-0">
+                        <CountriesDetailRow country_id={parseInt(countries.id)} />
+                    </TableCell>
+                </TableRow>
+            )}
         </>
     )
 }

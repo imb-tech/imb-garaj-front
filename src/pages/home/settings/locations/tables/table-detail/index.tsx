@@ -1,36 +1,16 @@
-import { SETTINGS_DISTRICTS } from "@/constants/api-endpoints"
-import { useGet } from "@/hooks/useGet"
-import { useNavigate } from "@tanstack/react-router"
+import DistrictsTable from "./districts"
+import RegionsTable from "./regions"
 
 interface CountriesDetailRow {
-    countries: RolesType
+    country_id: number
 }
 
-export const CountriesDetailRow = ({ countries }: CountriesDetailRow) => {
-    const navigate = useNavigate()
-    // const search = useSearch({ from: "/_main/_settings/locations/" })
-    const { data } = useGet<ListResponse<RolesType>>(
-        `${SETTINGS_DISTRICTS}/${countries.id}`,
-        {
-            enabled: !!countries.id,
-        },
-    )
-
-    // useEffect(() => {
-    //     if (data?.results.length) {
-    //         const orderUuid = data?.results?.[0]?.id
-    //         navigate({
-    //             to: "/locations",
-    //             search: { ...search, country:  },
-    //         })
-    //     }
-    // }, [data])
-
+export const CountriesDetailRow = ({ country_id }: CountriesDetailRow) => {
     return (
         <div className="py-3 px-2">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4  ">
-                {/* <LeftSideCars />
-                <RightSideCars /> */}
+                <RegionsTable country_id={country_id} />
+                <DistrictsTable />
             </div>
         </div>
     )

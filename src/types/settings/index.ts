@@ -205,5 +205,23 @@ type UserType = {
     is_staff: boolean
     is_active: boolean
     role: number
-    role_name:string
+    role_name: string
+}
+
+// SETTING/LOCATION
+
+// regions
+
+type RegionsType = {
+    id: number
+    name: string
+    country: number
+}
+
+// district
+
+type SettingsDistrictType = {
+    id: number
+    name: string
+    region: number
 }
