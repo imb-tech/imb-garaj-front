@@ -4,10 +4,10 @@ import { DataTable } from "@/components/ui/datatable"
 import { SETTINGS_REGIONS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
-import TableHeader from "@/pages/home/settings/table-header"
 import { useGlobalStore } from "@/store/global-store"
 import { useMatch, useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
+import TableHeaderLocation from "../../table-header"
 import AddRegionsModal from "./add-regions"
 import { useColumnsRegionsTable } from "./regions-cols"
 
@@ -30,7 +30,7 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     const item = getData<RegionsType>(SETTINGS_REGIONS)
 
     const { openModal: openDeleteModal } = useModal("delete")
-    const { openModal: openCreateModal } = useModal("create")
+    const { openModal: openCreateModal } = useModal("create-region")
     const columns = useColumnsRegionsTable()
 
     const handleDelete = (row: { original: RegionsType }) => {
@@ -63,10 +63,11 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                 onEdit={({ original }) => handleEdit(original)}
                 numeration={true}
                 head={
-                    <TableHeader
+                    <TableHeaderLocation
                         fileName="Viloyatlar"
                         url="excel"
                         storeKey={SETTINGS_REGIONS}
+                        modalKey="create-region"
                     />
                 }
             />
@@ -74,9 +75,9 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
             <Modal
                 size="max-w-2xl"
                 title={`Viloyat ${item?.id ? "tahrirlash" : "qo'shish"}`}
-                modalKey={"create"}
+                modalKey={"create-region"}
             >
-                <AddRegionsModal />
+                <AddRegionsModal  />
             </Modal>
         </>
     )

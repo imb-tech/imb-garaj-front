@@ -9,6 +9,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
+import { useNavigate } from "@tanstack/react-router"
 import { ChevronDown, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { CountriesDetailRow } from "../table-detail"
@@ -24,6 +25,7 @@ export const CountryRowTable = ({
     index,
     colSpan,
 }: CountryRowTableType) => {
+    const navigate = useNavigate()
     const { setData } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("country-modal")
     const { openModal: openDeleteModal } = useModal("delete")
@@ -36,6 +38,7 @@ export const CountryRowTable = ({
     ]
 
     const handleRowClick = () => {
+        navigate({ to: "/locations", params: { country: countries.id } })
         setIsExpanded(!isExpanded)
     }
 
@@ -115,7 +118,9 @@ export const CountryRowTable = ({
             {isExpanded && (
                 <TableRow>
                     <TableCell colSpan={totalColSpan} className="p-0">
-                        <CountriesDetailRow country_id={parseInt(countries.id)} />
+                        <CountriesDetailRow
+                            country_id={parseInt(countries.id)}
+                        />
                     </TableCell>
                 </TableRow>
             )}

@@ -14,7 +14,7 @@ type User = {
     uuid: string
     full_name: string
     phone: string | null
-    actions: unknown | null
+    actions: string[]
     username: string
 }
 

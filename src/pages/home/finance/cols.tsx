@@ -1,0 +1,89 @@
+import { CopyButton } from "@/lib/copy-button";
+import { ColumnDef } from "@tanstack/react-table";
+import { Truck } from "lucide-react";
+import { useMemo } from "react";
+
+
+export const useCostCols = () => {
+  return useMemo<ColumnDef<Truck>[]>(() => [
+    {
+      header: "Transport ID",
+      accessorKey: "id",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2 font-medium">
+          <Truck className="w-4 h-4 text-muted-foreground" />
+          {row.original.id}
+        </div>
+      ),
+    },
+    {
+      header: "Avtoraqam",
+      accessorKey: "truck_number",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="font-semibold uppercase">
+          {row.original.truck_number}
+        </span>
+      ),
+    },
+    {
+      header: "Transport turi",
+      accessorKey: "truck_type",
+      enableSorting: true,
+      cell: ({ row }) => {
+        // You can adjust the mapping based on your actual truck_type values
+        const typeMap: Record<number, string> = {
+          1: "Fura",
+          2: "Tent",
+          3: "Refrigerator",
+          4: "Yengil yuk",
+        };
+        return <span>{typeMap[row.original.truck_type] || "Noma'lum"}</span>;
+      },
+    },
+    {
+      header: "Yoqilg'i turi",
+      accessorKey: "fuel",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="capitalize">{row.original.fuel}</span>
+      ),
+    },
+    {
+      header: "Pasport raqami",
+      accessorKey: "truck_passport",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="font-mono text-sm">{row.original.truck_passport}</span>
+      ),
+    },
+    {
+      header: "Tirkama raqami",
+      accessorKey: "trailer_number",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">
+          {row.original.trailer_number || "—"}
+        </span>
+      ),
+    },
+    {
+      header: "Haydovchi ID",
+      accessorKey: "driver",
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="font-medium">#{row.original.driver}</span>
+      ),
+    },
+    {
+      header: "Yaratilgan sana",
+      accessorKey: "created",
+      enableSorting: true,
+      cell: ({ row }) => {
+        const date = new Date(row.original.created);
+        return <span>{date.toLocaleDateString("uz-UZ")}</span>;
+      },
+    },
+  ], []);
+};

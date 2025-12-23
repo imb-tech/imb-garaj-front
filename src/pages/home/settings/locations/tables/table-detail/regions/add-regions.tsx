@@ -14,7 +14,7 @@ import { toast } from "sonner"
 
 const AddRegionsModal = () => {
     const queryClient = useQueryClient()
-    const { closeModal } = useModal("create")
+    const { closeModal } = useModal("create-region")
     const { getData, clearKey } = useGlobalStore()
     const { data: countries } =
         useGet<ListResponse<RolesType>>(SETTINGS_COUNTRIES)

@@ -18,8 +18,8 @@ const AddDestrictsModal = () => {
     const { getData, clearKey } = useGlobalStore()
     const { data: regions } = useGet<ListResponse<RolesType>>(SETTINGS_REGIONS)
 
-    const currentDistrict = getData<RegionsType>(SETTINGS_DISTRICTS)
-    const form = useForm<RegionsType>({
+    const currentDistrict = getData<SettingsDistrictType>(SETTINGS_DISTRICTS)
+    const form = useForm<SettingsDistrictType>({
         defaultValues: currentDistrict,
     })
 
@@ -46,7 +46,7 @@ const AddDestrictsModal = () => {
 
     const isPending = isPendingCreate || isPendingUpdate
 
-    const onSubmit = (values: RegionsType) => {
+    const onSubmit = (values: SettingsDistrictType) => {
         if (currentDistrict?.id) {
             updateMutate(`${SETTINGS_DISTRICTS}/${currentDistrict.id}`, values)
         } else {
@@ -70,7 +70,7 @@ const AddDestrictsModal = () => {
 
                     <FormCombobox
                         label="Viloyat"
-                        name="country"
+                        name="region"
                         options={regions?.results}
                         control={form.control}
                     />
