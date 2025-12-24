@@ -33,6 +33,7 @@ type TripRow = {
 }
 
 type Truck = {
+  driver_name: string
   id: number;
   created: string;
   updated: string;

@@ -5,7 +5,7 @@ import Modal from "@/components/custom/modal"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate, useParams,  } from "@tanstack/react-router"
+import { useParams, useSearch, } from "@tanstack/react-router"
 import { formatMoney } from "@/lib/format-money"
 import { useCostCols } from "./cols"
 import DeleteModal from "@/components/custom/delete-modal"
@@ -15,19 +15,17 @@ import AddTripOrders from "./create"
 
 
 const TripOrderMain = () => {
-  const navigate = useNavigate()
   const { getData, setData, clearKey } = useGlobalStore()
   const { openModal: openCreateModal } = useModal("create")
   const { openModal: openDeleteModal } = useModal("delete")
-  const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
-  const search = useParams({ strict:false },)
-  const tripId = search?.id
+  const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
+  const { id } = useParams({ strict: false })
 
   const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(TRIPS_ORDERS, {
     params: {
-      trip: tripId,
-    },
+      id: id
+    }
   })
 
   const columns = useCostCols()
@@ -47,16 +45,7 @@ const TripOrderMain = () => {
     openDeleteModal()
   }
 
-  const handleRowClick = (item: TripOrdersRow) => {
-    const id = item?.id
-    console.log(id,"id");
-    
-    if (id) return
-    navigate({
-      to: "/trip-orders/$id",
-      params: { id: id.toString() },
-    })
-  }
+
 
 
 
@@ -75,7 +64,6 @@ const TripOrderMain = () => {
         numeration
         onEdit={({ original }) => handleEdit(original)}
         onDelete={handleDelete}
-        onRowClick={handleRowClick}
         head={
           <div className="flex items-center gap-3 mb-3">
             <h1 className="text-xl">Buyurtmalar ro'yxati</h1>
