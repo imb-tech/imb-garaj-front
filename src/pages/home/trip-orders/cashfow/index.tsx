@@ -49,15 +49,17 @@ const TripOrderDetailRow = () => {
 
   return (
     <div className="space-y-3 border-t p-4">
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-medium">Xarajatlar ro'yxati</h3>
+        </div>
         <Button size="sm" onClick={handleCreate}>
           Xarajat qo‘shish +
         </Button>
+
       </div>
 
-      <div className="flex items-center gap-3">
-        <h3 className="text-lg font-medium">Xarajatlar ro'yxati</h3>
-      </div>
+
 
       <DataTable
         loading={isLoading}
@@ -79,11 +81,11 @@ const TripOrderDetailRow = () => {
           }`}
       >
         <div className="max-h-[80vh] overflow-y-auto p-0.5">
-         <AddCashflow/>
+          <AddCashflow />
         </div>
       </Modal>
 
-     
+
       <DeleteModal
         path={ORDER_CASHFLOWS}
         id={currentCashflow?.id}
