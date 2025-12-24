@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -23,31 +22,34 @@ import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { TRIPS_ORDERS } from "@/constants/api-endpoints"
-import { formatMoney } from "@/lib/format-money"
 import AddTripOrders from "./create"
 import { MoreVertical, Pencil, Trash2, ChevronDown } from "lucide-react"
 import OrderTabs from "./cashfow"
+import ParamPagination from "@/components/as-params/pagination"
 
 const TripOrderMain = () => {
   const { id } = useParams({ strict: false })
-  const { getData, setData, clearKey } = useGlobalStore()
-  const { openModal: openCreateModal } = useModal("create")
-  const { openModal: openDeleteModal } = useModal("delete")
   const search = useSearch({ strict: false })
   const navigate = useNavigate()
 
-  const expandedOrderId = search.order
-    ? Number(search.order)
-    : null
+  const page = Number(search.page ?? 1)
+  const expandedOrderId = search.order ? Number(search.order) : null
+
+  const { getData, setData, clearKey } = useGlobalStore()
+  const { openModal: openCreateModal } = useModal("create")
+  const { openModal: openDeleteModal } = useModal("delete")
 
   const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
   const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(
     TRIPS_ORDERS,
-    { params: { id } }
+    {
+      params: {
+        id,
+        page,
+      },
+    }
   )
-
-
 
   const toggleExpand = (orderId: number) => {
     const isOpen = expandedOrderId === orderId
@@ -85,7 +87,6 @@ const TripOrderMain = () => {
 
       <div className="flex items-center gap-3">
         <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
-        <Badge>{formatMoney(25)}</Badge>
       </div>
 
       <Table>
@@ -119,34 +120,47 @@ const TripOrderMain = () => {
               <>
                 <TableRow
                   key={order.id}
-                  className={`cursor-pointer ${isExpanded ? "bg-secondary" : ""}`}
+                  className={`cursor-pointer ${
+                    isExpanded ? "bg-secondary" : ""
+                  }`}
                   onClick={() => toggleExpand(order.id)}
                 >
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    {(page - 1) * (data.page_size ?? 2) + index + 1}
+                  </TableCell>
+
                   <TableCell className="font-mono text-sm">
                     {order.loading_name}
                   </TableCell>
+
                   <TableCell className="font-mono text-sm">
                     {order.unloading_name}
                   </TableCell>
+
                   <TableCell className="text-muted-foreground">
                     {order.cargo_type_name ?? "—"}
                   </TableCell>
+
                   <TableCell className="font-semibold">
                     {order.payments?.[0]?.amount
                       ? Number(order.payments[0].amount).toLocaleString("uz-UZ")
                       : "—"}
                   </TableCell>
+
                   <TableCell>
                     {order.payments?.[0]?.currency === 1
                       ? "UZS"
                       : order.payments?.[0]?.currency === 2
-                        ? "USD"
-                        : "—"}
+                      ? "USD"
+                      : "—"}
                   </TableCell>
+
                   <TableCell>
                     {order.created
-                      ? format(new Date(order.created), "dd.MM.yyyy HH:mm")
+                      ? format(
+                          new Date(order.created),
+                          "dd.MM.yyyy HH:mm"
+                        )
                       : "—"}
                   </TableCell>
 
@@ -162,7 +176,9 @@ const TripOrderMain = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => handleEdit(order, e)}>
+                        <DropdownMenuItem
+                          onClick={(e) => handleEdit(order, e)}
+                        >
                           <Pencil className="mr-2 h-4 w-4" />
                           Tahrirlash
                         </DropdownMenuItem>
@@ -187,8 +203,9 @@ const TripOrderMain = () => {
                       }}
                     >
                       <ChevronDown
-                        className={`transition-transform ${isExpanded ? "rotate-180" : ""
-                          }`}
+                        className={`transition-transform ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
                       />
                     </Button>
                   </TableCell>
@@ -204,15 +221,24 @@ const TripOrderMain = () => {
               </>
             )
           })}
-
         </TableBody>
       </Table>
+
+      {!!data?.total_pages && data.total_pages > 1 && (
+        <div className="pt-4 flex justify-center">
+          <ParamPagination
+            totalPages={data.total_pages}
+            disabled={isLoading}
+          />
+        </div>
+      )}
 
       <Modal
         modalKey="create"
         size="max-w-2xl"
-        title={`Buyurtma ${currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
-          }`}
+        title={`Buyurtma ${
+          currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
+        }`}
       >
         <div className="max-h-[80vh] overflow-y-auto p-0.5">
           <AddTripOrders />
