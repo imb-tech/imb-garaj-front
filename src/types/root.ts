@@ -41,4 +41,5 @@ type SearchParams = {
     country?: number
     region_search?: string
     district_search?:string
+    order?:number|string
 }
