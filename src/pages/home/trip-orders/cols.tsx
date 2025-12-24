@@ -1,5 +1,4 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { Truck } from "lucide-react"
 import { useMemo } from "react"
 import { format } from "date-fns"
 

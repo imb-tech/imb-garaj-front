@@ -5,11 +5,11 @@ import Modal from "@/components/custom/modal"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useMatch, useNavigate, useSearch } from "@tanstack/react-router"
+import { useNavigate, useParams,  } from "@tanstack/react-router"
 import { formatMoney } from "@/lib/format-money"
 import { useCostCols } from "./cols"
 import DeleteModal from "@/components/custom/delete-modal"
-import { TRIPS, TRIPS_ORDERS } from "@/constants/api-endpoints"
+import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import AddTripOrders from "./create"
 
 
@@ -17,11 +17,11 @@ import AddTripOrders from "./create"
 const TripOrderMain = () => {
   const navigate = useNavigate()
   const { getData, setData, clearKey } = useGlobalStore()
-  const { openModal: openCreateModal, closeModal: closeCreateModal } = useModal("create")
+  const { openModal: openCreateModal } = useModal("create")
   const { openModal: openDeleteModal } = useModal("delete")
   const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
-  const search = useSearch({ strict:false },)
+  const search = useParams({ strict:false },)
   const tripId = search?.id
 
   const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(TRIPS_ORDERS, {
@@ -29,8 +29,6 @@ const TripOrderMain = () => {
       trip: tripId,
     },
   })
-
-
 
   const columns = useCostCols()
 

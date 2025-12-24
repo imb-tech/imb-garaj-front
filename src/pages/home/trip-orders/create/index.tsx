@@ -8,7 +8,7 @@ import { useGlobalStore } from "@/store/global-store"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
-import { SETTINGS_SELECTABLE_CARGO_TYPE, SETTINGS_SELECTABLE_CLIENT, SETTINGS_SELECTABLE_DISTRICT, SETTINGS_SELECTABLE_PAYMENT_TYPE, SETTINGS_SELECTABLE_USERS, TRIPS, TRIPS_ORDERS } from "@/constants/api-endpoints"
+import { SETTINGS_SELECTABLE_CARGO_TYPE, SETTINGS_SELECTABLE_CLIENT, SETTINGS_SELECTABLE_DISTRICT, SETTINGS_SELECTABLE_PAYMENT_TYPE, TRIPS_ORDERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useParams } from "@tanstack/react-router"
 
@@ -25,9 +25,11 @@ const AddTripOrders = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create")
-    const currentTripOrder = getData<TripOrdersRow & { id?: number }>(TRIPS_ORDERS)
+    const currentTripOrder = getData<TripOrdersRow>(TRIPS_ORDERS)
     const params = useParams({ strict: false },)
     const tripId = params?.id
+    console.log(tripId);
+    
 
     const { data: districtsData } = useGet<DistrictType[]>(SETTINGS_SELECTABLE_DISTRICT, {
         params: {
@@ -55,7 +57,14 @@ const AddTripOrders = () => {
             loading: currentTripOrder?.loading,
             unloading: currentTripOrder?.unloading,
             trip: currentTripOrder?.trip,
-            payment_type: currentTripOrder?.payment_type
+            payment_type: currentTripOrder?.payment_type,
+            currency:currentTripOrder?.currency,
+            currency_course:currentTripOrder?.currency_course,
+            date:currentTripOrder?.date,
+            amount:currentTripOrder?.amount,
+            type:currentTripOrder?.type,
+            cargo_type:currentTripOrder?.cargo_type,
+            client:currentTripOrder?.client
         },
     })
 
