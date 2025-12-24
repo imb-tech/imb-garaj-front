@@ -95,6 +95,7 @@ const TripOrderDetailRow = () => {
       <DeleteModal
         path={ORDER_CASHFLOWS}
         id={currentCashflow?.id}
+        modalKey="delete-order-cashflow"
       />
     </div>
   )
