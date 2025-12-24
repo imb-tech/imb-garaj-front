@@ -134,11 +134,11 @@ const AddTransport = () => {
 
             <FormCombobox
                 required
-                label="Transport turi"
+                label="Truck turi"
                 name="truck_type"
                 control={form.control}
                 options={truckType}
-                placeholder="Transport turi"
+                placeholder="Truck turi"
             />
 
             <FormCombobox
@@ -151,7 +151,7 @@ const AddTransport = () => {
             />
 
             <FormNumberInput
-                name="trailer_type"
+                name="trailer_number"
                 label="Trailer raqami"
                 control={control}
                 placeholder="Misol: 1"

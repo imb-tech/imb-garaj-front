@@ -19,6 +19,11 @@ export const useColumnsCashflowsTable = () => {
                 header: "Eslatmalar",
                 enableSorting: true,
             },
+            {
+                accessorKey: "amount",
+                header: "Miqdor",
+                enableSorting: true,
+            },
         ],
         [],
     )

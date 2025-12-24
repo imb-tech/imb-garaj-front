@@ -58,24 +58,9 @@ const FinanceStatisticMain = () => {
     return (
         <div className="space-y-3">
             <div className="flex sm:justify-end mb-3  gap-4">
-                <Button onClick={handleCreate}>Reys qo'shish +</Button>
+                <Button onClick={handleCreate}>Transport qo'shish +</Button>
                 <ReportsFilter />
             </div>
-            {/* <Card className="w-full mb-3">
-                <CardContent>
-                    <h3 className="text-lg font-semibold mb-4">
-                        Moliyaviy Ko'rsatkichlar
-                    </h3>
-
-                    <div className="overflow-x-auto no-scrollbar p-1">
-                        <div className="grid grid-cols-[repeat(4,300px)] md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {cardData.map((card, idx) => (
-                                <FinanceCard key={idx} data={card} />
-                            ))}
-                        </div>
-                    </div>
-                </CardContent>
-            </Card> */}
 
             <DataTable
                 columns={columns}
@@ -88,7 +73,6 @@ const FinanceStatisticMain = () => {
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">{`Transportlar ro'yxati`}</h1>
-                        <Badge className="text-sm">{formatMoney(25)}</Badge>
                     </div>
                 }
                 paginationProps={{
