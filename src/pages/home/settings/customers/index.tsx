@@ -42,6 +42,9 @@ const Customers = () => {
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
                 numeration={true}
+                paginationProps={{
+                    totalPages: data?.total_pages,
+                }}
                 head={
                     <TableHeader
                         fileName="Mijozlar"

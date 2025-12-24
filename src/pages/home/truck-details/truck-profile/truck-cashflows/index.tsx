@@ -17,6 +17,7 @@ const VehicleCashflows = () => {
         useGet<ListResponse<VehicleCashflowsType>>(VEHICLES_CASHFLOWS)
     const { getData, setData } = useGlobalStore()
     const item = getData<VehicleCashflowsType>(VEHICLES_CASHFLOWS)
+
     const { openModal: openDeleteModal } = useModal("delete-vehicle-cashflow")
     const { openModal: openCreateModal } = useModal(`create-vehicle-cashflow`)
     const columns = useColumnsCashflowsTable()
@@ -37,6 +38,9 @@ const VehicleCashflows = () => {
                 data={data?.results}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
+                paginationProps={{
+                    totalPages: data?.total_pages,
+                }}
                 head={
                     <TableTruckHeader
                         storeKey={VEHICLES_CASHFLOWS}

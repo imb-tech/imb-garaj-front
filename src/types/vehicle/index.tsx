@@ -33,10 +33,12 @@ type VehicleDetailType = {
     truck_type: number
     trailer_type: number
     driver: number
+    consumption:number
 }
 type VehicleCashFlowAdd = {
     id: number
     vehicle: number
     amount: number
     category: number
+    comment:string
 }

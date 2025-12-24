@@ -45,6 +45,7 @@ const  PaymenTypePage = () => {
                 paginationProps={{
                     totalPages: data?.total_pages,
                 }}
+                
                 head={
                     <TableHeader
                         fileName="To'lov turlari"
