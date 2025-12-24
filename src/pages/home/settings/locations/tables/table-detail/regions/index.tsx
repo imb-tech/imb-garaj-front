@@ -25,8 +25,10 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RegionsType>(SETTINGS_REGIONS)
+   
+    
 
-    const { openModal: openDeleteModal } = useModal("delete")
+    const { openModal: openDeleteModal } = useModal("delete-region")
     const { openModal: openCreateModal } = useModal("create-region")
 
     const handleEdit = (row: { original: RegionsType }) => {
@@ -76,7 +78,7 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                 }
             />
 
-            <DeleteModal path={SETTINGS_REGIONS} id={item?.id} />
+            <DeleteModal modalKey="delete-region" path={SETTINGS_REGIONS} id={item?.id} />
             <Modal
                 size="max-w-2xl"
                 title={`Viloyat ${item?.id ? "tahrirlash" : "qo'shish"}`}

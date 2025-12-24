@@ -27,7 +27,7 @@ export const CountryRowTable = ({
     const search = useSearch({ strict:false })
     const { setData } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("country-modal")
-    const { openModal: openDeleteModal } = useModal("delete")
+    const { openModal: openDeleteModal } = useModal("delete-country")
 
     const { country, region, ...otherSearchParams } = search as any
     const navigate = useNavigate()
