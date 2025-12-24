@@ -108,3 +108,8 @@ type CashflowRow = {
   order: number     
   category: number     
 }
+
+type ExpenseCategory ={
+  id?:number|string
+  name?:string
+}

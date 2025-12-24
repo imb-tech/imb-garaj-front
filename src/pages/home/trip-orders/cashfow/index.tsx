@@ -9,24 +9,24 @@ import { useGlobalStore } from "@/store/global-store"
 import { formatMoney } from "@/lib/format-money"
 import { ORDER_CASHFLOWS } from "@/constants/api-endpoints"
 import { useCostCols } from "./cols"
+import { useSearch } from "@tanstack/react-router"
 import AddCashflow from "./add-cashflow"
 
-interface TripOrderDetailRowProps {
-  orderId: number
-}
 
-const TripOrderDetailRow = ({ orderId }: TripOrderDetailRowProps) => {
+
+const TripOrderDetailRow = () => {
   const { getData, setData, clearKey } = useGlobalStore()
-  const { openModal: openCreateModal } = useModal("create")
-  const { openModal: openDeleteModal } = useModal("delete")
+  const { openModal: openCreateModal } = useModal("create-order-cashflow")
+  const { openModal: openDeleteModal } = useModal("delete-order-cashflow")
 
   const currentCashflow = getData<CashflowRow>(ORDER_CASHFLOWS)
-
+  const search = useSearch({ strict: false })
+  const orderId = Number(search.order)
   const { data, isLoading } = useGet<ListResponse<CashflowRow>>(
     ORDER_CASHFLOWS,
     {
       params: { order: orderId },
-      
+
     }
   )
 
@@ -84,15 +84,14 @@ const TripOrderDetailRow = ({ orderId }: TripOrderDetailRowProps) => {
 
       {/* MODAL */}
       <Modal
-        modalKey="create"
+        modalKey="create-order-cashflow"
         size="max-w-2xl"
         classNameTitle="font-medium text-xl"
-        title={`Cashflow ${
-          currentCashflow?.id ? "tahrirlash" : "qo‘shish"
-        }`}
+        title={`Cashflow ${currentCashflow?.id ? "tahrirlash" : "qo‘shish"
+          }`}
       >
         <div className="max-h-[80vh] overflow-y-auto p-0.5">
-          <AddCashflow />
+         <AddCashflow/>
         </div>
       </Modal>
 

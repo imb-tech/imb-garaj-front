@@ -1,5 +1,3 @@
-import { FormCombobox } from "@/components/form/combobox"
-import { FormDatePicker } from "@/components/form/date-picker"
 import { Button } from "@/components/ui/button"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
@@ -8,233 +6,122 @@ import { useGlobalStore } from "@/store/global-store"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
-import { SETTINGS_SELECTABLE_CARGO_TYPE, SETTINGS_SELECTABLE_CLIENT, SETTINGS_SELECTABLE_DISTRICT, SETTINGS_SELECTABLE_PAYMENT_TYPE, TRIPS_ORDERS } from "@/constants/api-endpoints"
-import { useGet } from "@/hooks/useGet"
-import { useParams } from "@tanstack/react-router"
-
+import { ORDER_CASHFLOWS, SETTINGS_SELECTABLE_EXPENSE_CATEGORY } from "@/constants/api-endpoints"
+import { useSearch } from "@tanstack/react-router"
+import { FormCombobox } from "@/components/form/combobox"
 import { FormNumberInput } from "@/components/form/number-input"
+import { useGet } from "@/hooks/useGet"
 
-
-type ClientType = {
-    id: number | string
-    name: string
+interface CashflowForm {
+    action: number
+    amount: number
+    category: number
 }
 
-
-const AddTripOrders = () => {
+const AddCashflow = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
-    const { closeModal } = useModal("create")
-    const currentTripOrder = getData<TripOrdersRow>(TRIPS_ORDERS)
-    const params = useParams({ strict: false },)
-    const tripId = params?.id
-    console.log(tripId);
-    
+    const { closeModal } = useModal("create-order-cashflow")
+    const search = useSearch({ strict: false })
+    const orderId = Number(search.order)
+    const { data: categoryData } = useGet<ExpenseCategory[]>(SETTINGS_SELECTABLE_EXPENSE_CATEGORY)
+    const currentCashflow = getData<(CashflowForm & { id?: number })>(ORDER_CASHFLOWS)
 
-    const { data: districtsData } = useGet<DistrictType[]>(SETTINGS_SELECTABLE_DISTRICT, {
-        params: {
-            model_name: "district"
-        }
-    })
-    const { data: clientData } = useGet<ClientType[]>(SETTINGS_SELECTABLE_CLIENT, {
-        params: {
-            model_name: "client"
-        }
-    })
-    const { data: paymentType } = useGet<ClientType[]>(SETTINGS_SELECTABLE_PAYMENT_TYPE, {
-        params: {
-            model_name: "payment-type"
-        }
-    })
-    const { data: cargoType } = useGet<ClientType[]>(SETTINGS_SELECTABLE_CARGO_TYPE, {
-        params: {
-            model_name: "payment-type"
-        }
-    })
-
-    const form = useForm<TripOrdersRow>({
+    const form = useForm<CashflowForm>({
         defaultValues: {
-            loading: currentTripOrder?.loading,
-            unloading: currentTripOrder?.unloading,
-            trip: currentTripOrder?.trip,
-            payment_type: currentTripOrder?.payment_type,
-            currency:currentTripOrder?.currency,
-            currency_course:currentTripOrder?.currency_course,
-            date:currentTripOrder?.date,
-            amount:currentTripOrder?.amount,
-            type:currentTripOrder?.type,
-            cargo_type:currentTripOrder?.cargo_type,
-            client:currentTripOrder?.client
-        },
-    })
 
-    const { handleSubmit, control, reset, watch } = form
+            action: currentCashflow?.action,
+            amount: currentCashflow?.amount,
+            category:currentCashflow?.category
+        }
 
-    const selectedCurrency = watch("currency")
+        })
 
+    const { handleSubmit, control, reset } = form
 
     const onSuccess = () => {
         toast.success(
-            currentTripOrder?.id
-                ? "Buyurtma tahrirlandi!"
-                : "Buyurtma qo'shildi!",
+            currentCashflow?.id
+                ? "Cashflow tahrirlandi!"
+                : "Cashflow qo‘shildi!"
         )
         reset()
-        clearKey(TRIPS_ORDERS)
+        clearKey(ORDER_CASHFLOWS)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [TRIPS_ORDERS] })
+        queryClient.invalidateQueries({
+            queryKey: [ORDER_CASHFLOWS],
+        })
     }
 
     const { mutate: create, isPending: creating } = usePost({ onSuccess })
     const { mutate: update, isPending: updating } = usePatch({ onSuccess })
 
-    const isPending = creating || updating
+    const onSubmit = (data: CashflowForm) => {
+        if (!orderId) return
 
-   const onSubmit = (data: TripOrdersRow) => {
-    const {
-        currency,
-        currency_course,
-        amount,
-        payment_type,
-        ...rest
-    } = data
+        const payload = {
+            order: orderId,
+            action: data.action,
+            amount: Number(data.amount),
+            category: data.category
+        }
 
-    const payment: any = {
-        currency,
-        amount: String(amount),
-        payment_type,
+        if (currentCashflow?.id) {
+            update(`${ORDER_CASHFLOWS}/${currentCashflow.id}`, payload)
+        } else {
+            create(ORDER_CASHFLOWS, payload)
+        }
     }
 
-    if (currency === 2) {
-        payment.currency_course = String(currency_course)
+    /** 🔒 SAFETY */
+    if (!orderId) {
+        return (
+            <div className="text-sm text-muted-foreground">
+                Buyurtma tanlanmagan
+            </div>
+        )
     }
-
-    const formattedData = {
-        ...rest,
-        trip: tripId,
-        payments: [payment],
-    }
-
-    if (currentTripOrder?.id) {
-        update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
-    } else {
-        create(TRIPS_ORDERS, formattedData)
-    }
-}
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+            {/* ACTION */}
             <FormCombobox
                 required
-                label="Buyurtma turi"
-                name="type"
+                label="Amal turi"
+                name="action"
                 control={control}
                 options={[
-                    { id: 1, name: "Band" },
-                    { id: 2, name: "Bo'sh" },
+                    { id: 1, name: "Kirim" },
+                    { id: 2, name: "Chiqim" },
                 ]}
                 valueKey="id"
                 labelKey="name"
-                placeholder="Hududni tanlang"
             />
             <FormCombobox
                 required
-                label="Yuklash manzili"
-                name="loading"
+                label="Xarajat turi"
+                name="action"
                 control={control}
-                options={districtsData}
+                options={categoryData}
                 valueKey="id"
                 labelKey="name"
-                placeholder="Hududni tanlang"
-            />
-            <FormCombobox
-                required
-                label="Yuk tushirish manzili"
-                name="unloading"
-                control={control}
-                options={districtsData}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Hududni tanlang"
-            />
-            <FormDatePicker
-                required
-                label="Reja qilingan yetkazib berish sanasi"
-                control={control}
-                name="date"
-                placeholder="Sanani tanlang"
-                className="w-full"
-            />
-            <FormCombobox
-                required
-                label="Yuk turi"
-                name="cargo_type"
-                control={control}
-                options={cargoType}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Yuk turini tanlang"
-            />
-            <FormCombobox
-                required
-                label="To'lov turi"
-                name="payment_type"
-                control={control}
-                options={paymentType || undefined}
-                valueKey="id"
-                labelKey="name"
-                placeholder="To'lov turini tanlang"
             />
 
-            <FormCombobox
-                required
-                label="Yuk egasi"
-                name="client"
-                control={control}
-                options={clientData}
-                // valueKey="id"
-                // labelKey="name"
-                placeholder="Yuk egasini tanlang"
-            />
-            <FormCombobox
-                required
-                label="Valyuta"
-                name="currency"
-                control={control}
-                options={[
-                    { value: 1, label: "UZS - So‘m" },
-                    { value: 2, label: "USD - AQSh dollari" },
-                ]}
-                valueKey="value"
-                labelKey="label"
-                placeholder="Valyutani tanlang"
-
-            />
-            {selectedCurrency === 2 && (
-                <FormNumberInput
-                    thousandSeparator=" "
-                    name="currency_course"
-                    label="Valyuta kursi"
-                    placeholder="12 206 UZS"
-                    control={control}
-                />
-            )}
-
+            {/* AMOUNT */}
             <FormNumberInput
                 required
                 name="amount"
-                thousandSeparator={" "}
-                label="To'lov miqdori"
-                placeholder="12 206 000 UZS"
-                control={form.control}
+                label="Miqdor"
+                thousandSeparator=" "
+                control={control}
+                placeholder="0"
             />
-            <div className="col-span-2 flex justify-end gap-4 pt-4">
 
-
+            <div className="col-span-2 flex justify-end pt-4">
                 <Button
                     type="submit"
-                    loading={isPending}
-                    disabled={isPending}
+                    loading={creating || updating}
+                    disabled={creating || updating}
                 >
                     Saqlash
                 </Button>
@@ -243,4 +130,4 @@ const AddTripOrders = () => {
     )
 }
 
-export default AddTripOrders
+export default AddCashflow
