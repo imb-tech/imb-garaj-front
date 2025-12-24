@@ -6,7 +6,7 @@ export const useColumnsCargoTable = () => {
         () => [
             {
                 accessorKey: "name",
-                header: "Rol turi",
+                header: "Yuk turi",
                 enableSorting: true,
             },
         ],
