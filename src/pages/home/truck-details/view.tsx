@@ -5,13 +5,12 @@ import { ParamCombobox } from "@/components/as-params/combobox"
 import ParamDateRange from "@/components/as-params/date-picker-range"
 import { months, optionYears } from "./filter"
 import TruckMap from "./truck-profile/map"
+import VehicleCashflows from "./truck-profile/truck-cashflows"
 import { TruckTabsFour } from "./truck-profile/truck-tabs-four"
 import { TruckTabsOne } from "./truck-profile/truck-tabs-one"
 import { TruckTabsOneClone } from "./truck-profile/truck-tabs-one-clone"
-import { TruckTabsTwo } from "./truck-profile/truck-tabs-two"
 
 function ViewPage({ data }: { data: Human | undefined }) {
-    
     const options = [
         {
             value: "0",
@@ -23,7 +22,11 @@ function ViewPage({ data }: { data: Human | undefined }) {
             label: "Bo'sh  Reyslar",
             content: <TruckTabsOneClone />,
         },
-        { value: "6", label: "Boshqa xarajatlar", content: <TruckTabsTwo /> },
+        {
+            value: "6",
+            label: "Boshqa xarajatlar",
+            content: <VehicleCashflows />,
+        },
         {
             value: "4",
             label: "Texnik Statistika ",
