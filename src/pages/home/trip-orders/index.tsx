@@ -21,7 +21,7 @@ import DeleteModal from "@/components/custom/delete-modal"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useParams } from "@tanstack/react-router"
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import { formatMoney } from "@/lib/format-money"
 import AddTripOrders from "./create"
@@ -33,6 +33,12 @@ const TripOrderMain = () => {
   const { getData, setData, clearKey } = useGlobalStore()
   const { openModal: openCreateModal } = useModal("create")
   const { openModal: openDeleteModal } = useModal("delete")
+  const search = useSearch({ strict: false })
+  const navigate = useNavigate()
+
+  const expandedOrderId = search.order
+    ? Number(search.order)
+    : null
 
   const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
@@ -41,10 +47,17 @@ const TripOrderMain = () => {
     { params: { id } }
   )
 
-  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null)
+
 
   const toggleExpand = (orderId: number) => {
-    setExpandedOrderId((prev) => (prev === orderId ? null : orderId))
+    const isOpen = expandedOrderId === orderId
+
+    navigate({
+      search: (prev: any) => ({
+        ...prev,
+        order: isOpen ? undefined : String(orderId),
+      }),
+    })
   }
 
   const handleCreate = () => {
@@ -106,30 +119,24 @@ const TripOrderMain = () => {
               <>
                 <TableRow
                   key={order.id}
-                  className={`cursor-pointer ${isExpanded ? "bg-secondary" : ""
-                    }`}
+                  className={`cursor-pointer ${isExpanded ? "bg-secondary" : ""}`}
                   onClick={() => toggleExpand(order.id)}
                 >
                   <TableCell>{index + 1}</TableCell>
-
                   <TableCell className="font-mono text-sm">
                     {order.loading_name}
                   </TableCell>
-
                   <TableCell className="font-mono text-sm">
                     {order.unloading_name}
                   </TableCell>
-
                   <TableCell className="text-muted-foreground">
                     {order.cargo_type_name ?? "—"}
                   </TableCell>
-
                   <TableCell className="font-semibold">
                     {order.payments?.[0]?.amount
                       ? Number(order.payments[0].amount).toLocaleString("uz-UZ")
                       : "—"}
                   </TableCell>
-
                   <TableCell>
                     {order.payments?.[0]?.currency === 1
                       ? "UZS"
@@ -137,16 +144,13 @@ const TripOrderMain = () => {
                         ? "USD"
                         : "—"}
                   </TableCell>
-
                   <TableCell>
                     {order.created
-                      ? format(
-                        new Date(order.created),
-                        "dd.MM.yyyy HH:mm"
-                      )
+                      ? format(new Date(order.created), "dd.MM.yyyy HH:mm")
                       : "—"}
                   </TableCell>
 
+                  {/* actions */}
                   <TableCell className="text-right p-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -158,15 +162,11 @@ const TripOrderMain = () => {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={(e) => handleEdit(order, e)}
-                        >
+                        <DropdownMenuItem onClick={(e) => handleEdit(order, e)}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Tahrirlash
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={(e) => handleDelete(order, e)}
@@ -178,7 +178,7 @@ const TripOrderMain = () => {
                     </DropdownMenu>
                   </TableCell>
 
-                  {/* CHEVRON */}
+                  {/* chevron */}
                   <TableCell className="text-right p-0">
                     <Button
                       variant="ghost"
@@ -199,13 +199,14 @@ const TripOrderMain = () => {
                 {isExpanded && (
                   <TableRow>
                     <TableCell colSpan={9} className="p-0">
-                      <OrderTabs orderId={order.id} />
+                      <OrderTabs />
                     </TableCell>
                   </TableRow>
                 )}
               </>
             )
           })}
+
         </TableBody>
       </Table>
 
