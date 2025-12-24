@@ -34,33 +34,8 @@ export const useCostCols = () => {
     },
 
     {
-      header: "Ijrochi",
-      accessorKey: "executor",
-      cell: ({ getValue }) => (
-        <span>{getValue<number>()}</span>
-      ),
-    },
-
-    {
-      header: "Tranzaksiya",
-      accessorKey: "transaction",
-      cell: ({ getValue }) => (
-        <span>{getValue<number>()}</span>
-      ),
-    },
-
-    {
-      header: "Buyurtma ID",
-      accessorKey: "order",
-      enableSorting: true,
-      cell: ({ getValue }) => (
-        <span>{getValue<number>()}</span>
-      ),
-    },
-
-    {
       header: "Kategoriya",
-      accessorKey: "category",
+      accessorKey: "category_name",
       cell: ({ getValue }) => (
         <span>{getValue<number>()}</span>
       ),

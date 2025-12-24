@@ -76,7 +76,6 @@ const ShiftStatisticMain = () => {
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Reyslar ro'yxati</h1>
-                        <Badge className="text-sm">{formatMoney(25)}</Badge>
                     </div>
                 }
                 paginationProps={{

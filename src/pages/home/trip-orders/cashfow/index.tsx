@@ -57,14 +57,6 @@ const TripOrderDetailRow = () => {
 
       <div className="flex items-center gap-3">
         <h3 className="text-lg font-medium">Xarajatlar ro'yxati</h3>
-        <Badge className="text-sm">
-          {formatMoney(
-            data?.results?.reduce(
-              (sum, item) => sum + Number(item.amount ?? 0),
-              0
-            ) || 0
-          )}
-        </Badge>
       </div>
 
       <DataTable
