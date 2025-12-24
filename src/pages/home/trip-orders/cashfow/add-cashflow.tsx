@@ -29,13 +29,12 @@ const AddCashflow = () => {
 
     const form = useForm<CashflowForm>({
         defaultValues: {
-
             action: currentCashflow?.action,
             amount: currentCashflow?.amount,
-            category:currentCashflow?.category
+            category: currentCashflow?.category
         }
 
-        })
+    })
 
     const { handleSubmit, control, reset } = form
 
@@ -73,26 +72,24 @@ const AddCashflow = () => {
         }
     }
 
-    /** 🔒 SAFETY */
     if (!orderId) {
         return (
             <div className="text-sm text-muted-foreground">
-                Buyurtma tanlanmagan
+               Xarajatlar mavjud emas
             </div>
         )
     }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
-            {/* ACTION */}
             <FormCombobox
                 required
                 label="Amal turi"
                 name="action"
                 control={control}
                 options={[
-                    { id: 1, name: "Kirim" },
-                    { id: 2, name: "Chiqim" },
+                    { id: 1, name: "Haydovchidan Menejerga" },
+                    { id: 2, name: "Menejerdan Haydovchiga" },
                 ]}
                 valueKey="id"
                 labelKey="name"
@@ -100,21 +97,20 @@ const AddCashflow = () => {
             <FormCombobox
                 required
                 label="Xarajat turi"
-                name="action"
+                name="category"
                 control={control}
                 options={categoryData}
                 valueKey="id"
                 labelKey="name"
             />
 
-            {/* AMOUNT */}
             <FormNumberInput
                 required
                 name="amount"
                 label="Miqdor"
                 thousandSeparator=" "
                 control={control}
-                placeholder="0"
+                placeholder="0 UZS"
             />
 
             <div className="col-span-2 flex justify-end pt-4">

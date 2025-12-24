@@ -113,11 +113,6 @@ export const useItems = () =>
                 path: "/trip",
             },
             {
-                label: "Transport Info",
-                icon: <Truck width={18} />,
-                path: "/transport",
-            },
-            {
                 label: "Sozlamalar",
                 icon: <Settings width={18} />,
                 path: "/locations",
@@ -138,10 +133,6 @@ export const useItems = () =>
                         label: "Rollar",
                         path: "/roles",
                     },
-                    // {
-                    //     label: "Ekspeditorlar",
-                    //     path: "/settings/freight-forwarders",
-                    // },
                     {
                         label: "Xaridorlar",
                         path: "/customers",

@@ -49,27 +49,16 @@ const TripOrderDetailRow = () => {
 
   return (
     <div className="space-y-3 border-t p-4">
-      {/* CREATE */}
       <div className="flex justify-end">
         <Button size="sm" onClick={handleCreate}>
-          Cashflow qo‘shish +
+          Xarajat qo‘shish +
         </Button>
       </div>
 
-      {/* HEADER */}
       <div className="flex items-center gap-3">
-        <h3 className="text-lg font-medium">Cashflow</h3>
-        <Badge className="text-sm">
-          {formatMoney(
-            data?.results?.reduce(
-              (sum, item) => sum + Number(item.amount ?? 0),
-              0
-            ) || 0
-          )}
-        </Badge>
+        <h3 className="text-lg font-medium">Xarajatlar ro'yxati</h3>
       </div>
 
-      {/* TABLE */}
       <DataTable
         loading={isLoading}
         columns={columns}
@@ -82,12 +71,11 @@ const TripOrderDetailRow = () => {
         }}
       />
 
-      {/* MODAL */}
       <Modal
         modalKey="create-order-cashflow"
         size="max-w-2xl"
         classNameTitle="font-medium text-xl"
-        title={`Cashflow ${currentCashflow?.id ? "tahrirlash" : "qo‘shish"
+        title={`Xarajat ${currentCashflow?.id ? "tahrirlash" : "qo‘shish"
           }`}
       >
         <div className="max-h-[80vh] overflow-y-auto p-0.5">
@@ -95,10 +83,11 @@ const TripOrderDetailRow = () => {
         </div>
       </Modal>
 
-      {/* DELETE */}
+     
       <DeleteModal
         path={ORDER_CASHFLOWS}
         id={currentCashflow?.id}
+        modalKey="delete-order-cashflow"
       />
     </div>
   )

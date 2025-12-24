@@ -29,7 +29,7 @@ const ShiftStatisticMain = () => {
         openCreateModal()
     }
 
-    const handleEdit = (item:TripRow) => {
+    const handleEdit = (item: TripRow) => {
         setData(TRIPS, item)
         openCreateModal()
     }
@@ -49,10 +49,7 @@ const ShiftStatisticMain = () => {
         })
     }
 
-    const { data: dataCard } = useGet<CardMain>("", {
-        // params: search,
-        options: { enabled: false }, 
-    })
+
 
     return (
         <div className="space-y-3">
@@ -68,10 +65,17 @@ const ShiftStatisticMain = () => {
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
+                onView={(row) => {
+                    navigate({
+                        to: "/trip-orders/$id",
+                        params: {
+                            id: String(row.original.id),
+                        },
+                    })
+                }}
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Reyslar ro'yxati</h1>
-                        <Badge className="text-sm">{formatMoney(25)}</Badge>
                     </div>
                 }
                 paginationProps={{
