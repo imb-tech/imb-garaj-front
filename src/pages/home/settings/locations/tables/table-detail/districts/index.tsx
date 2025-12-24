@@ -20,19 +20,18 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
     const { data, isLoading } = useGet<ListResponse<SettingsDistrictType>>(
         SETTINGS_DISTRICTS,
         {
-            params: {
-                region: region_id ? { region: region_id } : undefined,
+            params: region_id ? {
+                region: region_id,
                 search: search.district_search,
-            },
-
-            enabled: !!region_id,
+            } : {},
+            enabled: !!region_id, 
         },
     )
 
     const { getData, setData } = useGlobalStore()
     const item = getData<SettingsDistrictType>(SETTINGS_DISTRICTS)
 
-    const { openModal: openDeleteModal } = useModal("delete")
+    const { openModal: openDeleteModal } = useModal("delete-districts")
     const { openModal: openCreateModal } = useModal("create-districts")
     const columns = useColumnDestricts()
 
@@ -66,7 +65,7 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
                     />
                 }
             />
-            <DeleteModal path={SETTINGS_DISTRICTS} id={item?.id} />
+            <DeleteModal modalKey="delete-districts" path={SETTINGS_DISTRICTS} id={item?.id} />
             <Modal
                 size="max-w-2xl"
                 title={`Tuman ${item?.id ? "tahrirlash" : "qo'shish"}`}

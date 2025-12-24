@@ -81,7 +81,7 @@ const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
                 <ParamPagination totalPages={data?.total_pages} />
             </div>
 
-            <DeleteModal path={SETTINGS_COUNTRIES} id={selectedCountry?.id} />
+            <DeleteModal modalKey="delete-country" path={SETTINGS_COUNTRIES} id={selectedCountry?.id} />
         </div>
     )
 }
