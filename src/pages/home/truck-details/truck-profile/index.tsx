@@ -17,6 +17,8 @@ type Props = {
 
 
 function TruckProfile({ data }: Props) {
+
+    
     return (
         <div
             className="bg-background border border-divider relative rounded-lg p-4 
