@@ -9,7 +9,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useSearch } from "@tanstack/react-router"
 import { ChevronDown, MoreVertical, Pencil, Trash2 } from "lucide-react"
 import { CountriesDetailRow } from "../table-detail"
 
@@ -24,11 +24,12 @@ export const CountryRowTable = ({
     index,
     colSpan,
 }: CountryRowTableType) => {
-    // const search = useSearch({ from: "/_main/_settings/locations/" })
+    const search = useSearch({ strict:false })
     const { setData } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("country-modal")
     const { openModal: openDeleteModal } = useModal("delete")
-    // const { country, ...otherSearchParams } = search
+
+    const { country, region, ...otherSearchParams } = search as any
     const navigate = useNavigate()
 
     const cols = [
@@ -38,10 +39,14 @@ export const CountryRowTable = ({
     ]
 
     const handleRowClick = () => {
-        // const hasId = country === String(countries.id)
+        const hasId = country === String(countries.id)
 
         navigate({
-            to: "/locations",
+            search: (prev: Record<string, unknown>) => ({
+                ...prev,
+                country: hasId ? undefined : String(countries.id),
+                region: undefined,
+            }),
         })
     }
 
@@ -57,22 +62,23 @@ export const CountryRowTable = ({
         openDeleteModal()
     }
 
+    const handleChevronClick = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        handleRowClick()
+    }
+
     const totalColSpan = colSpan || 10
 
     return (
         <>
             <TableRow
-                className={`cursor-pointer ${String(countries.id) ? "bg-secondary" : ""}`}
+                className={`cursor-pointer ${country == String(countries.id) ? "bg-secondary" : ""}`}
                 onClick={handleRowClick}
             >
                 <TableCell>{index + 1}</TableCell>
 
                 {cols.map((cell, i) => (
-                    <TableCell key={i}>
-                        <div className="flex items-center gap-[5px] bg-secondary whitespace-nowrap rounded-lg px-3 py-2">
-                            {cell?.value}
-                        </div>
-                    </TableCell>
+                    <TableCell key={i}>{cell?.value}</TableCell>
                 ))}
 
                 <TableCell className="p-0 text-right">
@@ -108,14 +114,11 @@ export const CountryRowTable = ({
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            handleRowClick()
-                        }}
+                        onClick={handleChevronClick}
                     >
                         <ChevronDown
-                            className={`h-5 w-5 transition-transform 
-                                 "rotate-180"
+                            className={`h-5 w-5 transition-transform ${
+                                country == String(countries.id) ? "rotate-180"
                                 :   ""
                             }`}
                         />
@@ -123,11 +126,15 @@ export const CountryRowTable = ({
                 </TableCell>
             </TableRow>
 
-            <TableRow>
-                <TableCell colSpan={totalColSpan} className="p-0">
-                    <CountriesDetailRow countries={countries} />
-                </TableCell>
-            </TableRow>
+            {country == String(countries.id) && (
+                <TableRow>
+                    <TableCell colSpan={totalColSpan} className="p-0">
+                        <CountriesDetailRow
+                            country_id={parseInt(countries.id)}
+                        />
+                    </TableCell>
+                </TableRow>
+            )}
         </>
     )
 }

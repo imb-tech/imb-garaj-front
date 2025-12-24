@@ -1,5 +1,4 @@
 import Modal from "@/components/custom/modal"
-import DownloadAsExcel from "@/components/download-as-excel"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
@@ -24,7 +23,6 @@ const Locations = () => {
                         <CardTitle className="text-xl font-semibold tracking-tight">
                             Davlatlar
                         </CardTitle>
-                        <DownloadAsExcel url="/" name="Davlatlar" />
                     </div>
                 </CardHeader>
                 <CardContent className="flex-1 min-h-0 pt-0">
