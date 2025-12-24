@@ -5,15 +5,6 @@ import { format } from "date-fns"
 export const useCostCols = () => {
   return useMemo<ColumnDef<CashflowRow>[]>(() => [
     {
-      header: "ID",
-      accessorKey: "id",
-      enableSorting: true,
-      cell: ({ getValue }) => (
-        <span className="font-mono">{getValue<number>()}</span>
-      ),
-    },
-
-    {
       header: "Amal",
       accessorKey: "action",
       enableSorting: true,
@@ -23,9 +14,9 @@ export const useCostCols = () => {
         return (
           <span>
             {value === 1
-              ? "Driver to Manager(D2M)"
+              ? "Haydovchidan Menejerga (D2M)"
               : value === 2
-              ? "Manager to Driver(M2D)"
+              ? "Menejerdan Haydovchiga (M2D)"
               : "—"}
           </span>
         )
