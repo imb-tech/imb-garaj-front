@@ -150,7 +150,6 @@ const TripOrderMain = () => {
                       : "—"}
                   </TableCell>
 
-                  {/* actions */}
                   <TableCell className="text-right p-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -178,7 +177,6 @@ const TripOrderMain = () => {
                     </DropdownMenu>
                   </TableCell>
 
-                  {/* chevron */}
                   <TableCell className="text-right p-0">
                     <Button
                       variant="ghost"
