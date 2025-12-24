@@ -502,4 +502,4 @@ function notClick(id: string) {
         " ",
         "Telefon",
     ].includes(id)
-}
+} 
