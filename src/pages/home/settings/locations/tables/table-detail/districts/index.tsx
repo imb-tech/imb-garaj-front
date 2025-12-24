@@ -4,43 +4,65 @@ import { DataTable } from "@/components/ui/datatable"
 import { SETTINGS_DISTRICTS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
-import TableHeader from "@/pages/home/settings/table-header"
 import { useGlobalStore } from "@/store/global-store"
+import { useSearch } from "@tanstack/react-router"
+import TableHeaderLocation from "../../table-header"
 import AddDestrictsModal from "./add-districts"
 import { useColumnDestricts } from "./districts-cols"
 
-const DistrictsTable = () => {
-    const { data, isLoading } =
-        useGet<ListResponse<SettingsDistrictType>>(SETTINGS_DISTRICTS)
+interface DistrictsTableProps {
+    country_id: number
+    region_id?: string | number
+}
+
+const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
+    const search = useSearch({ strict: false })
+    const { data, isLoading } = useGet<ListResponse<SettingsDistrictType>>(
+        SETTINGS_DISTRICTS,
+        {
+            params: {
+                region: region_id ? { region: region_id } : undefined,
+                search: search.district_search,
+            },
+
+            enabled: !!region_id,
+        },
+    )
+
     const { getData, setData } = useGlobalStore()
     const item = getData<SettingsDistrictType>(SETTINGS_DISTRICTS)
 
     const { openModal: openDeleteModal } = useModal("delete")
-    const { openModal: openCreateModal } = useModal("create")
+    const { openModal: openCreateModal } = useModal("create-districts")
     const columns = useColumnDestricts()
 
     const handleDelete = (row: { original: SettingsDistrictType }) => {
         setData(SETTINGS_DISTRICTS, row.original)
         openDeleteModal()
     }
+
     const handleEdit = (item: SettingsDistrictType) => {
         setData(SETTINGS_DISTRICTS, item)
         openCreateModal()
     }
+
     return (
         <>
             <DataTable
                 loading={isLoading}
                 columns={columns}
-                data={data?.results}
+                data={region_id ? data?.results : []}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
                 numeration={true}
                 head={
-                    <TableHeader
-                        fileName="Tumanlar"
-                        url="excel"
+                    <TableHeaderLocation
                         storeKey={SETTINGS_DISTRICTS}
+                        modalKey="create-districts"
+                        disabled={!region_id}
+                        pageKey="page"
+                        name="tumanlar"
+                        searchKey="district_search"
                     />
                 }
             />
@@ -48,9 +70,12 @@ const DistrictsTable = () => {
             <Modal
                 size="max-w-2xl"
                 title={`Tuman ${item?.id ? "tahrirlash" : "qo'shish"}`}
-                modalKey={"create"}
+                modalKey={"create-districts"}
             >
-                <AddDestrictsModal />
+                <AddDestrictsModal
+                    region_id={region_id}
+                    country_id={country_id}
+                />
             </Modal>
         </>
     )

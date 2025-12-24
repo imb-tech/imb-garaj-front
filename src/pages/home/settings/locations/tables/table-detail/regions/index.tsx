@@ -5,24 +5,21 @@ import { SETTINGS_REGIONS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useMatch, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
+import { useNavigate, useSearch } from "@tanstack/react-router"
 import TableHeaderLocation from "../../table-header"
 import AddRegionsModal from "./add-regions"
 import { useColumnsRegionsTable } from "./regions-cols"
 
 const RegionsTable = ({ country_id }: { country_id: number }) => {
     const navigate = useNavigate()
-    const match = useMatch({
-        from: "/_main/_settings/locations/",
-        shouldThrow: false,
-    })
+    const search = useSearch({ strict: false })
 
     const { data, isLoading } = useGet<ListResponse<RegionsType>>(
         `${SETTINGS_REGIONS}`,
         {
             params: {
                 country: country_id,
+                search: search.region_search,
             },
         },
     )
@@ -31,53 +28,61 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
 
     const { openModal: openDeleteModal } = useModal("delete")
     const { openModal: openCreateModal } = useModal("create-region")
-    const columns = useColumnsRegionsTable()
+
+    const handleEdit = (row: { original: RegionsType }) => {
+        setData(SETTINGS_REGIONS, row.original)
+        openCreateModal()
+    }
 
     const handleDelete = (row: { original: RegionsType }) => {
         setData(SETTINGS_REGIONS, row.original)
         openDeleteModal()
     }
-    const handleEdit = (item: RegionsType) => {
-        setData(SETTINGS_REGIONS, item)
-        openCreateModal()
+
+    const handleRowClick = (row: RegionsType) => {
+        const isCurrentlySelected = String(search.region) === String(row.id)
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                region: isCurrentlySelected ? undefined : String(row.id),
+            }),
+        })
     }
 
-    useEffect(() => {
-        if (data?.results?.length) {
-            navigate({
-                to: "/locations",
-                search: {
-                    ...match?.search,
-                },
-            })
-        }
-    }, [data, navigate, country_id, match?.search])
+    const simpleColumns = useColumnsRegionsTable()
 
     return (
         <>
             <DataTable
                 loading={isLoading}
-                columns={columns}
+                columns={simpleColumns}
                 data={data?.results}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
-                onEdit={({ original }) => handleEdit(original)}
+                onRowClick={handleRowClick}
                 numeration={true}
                 head={
                     <TableHeaderLocation
-                        fileName="Viloyatlar"
-                        url="excel"
+                        disabled={!country_id}
                         storeKey={SETTINGS_REGIONS}
                         modalKey="create-region"
+                        name="Viloyatlar"
+                        searchKey="region_search"
+                        pageKey="page"
                     />
                 }
+                rowColor={(row: any) =>
+                    search.region === row.id ? "bg-secondary" : ""
+                }
             />
+
             <DeleteModal path={SETTINGS_REGIONS} id={item?.id} />
             <Modal
                 size="max-w-2xl"
                 title={`Viloyat ${item?.id ? "tahrirlash" : "qo'shish"}`}
                 modalKey={"create-region"}
             >
-                <AddRegionsModal  />
+                <AddRegionsModal country_id={country_id} />
             </Modal>
         </>
     )
