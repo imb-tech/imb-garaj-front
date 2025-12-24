@@ -7,17 +7,6 @@ import { useMemo } from "react";
 export const useCostCols = () => {
   return useMemo<ColumnDef<Truck>[]>(() => [
     {
-      header: "Transport ID",
-      accessorKey: "id",
-      enableSorting: true,
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 font-medium">
-          <Truck className="w-4 h-4 text-muted-foreground" />
-          {row.original.id}
-        </div>
-      ),
-    },
-    {
       header: "Avtoraqam",
       accessorKey: "truck_number",
       enableSorting: true,

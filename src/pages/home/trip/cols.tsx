@@ -2,30 +2,22 @@ import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
 export const useCostCols = () => {
-  return useMemo<ColumnDef<any>[]>(
+  return useMemo<ColumnDef<TripRow>[]>(
     () => [
       {
-        header: "ID",
-        accessorKey: "id",
-        enableSorting: true,
-        cell: ({ row }) => (
-          <span>{row.original.id}</span>
-        ),
-      },
-      {
         header: "Mashina",
-        accessorKey: "vehicle",
+        accessorKey: "vehicle_number",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.vehicle}</span>
+          <span>{row.original.vehicle_number}</span>
         ),
       },
       {
         header: "Haydovchi",
-        accessorKey: "driver",
+        accessorKey: "driver_name",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.driver}</span>
+          <span>{row.original.driver_name}</span>
         ),
       },
       {
@@ -37,11 +29,11 @@ export const useCostCols = () => {
         ),
       },
       {
-        header: "Reys turi",
-        accessorKey: "type",
+        header: "Buyurtmalar soni",
+        accessorKey: "orders_count",
         enableSorting: true,
         cell: ({ row }) => (
-          <span>{row.original.type}</span>
+          <span>{row.original.orders_count}</span>
         ),
       },
     ],

@@ -243,10 +243,9 @@ export function DataTable<TData>({
                                                 key={index}
                                                 className={`grid gap-1`}
                                                 style={{
-                                                    gridTemplateColumns: `repeat(${
-                                                        headerGroup?.headers
+                                                    gridTemplateColumns: `repeat(${headerGroup?.headers
                                                             ?.length || 0
-                                                    }, minmax(0, 1fr))`,
+                                                        }, minmax(0, 1fr))`,
                                                 }}
                                             >
                                                 {headerGroup.headers.map(
@@ -329,7 +328,7 @@ export function DataTable<TData>({
                                                                     .enableSorting
                                                             ) ?
                                                                 header.column.getToggleSortingHandler()
-                                                            :   undefined
+                                                                : undefined
                                                         }
                                                     >
                                                         <div className="cursor-pointer flex items-center gap-1 select-none w-max">
@@ -365,14 +364,14 @@ export function DataTable<TData>({
                                                                 }[
                                                                     header.column.getIsSorted() as string
                                                                 ] ?? (
-                                                                    <ChevronsUpDown
-                                                                        className="text-muted-foreground"
-                                                                        width={
-                                                                            16
-                                                                        }
-                                                                    />
-                                                                ))
-                                                            :   null}
+                                                                        <ChevronsUpDown
+                                                                            className="text-muted-foreground"
+                                                                            width={
+                                                                                16
+                                                                            }
+                                                                        />
+                                                                    ))
+                                                                : null}
                                                         </div>
                                                     </TableHead>
                                                 )
@@ -433,10 +432,9 @@ export function DataTable<TData>({
                                                     )
                                                 }
                                                 className={cn(
-                                                    `cursor-pointer border-r border-secondary last:border-none  ${
-                                                        notClick(
-                                                            cell.column.id,
-                                                        ) && "cursor-default"
+                                                    `cursor-pointer border-r border-secondary last:border-none  ${notClick(
+                                                        cell.column.id,
+                                                    ) && "cursor-default"
                                                     }`,
                                                 )}
                                             >
@@ -462,7 +460,7 @@ export function DataTable<TData>({
                             Soni:{" "}
                             {typeof viewCount === "number" ?
                                 viewCount
-                            :   table.getRowModel().rows?.length}{" "}
+                                : table.getRowModel().rows?.length}{" "}
                             ta
                         </p>
                     )}
@@ -471,25 +469,25 @@ export function DataTable<TData>({
                             disabled={disabled || loading}
                             {...paginationProps}
                         />
-                    : cursorPagination ?
-                        <CursorPagination
-                            {...cursorPagination}
-                            disabled={disabled || loading}
-                        />
-                    : limitOffsetPagination ?
-                        <LimitOffsetPagination
-                            {...limitOffsetPagination}
-                            disabled={disabled || loading}
-                        />
-                    :   <ParamPagination
-                            disabled={disabled || loading}
-                            {...paginationProps}
-                            totalPages={table.getPageCount() || 1}
-                            PageSize={table.getState().pagination.pageSize}
-                        />
+                        : cursorPagination ?
+                            <CursorPagination
+                                {...cursorPagination}
+                                disabled={disabled || loading}
+                            />
+                            : limitOffsetPagination ?
+                                <LimitOffsetPagination
+                                    {...limitOffsetPagination}
+                                    disabled={disabled || loading}
+                                />
+                                : <ParamPagination
+                                    disabled={disabled || loading}
+                                    {...paginationProps}
+                                    totalPages={table.getPageCount() || 1}
+                                    PageSize={table.getState().pagination.pageSize}
+                                />
                     }
                 </div>
-            :   ""}
+                : ""}
         </main>
     )
 }
@@ -504,4 +502,4 @@ function notClick(id: string) {
         " ",
         "Telefon",
     ].includes(id)
-}
+} 
