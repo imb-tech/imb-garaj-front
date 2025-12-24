@@ -48,7 +48,7 @@ const FinanceStatisticMain = () => {
         <div className="space-y-3">
             <div className="flex sm:justify-end mb-3  gap-4">
                 <Button onClick={handleCreate}>
-                    Reys qo'shish +
+                    Transport qo'shish +
                 </Button>
                 <ReportsFilter />
             </div>
@@ -93,7 +93,7 @@ const FinanceStatisticMain = () => {
                 modalKey="create"
                 size="max-w-2xl"
                 classNameTitle="font-medium text-xl"
-                title={`Reys ${currentTrip?.id ? "tahrirlash" : "qo'shish"}`}
+                title={`Transport ${currentTrip?.id ? "tahrirlash" : "qo'shish"}`}
             >
                 <div className="max-h-[80vh] overflow-y-auto p-0.5">
                     <AddTransport />

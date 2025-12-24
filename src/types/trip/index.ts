@@ -1,5 +1,5 @@
 interface TripFormData {
-  driver: number | string 
+  driver: number | string
   vehicle: number | string
   start: Date
   type: number | string
@@ -33,6 +33,7 @@ type TripRow = {
 }
 
 type Truck = {
+  driver_name: string
   id: number;
   created: string;
   updated: string;
@@ -65,6 +66,9 @@ type DistrictType = {
 }
 
 type TripOrdersRow = {
+  name: string
+  client_name: string
+  created_at: string | number
   cargo_type_name: string
   loading_name: string
   unloading_name: string
@@ -82,12 +86,25 @@ type TripOrdersRow = {
   currency_course: number | string,
   amount: number | string,
   type: number | string
- payments: [
-  {
-    currency: number
-    currency_course: string
-    amount: string
-  }
-]
+  payments: [
+    {
+      currency: number
+      currency_course: string
+      amount: string
+    }
+  ]
 
+}
+
+
+type CashflowRow = {
+  amount: number
+  id: number
+  created: string
+  updated: string
+  comment: string | null
+  executor: number 
+  transaction: number    
+  order: number     
+  category: number     
 }

@@ -1,6 +1,4 @@
-import { CopyButton } from "@/lib/copy-button";
 import { ColumnDef } from "@tanstack/react-table";
-import { Truck } from "lucide-react";
 import { useMemo } from "react";
 
 
@@ -21,7 +19,6 @@ export const useCostCols = () => {
       accessorKey: "truck_type",
       enableSorting: true,
       cell: ({ row }) => {
-        // You can adjust the mapping based on your actual truck_type values
         const typeMap: Record<number, string> = {
           1: "Fura",
           2: "Tent",
@@ -58,11 +55,11 @@ export const useCostCols = () => {
       ),
     },
     {
-      header: "Haydovchi ID",
-      accessorKey: "driver",
+      header: "Haydovchi",
+      accessorKey: "driver_name",
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="font-medium">#{row.original.driver}</span>
+        <span className="font-medium">{row.original.driver_name}</span>
       ),
     },
     {

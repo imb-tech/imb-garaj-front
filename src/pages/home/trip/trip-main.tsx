@@ -20,7 +20,7 @@ const ShiftStatisticMain = () => {
     const { openModal: openCreateModal, } = useModal("create")
     const { openModal: openDeleteModal } = useModal("delete")
 
-    const currentTrip = getData<TripRow>(TRIPS) 
+    const currentTrip = getData<TripRow>(TRIPS)
 
 
     const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS)
@@ -33,31 +33,30 @@ const ShiftStatisticMain = () => {
         openCreateModal()
     }
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item:TripRow) => {
         setData(TRIPS, item)
         openCreateModal()
     }
 
-       const handleDelete = (row: { original:any}) => {
+    const handleDelete = (row: { original:TripRow}) => {
         setData(TRIPS, row.original)
         openDeleteModal()
     }
 
     const handleRowClick = (item: TripRow) => {
-  const id = item?.id
-  if (!id) return
+        const id = item?.id
+        if (!id) return
+        navigate({
+            to: "/trip-orders/$id",
+            params: {
+                id: id.toString(),
+            },
+            search: (prev) => (prev)
+        })
 
-  navigate({
-    to: "/trip-orders/$id",
-    params: { id: id.toString() },
-  })
-}
+    }
 
 
-    const { data: dataCard } = useGet<CardMain>("", {
-        // params: search,
-        options: { enabled: false }, // disable if not used
-    })
 
     return (
         <div className="space-y-3">
@@ -74,7 +73,7 @@ const ShiftStatisticMain = () => {
                 numeration
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
-                onRowClick={handleRowClick}  
+                onRowClick={handleRowClick}
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Reyslar ro'yxati</h1>
@@ -82,7 +81,7 @@ const ShiftStatisticMain = () => {
                     </div>
                 }
                 paginationProps={{
-                    totalPages: 3, 
+                    totalPages: 3,
                 }}
             />
 
@@ -97,7 +96,7 @@ const ShiftStatisticMain = () => {
                 </div>
             </Modal>
 
-                        <DeleteModal path={TRIPS} id={currentTrip?.id} />
+            <DeleteModal path={TRIPS} id={currentTrip?.id} />
 
         </div>
     )
