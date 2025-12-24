@@ -32,13 +32,13 @@ type SearchParams = {
     start_date?: string
     end_date?: string
     pipeline?: number
-    region: number
+    region?: number
     project?: string
     companies?: string
     worker?: string
     departments?: string
     selected_loading_place?: string
-    country: number
+    country?: number
     region_search?: string
     district_search?:string
 }
