@@ -79,3 +79,7 @@ type ListResponse<T> = {
     count: number
     results: T[]
 }
+
+type SelectableResponse<T> = {
+    data?:T[]
+}

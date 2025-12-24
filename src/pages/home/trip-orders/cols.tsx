@@ -1,68 +1,72 @@
-import { CopyButton } from "@/lib/copy-button"
 import { ColumnDef } from "@tanstack/react-table"
-import { Truck } from "lucide-react"
 import { useMemo } from "react"
 import { format } from "date-fns"
 
-
-
 export const useCostCols = () => {
   return useMemo<ColumnDef<TripOrdersRow>[]>(() => [
+ 
     {
-      header: "ID",
-      accessorKey: "id",
+      header: "Yuklash joyi",
+      accessorKey: "loading_name",
       enableSorting: true,
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 font-medium">
-          <Truck className="w-4 h-4 text-muted-foreground" />
-          {row.original.id}
-        </div>
-      ),
-    },
-    {
-      header: "Yuklash joyi ID",
-      accessorKey: "loading",
-      enableSorting: true,
-      cell: ({ row }) => (
-        <span className="font-mono text-sm">#{row.original.loading}</span>
-      ),
-    },
-    {
-      header: "Tushirish joyi ID",
-      accessorKey: "unloading",
-      enableSorting: true,
-      cell: ({ row }) => (
-        <span className="font-mono text-sm">#{row.original.unloading}</span>
-      ),
-    },
-    {
-      header: "Transport ID",
-      accessorKey: "trip",
-      enableSorting: true,
-      cell: ({ row }) => (
-        <span className="font-semibold">#{row.original.trip}</span>
-      ),
-    },
-    {
-      header: "Yuk turi",
-      accessorKey: "cargo_type",
-      enableSorting: true,
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">
-          {row.original.cargo_type ? `ID: ${row.original.cargo_type}` : "—"}
+      cell: ({ getValue }) => (
+        <span className="font-mono text-sm">
+          {getValue<string>()}
         </span>
       ),
     },
+
+    {
+      header: "Tushirish joyi",
+      accessorKey: "unloading_name",
+      enableSorting: true,
+      cell: ({ getValue }) => (
+        <span className="font-mono text-sm">
+          {getValue<string>()}
+        </span>
+      ),
+    },
+
+    {
+      header: "Yuk turi",
+      accessorKey: "cargo_type_name",
+      enableSorting: true,
+      cell: ({ getValue }) => (
+        <span className="text-muted-foreground">
+          {getValue<string>() ?? "—"}
+        </span>
+      ),
+    },
+
+    {
+      header: "To‘lov miqdori",
+      accessorFn: (row) => row.payments?.[0]?.amount,
+      cell: ({ getValue }) => (
+        <span className="font-semibold">
+          {getValue() ? Number(getValue()).toLocaleString("uz-UZ") : "—"}
+        </span>
+      ),
+    },
+
+    {
+      header: "Valyuta",
+      accessorFn: (row) => row.payments?.[0]?.currency,
+      cell: ({ getValue }) => (
+        <span>
+          {getValue() === 1 ? "UZS" : getValue() === 2 ? "USD" : "—"}
+        </span>
+      ),
+    },
+
     {
       header: "Yaratilgan sana",
       accessorKey: "created",
       enableSorting: true,
-      cell: ({ row }) => {
-        const date = new Date(row.original.created)
-        return (
-          <span>{format(date, "dd.MM.yyyy HH:mm")}</span>
-        )
-      },
+      cell: ({ getValue }) => (
+        <span>
+          {format(new Date(getValue<string>()), "dd.MM.yyyy HH:mm")}
+        </span>
+      ),
     },
   ], [])
 }
