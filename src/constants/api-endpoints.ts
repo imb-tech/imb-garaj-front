@@ -37,6 +37,7 @@ export const SETTINGS_SELECTABLE_CLIENT = "common/selectable/client"
 export const SETTINGS_SELECTABLE_DISTRICT = "common/selectable/district"
 export const SETTINGS_SELECTABLE_PAYMENT_TYPE = "common/selectable/payment-type"
 export const SETTINGS_SELECTABLE_CARGO_TYPE = "common/selectable/cargo-type"
+export const SETTINGS_SELECTABLE_EXPENSE_CATEGORY = "common/selectable/expense-category"
 
 /** ===== VEHICLES ===== */
 export const VEHICLES = "vehicles"
