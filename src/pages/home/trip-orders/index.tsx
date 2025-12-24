@@ -49,7 +49,9 @@ const TripOrderMain = () => {
 
   const handleRowClick = (item: TripOrdersRow) => {
     const id = item?.id
-    if (!id) return
+    console.log(id,"id");
+    
+    if (id) return
     navigate({
       to: "/trip-orders/$id",
       params: { id: id.toString() },

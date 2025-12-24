@@ -17,7 +17,7 @@ import AddTrip from "./create"
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
     const { getData, setData, clearKey } = useGlobalStore()
-    const { openModal: openCreateModal, closeModal: closeCreateModal } = useModal("create")
+    const { openModal: openCreateModal, } = useModal("create")
     const { openModal: openDeleteModal } = useModal("delete")
 
     const currentTrip = getData<TripRow>(TRIPS) 
@@ -43,6 +43,16 @@ const ShiftStatisticMain = () => {
         openDeleteModal()
     }
 
+    const handleRowClick = (item: TripRow) => {
+  const id = item?.id
+  if (!id) return
+
+  navigate({
+    to: "/trip-orders/$id",
+    params: { id: id.toString() },
+  })
+}
+
 
     const { data: dataCard } = useGet<CardMain>("", {
         // params: search,
@@ -64,9 +74,7 @@ const ShiftStatisticMain = () => {
                 numeration
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
-                onRowClick={() =>
-                    navigate({ to: "/trip-orders/$id", params: { id: "2" } })
-                }
+                onRowClick={handleRowClick}  
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Reyslar ro'yxati</h1>
@@ -74,7 +82,7 @@ const ShiftStatisticMain = () => {
                     </div>
                 }
                 paginationProps={{
-                    totalPages: 3, // adjust based on data
+                    totalPages: 3, 
                 }}
             />
 
