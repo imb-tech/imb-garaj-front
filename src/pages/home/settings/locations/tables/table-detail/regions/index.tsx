@@ -25,8 +25,6 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RegionsType>(SETTINGS_REGIONS)
-   
-    
 
     const { openModal: openDeleteModal } = useModal("delete-region")
     const { openModal: openCreateModal } = useModal("create-region")
@@ -42,12 +40,15 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     }
 
     const handleRowClick = (row: RegionsType) => {
-        const isCurrentlySelected = String(search.region) === String(row.id)
+        const isCurrentlySelected = search.region === row.id
+
+        const updateSearch = (prev: typeof search): Partial<typeof search> => ({
+            ...prev,
+            region: isCurrentlySelected ? undefined : row.id,
+        })
+
         navigate({
-            search: (prev) => ({
-                ...prev,
-                region: isCurrentlySelected ? undefined : String(row.id),
-            }),
+            search: updateSearch as any, 
         })
     }
 
@@ -78,7 +79,11 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                 }
             />
 
-            <DeleteModal modalKey="delete-region" path={SETTINGS_REGIONS} id={item?.id} />
+            <DeleteModal
+                modalKey="delete-region"
+                path={SETTINGS_REGIONS}
+                id={item?.id}
+            />
             <Modal
                 size="max-w-2xl"
                 title={`Viloyat ${item?.id ? "tahrirlash" : "qo'shish"}`}
