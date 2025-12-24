@@ -75,6 +75,7 @@ type NotificationItem = {
 
 
 type ListResponse<T> = {
+    page_size: number
     total_pages: number
     count: number
     results: T[]
