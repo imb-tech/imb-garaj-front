@@ -22,8 +22,6 @@ interface CountriesTableProps {
 }
 
 const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
-    // const search = useSearch({ from: "/_main/_settings/locations/" })
-    // const { page_tabs, tabs, route_id, ...params } = search
     const { data } = useGet<ListResponse<RolesType>>(SETTINGS_COUNTRIES)
     const { getData } = useGlobalStore()
     const selectedCountry = getData(SETTINGS_COUNTRIES) as RolesType | null
@@ -32,7 +30,6 @@ const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
 
     return (
         <div className="overflow-x-auto">
-            {/* Search and Add Button Header */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div className="w-full sm:w-[360px]">
                     <ParamInput fullWidth placeholder="Qidirish..." />
@@ -46,7 +43,6 @@ const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
                 </Button>
             </div>
 
-            {/* Table */}
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -85,7 +81,7 @@ const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
                 <ParamPagination totalPages={data?.total_pages} />
             </div>
 
-            <DeleteModal path={SETTINGS_COUNTRIES} id={selectedCountry?.id} />
+            <DeleteModal modalKey="delete-country" path={SETTINGS_COUNTRIES} id={selectedCountry?.id} />
         </div>
     )
 }

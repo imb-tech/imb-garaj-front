@@ -205,5 +205,47 @@ type UserType = {
     is_staff: boolean
     is_active: boolean
     role: number
-    role_name:string
+    role_name: string
+}
+
+type DriversType = {
+    id: number
+    driver: DriverInfoType
+    password: string
+    last_login: string
+    is_superuser: boolean
+    username: string
+    first_name: string
+    last_name: string
+    date_joined: string
+    is_staff: boolean
+    is_active: boolean
+    role: number
+}
+
+type DriverInfoType = {
+    passport_serial: string
+    pinfl: string
+    phone: string
+    driver_license: string
+    driver_license_date: string
+    experience: string
+}
+
+// SETTING/LOCATION
+
+// regions
+
+type RegionsType = {
+    id: number
+    name: string
+    country: number
+}
+
+// district
+
+type SettingsDistrictType = {
+    id: number
+    name: string
+    region: number
 }

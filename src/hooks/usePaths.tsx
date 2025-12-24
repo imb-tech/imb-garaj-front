@@ -102,7 +102,7 @@ export const useItems = () =>
                 icon: <ListOrdered width={18} />,
                 path: "/dashboard",
             },
-             {
+            {
                 label: "Transport",
                 icon: <Truck width={18} />,
                 path: "/truck",
@@ -129,6 +129,10 @@ export const useItems = () =>
                     {
                         label: "Foydalanuvchilar",
                         path: "/users",
+                    },
+                    {
+                        label: "Haydovchilar",
+                        path: "/drivers",
                     },
                     {
                         label: "Rollar",
