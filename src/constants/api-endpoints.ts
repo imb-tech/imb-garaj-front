@@ -9,7 +9,6 @@ export const MANAGERS_ORDERS_NEW = "hr/"
 export const TRIPS = "trips"
 export const TRIPS_ORDERS = "trips/orders"
 
-export const VEHICLES = "vehicles"
 export const SHIFTS = "hr/"
 export const LOGIN = "auth/login"
 export const PROFILE = "/"
@@ -29,12 +28,11 @@ export const SETTINGS_DRIVERS = "users/drivers"
 export const SETTINGS_CARGO_TYPES = "common/cargo-types"
 export const SETTINGS_SELECTABLE_VEHICLE_TYPE = "common/selectable/vehicle-type"
 export const SETTINGS_SELECTABLE_USERS = "common/selectable/user"
-export const SETTINGS_SELECTABLE_CLIENT = 'common/selectable/client'
-export const SETTINGS_SELECTABLE_DISTRICT = 'common/selectable/district'
+export const SETTINGS_SELECTABLE_CLIENT = "common/selectable/client"
+export const SETTINGS_SELECTABLE_DISTRICT = "common/selectable/district"
 export const SETTINGS_SELECTABLE_PAYMENT_TYPE = "common/selectable/payment-type"
 export const SETTINGS_SELECTABLE_CARGO_TYPE = "common/selectable/cargo-type"
 
-
-
-
-
+/** ===== VEHICLES ===== */
+export const VEHICLES = "vehicles"
+export const VEHICLES_CASHFLOWS = "checkout/vehicle-cashflows"
