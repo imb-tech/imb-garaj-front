@@ -1,30 +1,26 @@
+import DeleteModal from "@/components/custom/delete-modal"
+import Modal from "@/components/custom/modal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
-import Modal from "@/components/custom/modal"
+import { TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
+import { formatMoney } from "@/lib/format-money"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate } from "@tanstack/react-router"
-import { formatMoney } from "@/lib/format-money"
 import { useCostCols } from "./cols"
-import DeleteModal from "@/components/custom/delete-modal"
-import { TRIPS } from "@/constants/api-endpoints"
 import AddTrip from "./create"
-
-
 
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
     const { getData, setData, clearKey } = useGlobalStore()
-    const { openModal: openCreateModal, } = useModal("create")
+    const { openModal: openCreateModal } = useModal("create")
     const { openModal: openDeleteModal } = useModal("delete")
 
     const currentTrip = getData<TripRow>(TRIPS)
 
-
     const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS)
-
 
     const columns = useCostCols()
 
@@ -38,7 +34,7 @@ const ShiftStatisticMain = () => {
         openCreateModal()
     }
 
-    const handleDelete = (row: { original:TripRow}) => {
+    const handleDelete = (row: { original: any }) => {
         setData(TRIPS, row.original)
         openDeleteModal()
     }
@@ -46,24 +42,22 @@ const ShiftStatisticMain = () => {
     const handleRowClick = (item: TripRow) => {
         const id = item?.id
         if (!id) return
+
         navigate({
             to: "/trip-orders/$id",
-            params: {
-                id: id.toString(),
-            },
-            search: (prev) => (prev)
+            params: { id: id.toString() },
         })
-
     }
 
-
+    const { data: dataCard } = useGet<CardMain>("", {
+        // params: search,
+        options: { enabled: false }, 
+    })
 
     return (
         <div className="space-y-3">
             <div className="flex sm:justify-end mb-3">
-                <Button onClick={handleCreate}>
-                    Reys qo'shish +
-                </Button>
+                <Button onClick={handleCreate}>Reys qo'shish +</Button>
             </div>
 
             <DataTable
@@ -97,7 +91,6 @@ const ShiftStatisticMain = () => {
             </Modal>
 
             <DeleteModal path={TRIPS} id={currentTrip?.id} />
-
         </div>
     )
 }
