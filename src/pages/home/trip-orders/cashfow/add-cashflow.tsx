@@ -110,7 +110,7 @@ const AddCashflow = () => {
                 label="Miqdor"
                 thousandSeparator=" "
                 control={control}
-                placeholder="0"
+                placeholder="0 UZS"
             />
 
             <div className="col-span-2 flex justify-end pt-4">
