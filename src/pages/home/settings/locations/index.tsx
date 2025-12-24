@@ -8,7 +8,7 @@ import AddCountriesModal from "./tables/country/add-country"
 
 const Locations = () => {
     const { openModal } = useModal("country-modal")
-    const { setData, clearKey } = useGlobalStore()
+    const {clearKey } = useGlobalStore()
 
     const handleCountyModalOpen = () => {
         clearKey(SETTINGS_COUNTRIES)

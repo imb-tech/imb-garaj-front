@@ -33,12 +33,12 @@ const ShiftStatisticMain = () => {
         openCreateModal()
     }
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item:TripRow) => {
         setData(TRIPS, item)
         openCreateModal()
     }
 
-    const handleDelete = (row: { original: any }) => {
+    const handleDelete = (row: { original:TripRow}) => {
         setData(TRIPS, row.original)
         openDeleteModal()
     }

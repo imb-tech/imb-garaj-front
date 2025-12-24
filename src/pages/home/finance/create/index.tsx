@@ -1,7 +1,7 @@
 import { FormCombobox } from "@/components/form/combobox"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
-import { SETTINGS_SELECTABLE_VEHICLE_TYPE, VEHICLES } from "@/constants/api-endpoints"
+import { SETTINGS_SELECTABLE_USERS, SETTINGS_SELECTABLE_VEHICLE_TYPE, VEHICLES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -20,18 +20,22 @@ const AddTransport = () => {
     const { closeModal } = useModal("create")
     const currentTruck = getData<TruckCreate & { id?: number }>(VEHICLES)
 
-    const { data: truckType } = useGet<TruckType>(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
+    const { data: truckType } = useGet<TruckType[]>(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
         params: {
             type: "truck"
         }
     })
-    const { data: trailerType } = useGet<ListResponse<TrailerType>>(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
+    const { data: trailerType } = useGet<TrailerType[]>(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
         params: {
             type: "trailer"
         }
     })
 
-
+   const { data: driversData } = useGet<DriversType[]>(SETTINGS_SELECTABLE_USERS, {
+        params: {
+            role: "1"
+        }
+    })
 
     const form = useForm<TruckCreate>({
         defaultValues: currentTruck || {
@@ -106,12 +110,9 @@ const AddTransport = () => {
                 label="Haydovchi"
                 name="driver"
                 control={form.control}
-                options={[
-                    { label: "Boltavoy", value: 1 },
-                    { label: "Teshavoy", value: 2 },
-                ]}
-                valueKey="value"
-                labelKey="label"
+                options={driversData}
+                valueKey="id"
+                labelKey="first_name"
                 placeholder="Haydovchi tanlang"
             />
 

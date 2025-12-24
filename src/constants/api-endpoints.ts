@@ -13,6 +13,11 @@ export const VEHICLES = "vehicles"
 export const SHIFTS = "hr/"
 export const LOGIN = "auth/login"
 export const PROFILE = "/"
+export const ORDER_CASHFLOWS = "checkout/order-cashflows"
+
+
+
+
 
 /** ===== SETTINGS ===== */
 export const SETTINGS_USERS = "users"
