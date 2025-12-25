@@ -21,6 +21,7 @@ import { Trash2, ChevronDown, Edit } from "lucide-react"
 import OrderTabs from "./cashfow"
 import ParamPagination from "@/components/as-params/pagination"
 import { cn } from "@/lib/utils"
+import ViewPageCashFlows from "./view"
 
 const TripOrderMain = () => {
   const { id } = useParams({ strict: false })
@@ -207,7 +208,7 @@ const TripOrderMain = () => {
                   {isExpanded && (
                     <TableRow className="border-none bg-secondary">
                       <TableCell colSpan={9} className="p-0">
-                        <OrderTabs />
+                       <ViewPageCashFlows/>
                       </TableCell>
                     </TableRow>
                   )}
