@@ -1,5 +1,5 @@
+import * as React from "react"
 import { format } from "date-fns"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -26,6 +26,7 @@ import AddTripOrders from "./create"
 import { MoreVertical, Pencil, Trash2, ChevronDown } from "lucide-react"
 import OrderTabs from "./cashfow"
 import ParamPagination from "@/components/as-params/pagination"
+import { cn } from "@/lib/utils"
 
 const TripOrderMain = () => {
   const { id } = useParams({ strict: false })
@@ -55,10 +56,10 @@ const TripOrderMain = () => {
     const isOpen = expandedOrderId === orderId
 
     navigate({
-      search: (prev: any) => ({
+      search: ((prev: Record<string, unknown>) => ({
         ...prev,
         order: isOpen ? undefined : String(orderId),
-      }),
+      })) as any,
     })
   }
 
@@ -89,149 +90,150 @@ const TripOrderMain = () => {
         <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>#</TableHead>
-            <TableHead>Yuklash joyi</TableHead>
-            <TableHead>Tushirish joyi</TableHead>
-            <TableHead>Yuk turi</TableHead>
-            <TableHead>To‘lov miqdori</TableHead>
-            <TableHead>Valyuta</TableHead>
-            <TableHead>Yaratilgan sana</TableHead>
-            <TableHead className="text-right" />
-            <TableHead className="text-right" />
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={9} className="text-center py-6">
-                Yuklanmoqda...
-              </TableCell>
+      {/* TABLE WRAPPER (same as DataTable) */}
+      <div className="bg-card rounded-md p-3">
+        <Table className="select-text bg-card rounded-md">
+          <TableHeader>
+            <TableRow className="border-none">
+              <TableHead>#</TableHead>
+              <TableHead>Yuklash joyi</TableHead>
+              <TableHead>Tushirish joyi</TableHead>
+              <TableHead>Yuk turi</TableHead>
+              <TableHead>To‘lov miqdori</TableHead>
+              <TableHead>Valyuta</TableHead>
+              <TableHead>Yaratilgan sana</TableHead>
+              <TableHead className="text-right" />
+              <TableHead className="text-right" />
             </TableRow>
-          )}
+          </TableHeader>
 
-          {data?.results?.map((order, index) => {
-            const isExpanded = expandedOrderId === order.id
+          <TableBody>
+            {isLoading && (
+              <TableRow className="border-none">
+                <TableCell colSpan={9} className="text-center py-6">
+                  Yuklanmoqda...
+                </TableCell>
+              </TableRow>
+            )}
 
-            return (
-              <>
-                <TableRow
-                  key={order.id}
-                  className={`cursor-pointer ${
-                    isExpanded ? "bg-secondary" : ""
-                  }`}
-                  onClick={() => toggleExpand(order.id)}
-                >
-                  <TableCell>
-                    {(page - 1) * (data.page_size ?? 2) + index + 1}
-                  </TableCell>
+            {data?.results?.map((order, index) => {
+              const isExpanded = expandedOrderId === order.id
 
-                  <TableCell className="font-mono text-sm">
-                    {order.loading_name}
-                  </TableCell>
+              return (
+                <React.Fragment key={order.id}>
+                  <TableRow
+                    onClick={() => toggleExpand(order.id)}
+                    className={cn(
+                      "cursor-pointer border-none transition-colors",
+                      "hover:bg-gray-200 dark:hover:bg-secondary",
+                      index % 2 !== 0 && "bg-secondary/70",
+                      isExpanded && "bg-secondary"
+                    )}
+                  >
+                    <TableCell className="border-r border-secondary last:border-none">
+                      {(page - 1) * (data.page_size ?? 10) + index + 1}
+                    </TableCell>
 
-                  <TableCell className="font-mono text-sm">
-                    {order.unloading_name}
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none">
+                      {order.loading_name}
+                    </TableCell>
 
-                  <TableCell className="text-muted-foreground">
-                    {order.cargo_type_name ?? "—"}
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none">
+                      {order.unloading_name}
+                    </TableCell>
 
-                  <TableCell className="font-semibold">
-                    {order.payments?.[0]?.amount
-                      ? Number(order.payments[0].amount).toLocaleString("uz-UZ")
-                      : "—"}
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none text-muted-foreground">
+                      {order.cargo_type_name ?? "—"}
+                    </TableCell>
 
-                  <TableCell>
-                    {order.payments?.[0]?.currency === 1
-                      ? "UZS"
-                      : order.payments?.[0]?.currency === 2
-                      ? "USD"
-                      : "—"}
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none font-semibold">
+                      {order.payments?.[0]?.amount
+                        ? Number(order.payments[0].amount).toLocaleString("uz-UZ")
+                        : "—"}
+                    </TableCell>
 
-                  <TableCell>
-                    {order.created
-                      ? format(
-                          new Date(order.created),
-                          "dd.MM.yyyy HH:mm"
-                        )
-                      : "—"}
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none">
+                      {order.payments?.[0]?.currency === 1
+                        ? "UZS"
+                        : order.payments?.[0]?.currency === 2
+                        ? "USD"
+                        : "—"}
+                    </TableCell>
 
-                  <TableCell className="text-right p-0">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={(e) => handleEdit(order, e)}
-                        >
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Tahrirlash
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={(e) => handleDelete(order, e)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          O‘chirish
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                    <TableCell className="border-r border-secondary last:border-none">
+                      {order.created
+                        ? format(
+                            new Date(order.created),
+                            "dd.MM.yyyy HH:mm"
+                          )
+                        : "—"}
+                    </TableCell>
 
-                  <TableCell className="text-right p-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleExpand(order.id)
-                      }}
+                    {/* ACTIONS */}
+                    <TableCell
+                      className="border-r border-secondary last:border-none cursor-default p-0 text-right"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <ChevronDown
-                        className={`transition-transform ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                      />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={(e) => handleEdit(order, e)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Tahrirlash
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={(e) => handleDelete(order, e)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            O‘chirish
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
 
-                {isExpanded && (
-                  <TableRow>
-                    <TableCell colSpan={9} className="p-0">
-                      <OrderTabs />
+                    {/* EXPAND */}
+                    <TableCell
+                      className="border-r border-secondary last:border-none cursor-default p-0 text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button variant="ghost" size="sm">
+                        <ChevronDown
+                          className={cn(
+                            "transition-transform",
+                            isExpanded && "rotate-180"
+                          )}
+                        />
+                      </Button>
                     </TableCell>
                   </TableRow>
-                )}
-              </>
-            )
-          })}
-        </TableBody>
-      </Table>
 
-      {!!data?.total_pages && data.total_pages > 1 && (
-        <div className="pt-4 flex justify-center">
-          <ParamPagination
-            totalPages={data.total_pages}
-            disabled={isLoading}
-          />
-        </div>
-      )}
+                  {isExpanded && (
+                    <TableRow className="border-none bg-secondary">
+                      <TableCell colSpan={9} className="p-0">
+                        <OrderTabs />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="pt-4 flex justify-center">
+        <ParamPagination
+          totalPages={data?.total_pages}
+          disabled={isLoading}
+        />
+      </div>
 
       <Modal
         modalKey="create"
@@ -240,9 +242,7 @@ const TripOrderMain = () => {
           currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
         }`}
       >
-        <div className="max-h-[80vh] overflow-y-auto p-0.5">
-          <AddTripOrders />
-        </div>
+        <AddTripOrders />
       </Modal>
 
       <DeleteModal path={TRIPS_ORDERS} id={currentTripsOrder?.id} />
