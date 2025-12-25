@@ -1,3 +1,4 @@
+import { FormFormatNumberInput } from "@/components/form/format-number-input"
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
 import { SETTINGS_CUSTOMERS } from "@/constants/api-endpoints"
@@ -7,10 +8,9 @@ import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
-
 import { toast } from "sonner"
 
-const  AddCustomerModal = () => {
+const AddCustomerModal = () => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
@@ -64,11 +64,14 @@ const  AddCustomerModal = () => {
                         label="F.I.O"
                         methods={form}
                     />
-                    <FormInput
+
+                    <FormFormatNumberInput
+                        control={form.control}
+                        format="+998 ## ### ## ##"
                         required
-                        name="phone_number"
-                        label="Telefon raqami"
-                        methods={form}
+                        label={"Telefon"}
+                        name={"phone_number"}
+                        placeholder="+998 __ ___ __ __"
                     />
 
                     <div className="flex items-center justify-end gap-2 md:col-span-2">
@@ -86,4 +89,4 @@ const  AddCustomerModal = () => {
     )
 }
 
-export default  AddCustomerModal
+export default AddCustomerModal

@@ -53,15 +53,11 @@ const TripOrderMain = () => {
     const toggleExpand = (orderId: number) => {
         const isOpen = expandedOrderId === orderId
 
-        const updateSearch = (prev: Record<string, unknown>) => {
-            return {
+        navigate({
+            search: ((prev: Record<string, unknown>) => ({
                 ...prev,
                 order: isOpen ? undefined : String(orderId),
-            }
-        }
-
-        navigate({
-            search: updateSearch as any,
+            })) as any,
         })
     }
 
@@ -88,10 +84,6 @@ const TripOrderMain = () => {
                 <Button onClick={handleCreate}>Buyurtma qo‘shish +</Button>
             </div>
 
-            <div className="flex items-center gap-3">
-                <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
-            </div>
-
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -102,8 +94,8 @@ const TripOrderMain = () => {
                         <TableHead>To‘lov miqdori</TableHead>
                         <TableHead>Valyuta</TableHead>
                         <TableHead>Yaratilgan sana</TableHead>
-                        <TableHead className="text-right" />
-                        <TableHead className="text-right" />
+                        <TableHead />
+                        <TableHead />
                     </TableRow>
                 </TableHeader>
 
@@ -134,19 +126,16 @@ const TripOrderMain = () => {
                                             1}
                                     </TableCell>
 
-                                    <TableCell className="font-mono text-sm">
-                                        {order.loading_name}
-                                    </TableCell>
-
-                                    <TableCell className="font-mono text-sm">
+                                    <TableCell>{order.loading_name}</TableCell>
+                                    <TableCell>
                                         {order.unloading_name}
                                     </TableCell>
 
-                                    <TableCell className="text-muted-foreground">
+                                    <TableCell>
                                         {order.cargo_type_name ?? "—"}
                                     </TableCell>
 
-                                    <TableCell className="font-semibold">
+                                    <TableCell>
                                         {order.payments?.[0]?.amount ?
                                             Number(
                                                 order.payments[0].amount,
@@ -254,9 +243,7 @@ const TripOrderMain = () => {
                     currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
                 }`}
             >
-                <div className="max-h-[80vh] overflow-y-auto p-0.5">
-                    <AddTripOrders />
-                </div>
+                <AddTripOrders />
             </Modal>
 
             <DeleteModal path={TRIPS_ORDERS} id={currentTripsOrder?.id} />
