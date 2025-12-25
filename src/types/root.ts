@@ -42,7 +42,6 @@ type SearchParams = {
     region_search?: string
     district_search?:string
     order?:number|string
-<<<<<<< HEAD
     user_search?:string
     first_name?:string
     payment_type?:string
@@ -53,8 +52,6 @@ type SearchParams = {
     country_search?:string
     vehicle_search?:string
     roles_search?:string
-=======
     trip?:string|number
->>>>>>> origin/rayhona
 }
 
