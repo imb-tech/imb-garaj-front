@@ -54,7 +54,9 @@ const UsersPage = () => {
             <Modal
                 size="max-w-2xl"
                 title={
-                    item?.id ? " Haydovchini tahrirlash" : " Haydovchi qo'shish"
+                    item?.id ?
+                        " Foydalanuvchi tahrirlash"
+                    :   " Foydalanuvchi qo'shish"
                 }
                 modalKey="create"
             >

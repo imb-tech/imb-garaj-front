@@ -48,7 +48,7 @@ export const useColumnsUsersTable = () => {
                 enableSorting: true,
                 cell: ({ row }) => {
                     const isActive = row.getValue("is_superuser")
-                    return isActive ? "Super admin" : "oddiy foydalanuvchi"
+                    return isActive ? "Super admin" : "Oddiy foydalanuvchi"
                 },
             },
         ],
