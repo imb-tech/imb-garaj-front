@@ -9,6 +9,7 @@ import { useGlobalStore } from "@/store/global-store"
 import { useNavigate } from "@tanstack/react-router"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
+import ParamInput from "@/components/as-params/input"
 
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
@@ -51,7 +52,8 @@ const ShiftStatisticMain = () => {
 
     return (
         <div className="space-y-3">
-            <div className="flex sm:justify-end mb-3">
+            <div className="flex justify-between items-center mb-3 gap-4">
+                <ParamInput name="driver_name" fullWidth searchKey="driver_name"/>
                 <Button onClick={handleCreate}>Reys qo'shish +</Button>
             </div>
 
