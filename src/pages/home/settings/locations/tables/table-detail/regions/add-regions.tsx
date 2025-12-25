@@ -1,4 +1,3 @@
-import { FormCombobox } from "@/components/form/combobox"
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
 import { SETTINGS_COUNTRIES, SETTINGS_REGIONS } from "@/constants/api-endpoints"
@@ -80,28 +79,22 @@ const AddRegionsModal = ({ country_id }: AddRegionsModalProps) => {
                     methods={form}
                 />
 
-                {/* Show combobox only when editing (currentRegion?.id exists) */}
-                {currentRegion?.id ?
-                    <FormCombobox
-                        label="Davlat"
-                        name="country"
-                        options={countries?.results}
-                        control={form.control}
-                    />
-                :   <div className="space-y-2">
-                        <label className="text-sm font-medium">Davlat</label>
-                        <div className="h-10 px-3 py-2 text-sm border rounded-md bg-muted flex items-center">
-                            {countries?.results?.find(
-                                (c) => String(c.id) === String(country_id),
-                            )?.name || "Davlat"}
-                        </div>
-                        <input
-                            type="hidden"
-                            {...form.register("country")}
-                            value={String(country_id)}
-                        />
+ 
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Davlat</label>
+
+                    <div className="h-10 px-3 py-2 text-sm border rounded-md bg-muted flex items-center">
+                        {countries?.results?.find(
+                            (c) => String(c.id) === String(country_id),
+                        )?.name || "Davlat"}
                     </div>
-                }
+
+                    <input
+                        type="hidden"
+                        {...form.register("country")}
+                        value={String(country_id)}
+                    />
+                </div>
 
                 <div className="flex items-center justify-end gap-2 md:col-span-2">
                     <Button
