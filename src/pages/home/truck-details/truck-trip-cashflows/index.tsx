@@ -7,7 +7,7 @@ import { useSearch } from "@tanstack/react-router"
 
 
 
-const TripOrderDetailRow = () => {
+const TruckTripCashflowRow = () => {
     const search = useSearch({ strict: false })
     const orderId = Number(search.order)
     const { data, isLoading } = useGet<ListResponse<CashflowRow>>(
@@ -53,4 +53,4 @@ const TripOrderDetailRow = () => {
     )
 }
 
-export default TripOrderDetailRow
+export default TruckTripCashflowRow
