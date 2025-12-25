@@ -2,13 +2,7 @@ import { ParamCombobox } from "@/components/as-params/combobox"
 import { SETTINGS_SELECTABLE_VEHICLE_TYPE } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 
-type VehicleSelection ={
-     
-        id: number | string,
-        type: string,
-        name:string
-    
-}
+
 
 
 export const optionYears = (
@@ -52,7 +46,7 @@ export const yearOnly = new Date().getFullYear()
 
 export default function ReportsFilter() {
 
-  const { data: vehicleType } = useGet(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
+    const { data: vehicleType } = useGet(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
         params: {
             model_name: "vehicle-type"
         }
@@ -164,11 +158,10 @@ export default function ReportsFilter() {
 // ]
 
 const statusFilter = [
-    { key: 1, name: "Bo'sh" },
-     { key:2, name: "Band" },
+    { key: 1, name: "Band" },
+    { key: 2, name: "Bo'sh" },
     { key: 3, name: "Ta'mirda" },
-   
- 
+
 ]
 
 // const regions = [
