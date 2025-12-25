@@ -17,6 +17,7 @@ import { Route as MainImport } from './routes/_main'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as MainIndexImport } from './routes/_main/index'
 import { Route as MainTrucksTruckDetailIdImport } from './routes/_main/_trucks/truck-detail/$id'
+import { Route as MainTrucksOrdersIdImport } from './routes/_main/_trucks/orders/$id'
 import { Route as MainTripTripOrdersIdImport } from './routes/_main/_trip/trip-orders/$id'
 
 // Create Virtual Routes
@@ -189,6 +190,11 @@ const MainTrucksTruckDetailIdRoute = MainTrucksTruckDetailIdImport.update({
   getParentRoute: () => MainRoute,
 } as any)
 
+const MainTrucksOrdersIdRoute = MainTrucksOrdersIdImport.update({
+  path: '/orders/$id',
+  getParentRoute: () => MainRoute,
+} as any)
+
 const MainTripTripOrdersIdRoute = MainTripTripOrdersIdImport.update({
   path: '/trip-orders/$id',
   getParentRoute: () => MainRoute,
@@ -238,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: '/trip-orders/$id'
       fullPath: '/trip-orders/$id'
       preLoaderRoute: typeof MainTripTripOrdersIdImport
+      parentRoute: typeof MainImport
+    }
+    '/_main/_trucks/orders/$id': {
+      id: '/_main/_trucks/orders/$id'
+      path: '/orders/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof MainTrucksOrdersIdImport
       parentRoute: typeof MainImport
     }
     '/_main/_trucks/truck-detail/$id': {
@@ -343,6 +356,7 @@ interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainIndexRoute: typeof MainIndexRoute
   MainTripTripOrdersIdRoute: typeof MainTripTripOrdersIdRoute
+  MainTrucksOrdersIdRoute: typeof MainTrucksOrdersIdRoute
   MainTrucksTruckDetailIdRoute: typeof MainTrucksTruckDetailIdRoute
   MainSettingsCargoTypesIndexLazyRoute: typeof MainSettingsCargoTypesIndexLazyRoute
   MainSettingsCustomersIndexLazyRoute: typeof MainSettingsCustomersIndexLazyRoute
@@ -361,6 +375,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainIndexRoute: MainIndexRoute,
   MainTripTripOrdersIdRoute: MainTripTripOrdersIdRoute,
+  MainTrucksOrdersIdRoute: MainTrucksOrdersIdRoute,
   MainTrucksTruckDetailIdRoute: MainTrucksTruckDetailIdRoute,
   MainSettingsCargoTypesIndexLazyRoute: MainSettingsCargoTypesIndexLazyRoute,
   MainSettingsCustomersIndexLazyRoute: MainSettingsCustomersIndexLazyRoute,
@@ -386,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof MainDashboardLazyRoute
   '/': typeof MainIndexRoute
   '/trip-orders/$id': typeof MainTripTripOrdersIdRoute
+  '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
@@ -406,6 +422,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof MainDashboardLazyRoute
   '/': typeof MainIndexRoute
   '/trip-orders/$id': typeof MainTripTripOrdersIdRoute
+  '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
   '/customers': typeof MainSettingsCustomersIndexLazyRoute
@@ -428,6 +445,7 @@ export interface FileRoutesById {
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/': typeof MainIndexRoute
   '/_main/_trip/trip-orders/$id': typeof MainTripTripOrdersIdRoute
+  '/_main/_trucks/orders/$id': typeof MainTrucksOrdersIdRoute
   '/_main/_trucks/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/_main/_settings/cargo-types/': typeof MainSettingsCargoTypesIndexLazyRoute
   '/_main/_settings/customers/': typeof MainSettingsCustomersIndexLazyRoute
@@ -450,6 +468,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/'
     | '/trip-orders/$id'
+    | '/orders/$id'
     | '/truck-detail/$id'
     | '/cargo-types'
     | '/customers'
@@ -469,6 +488,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/'
     | '/trip-orders/$id'
+    | '/orders/$id'
     | '/truck-detail/$id'
     | '/cargo-types'
     | '/customers'
@@ -489,6 +509,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard'
     | '/_main/'
     | '/_main/_trip/trip-orders/$id'
+    | '/_main/_trucks/orders/$id'
     | '/_main/_trucks/truck-detail/$id'
     | '/_main/_settings/cargo-types/'
     | '/_main/_settings/customers/'
@@ -542,6 +563,7 @@ export const routeTree = rootRoute
         "/_main/dashboard",
         "/_main/",
         "/_main/_trip/trip-orders/$id",
+        "/_main/_trucks/orders/$id",
         "/_main/_trucks/truck-detail/$id",
         "/_main/_settings/cargo-types/",
         "/_main/_settings/customers/",
@@ -570,6 +592,10 @@ export const routeTree = rootRoute
     },
     "/_main/_trip/trip-orders/$id": {
       "filePath": "_main/_trip/trip-orders/$id.tsx",
+      "parent": "/_main"
+    },
+    "/_main/_trucks/orders/$id": {
+      "filePath": "_main/_trucks/orders/$id.tsx",
       "parent": "/_main"
     },
     "/_main/_trucks/truck-detail/$id": {

@@ -52,5 +52,6 @@ type SearchParams = {
     country_search?:string
     vehicle_search?:string
     roles_search?:string
+    trip?:string|number
 }
 

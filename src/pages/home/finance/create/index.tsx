@@ -75,7 +75,7 @@ const AddTransport = () => {
             truck_passport: data.truck_passport,
             trailer_number: data.trailer_number || null,
             fuel: data.fuel,
-            truck_type: data.truck_type,
+            truck_type: data.truck_type || null,
             trailer_type: data.trailer_type || null,
             driver: data.driver,
         }
@@ -138,8 +138,6 @@ const AddTransport = () => {
                 name="truck_type"
                 control={form.control}
                 options={truckType}
-                valueKey="id"
-                labelKey="name"
                 placeholder="Avtomobil turi"
             />
 
