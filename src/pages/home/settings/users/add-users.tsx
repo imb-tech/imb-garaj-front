@@ -49,7 +49,11 @@ const AddUserModal = () => {
 
     const onSubmit = (values: UserType) => {
         if (currentDriver?.id) {
-            updateMutate(`${SETTINGS_USERS}/${currentDriver.id}`, values)
+            const { password, ...restValues } = values
+
+            const payload = password ? values : restValues
+
+            updateMutate(`${SETTINGS_USERS}/${currentDriver.id}`, payload)
         } else {
             postMutate(SETTINGS_USERS, values)
         }

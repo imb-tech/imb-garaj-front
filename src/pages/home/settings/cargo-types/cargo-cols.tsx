@@ -8,14 +8,18 @@ import { useGlobalStore } from "@/store/global-store"
 import { useColumnsCargoTable } from "."
 import TableHeader from "../table-header"
 import AddCargoModal from "./add-cargo"
+ import { useSearch } from "@tanstack/react-router"
 
 const  CargoPage = () => {
-    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const search = useSearch({ strict:false})
     const { data, isLoading } = useGet<ListResponse<RolesType>>(
         SETTINGS_CARGO_TYPE,
-        // {
-        //     params: search,
-        // },
+         {
+           params:{
+            search:search.cargo_search
+           
+         }
+        },
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RolesType>(SETTINGS_CARGO_TYPE)
@@ -49,6 +53,8 @@ const  CargoPage = () => {
                         fileName="Yuk"
                         url="excel"
                         storeKey={SETTINGS_CARGO_TYPE}
+                        searchKey="cargo_search"
+                        pageKey="page"
                     />
                 }
             />

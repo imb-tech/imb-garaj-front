@@ -31,6 +31,8 @@ const Locations = () => {
                                 <ParamInput
                                     fullWidth
                                     placeholder="Qidirish..."
+                                    searchKey="country_search"
+                                    pageKey="page"
                                 />
                             </div>
                             <Button
