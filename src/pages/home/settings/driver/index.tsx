@@ -11,9 +11,14 @@ import AddDriverModal from "./add-driver"
 import { useColumnsDriverTable } from "./driver-cols"
 
 const Drivers = () => {
-    // const search = useSearch({ from: "/_main/_settings/drivers/" })
+    const search = useSearch({strict:false})
     const { data, isLoading } = useGet<ListResponse<DriversType>>(
         SETTINGS_DRIVERS,
+        {
+            params:{
+                search:search.driver_search
+            }
+        }
      
     )
     const { getData, setData } = useGlobalStore()
@@ -44,6 +49,8 @@ const Drivers = () => {
                         fileName="Haydovchilar"
                         url="excel"
                         storeKey={SETTINGS_DRIVERS}
+                        pageKey="page"
+                        searchKey="driver_search"
                     />
                 }
             />

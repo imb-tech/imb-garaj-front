@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
-
+import { formatPhoneNumber } from "../customers/phone-number"
 export const useColumnsDriverTable = () => {
     return useMemo<ColumnDef<DriversType>[]>(
         () => [
@@ -9,23 +9,27 @@ export const useColumnsDriverTable = () => {
                 header: "Ism",
                 enableSorting: true,
             },
-              {
+            {
                 accessorKey: "last_name",
                 header: "Ism",
                 enableSorting: true,
-               
             },
             {
-                accessorKey: "phone",
+                accessorKey: "phone_number",
                 header: "Telefon raqami",
                 enableSorting: true,
-                accessorFn:(row)=>row.driver?.phone || "",
-                cell:({row})=>{
-                    return row.getValue("phone") || "-"
+                cell: ({ row }) => (
+                    <div className="min-w-[180px] w-[220px] truncate">
+                        {formatPhoneNumber(row.original?.driver?.phone || "Mavjud emas")}
+                    </div>
+                ),
+                sortingFn: (rowA, rowB, columnId) => {
+                    const phoneA = rowA.getValue(columnId) as string
+                    const phoneB = rowB.getValue(columnId) as string
+                    const digitsA = (phoneA || "").replace(/\D/g, "")
+                    const digitsB = (phoneB || "").replace(/\D/g, "")
+                    return digitsA.localeCompare(digitsB)
                 },
-                id:"phone"
-                
-
             },
             {
                 accessorKey: "username",
@@ -82,7 +86,7 @@ export const useColumnsDriverTable = () => {
                 },
                 id: "license_expiry",
             },
-                 {
+            {
                 accessorKey: "is_active",
                 header: "Aktiv",
                 enableSorting: true,

@@ -16,11 +16,17 @@ import { Plus } from "lucide-react"
 import { Key } from "react"
 import { useColumnsCountriesTable } from "./country-cols"
 import { CountryRowTable } from "./country-row"
+import { useSearch } from "@tanstack/react-router"
 
  
 
 const CountriesTable = () => {
-    const { data } = useGet<ListResponse<RolesType>>(SETTINGS_COUNTRIES)
+    const search = useSearch({strict:false})
+    const { data } = useGet<ListResponse<RolesType>>(SETTINGS_COUNTRIES,{
+        params:{
+            search:search.country_search
+        }
+    })
     const { getData } = useGlobalStore()
     const selectedCountry = getData(SETTINGS_COUNTRIES) as RolesType | null
     const columns = useColumnsCountriesTable()

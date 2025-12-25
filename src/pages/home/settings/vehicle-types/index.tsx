@@ -8,15 +8,19 @@ import { useGlobalStore } from "@/store/global-store"
 import TableHeader from "../table-header"
 import AddVehicleModal from "./add-vehicle"
 import { useColumnsVehicleTable } from "./vehicle-cols"
+import { useSearch } from "@tanstack/react-router"
  
 
 const  VehicleTypePage = () => {
-    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const search = useSearch({strict:false})
     const { data, isLoading } = useGet<ListResponse< VehicleRoleType>>(
          SETTINGS_VEHICLE_TYPE,
-        // {
-        //     params: search,
-        // },
+         {
+            params:{
+                search:search.vehicle_search
+            }
+         }
+       
     )
     const { getData, setData } = useGlobalStore()
     const item = getData< VehicleRoleType>( SETTINGS_VEHICLE_TYPE)
@@ -50,6 +54,8 @@ const  VehicleTypePage = () => {
                         fileName="Rollar"
                         url="excel"
                         storeKey={ SETTINGS_VEHICLE_TYPE}
+                        searchKey="vehicle_search"
+                        pageKey="page"
                     />
                 }
             />

@@ -11,12 +11,14 @@ import AddPaymentTypeModal from "./add-payment"
 import { useColumnsPaymentTable } from "./payment-cols"
 
 const  PaymenTypePage = () => {
-    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const search = useSearch({ strict:false })
     const { data, isLoading } = useGet<ListResponse<RolesType>>(
          SETTINTS_PAYMENT_TYPE,
-        // {
-        //     params: search,
-        // },
+        {
+            params: {
+                search:search.payment_type
+            },
+        },
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RolesType>( SETTINTS_PAYMENT_TYPE)
@@ -51,6 +53,8 @@ const  PaymenTypePage = () => {
                         fileName="To'lov turlari"
                         url="excel"
                         storeKey={ SETTINTS_PAYMENT_TYPE}
+                        pageKey="page"
+                        searchKey="payment_type"
                     />
                 }
             />

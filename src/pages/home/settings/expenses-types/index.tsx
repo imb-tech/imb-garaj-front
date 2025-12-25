@@ -8,14 +8,17 @@ import { useGlobalStore } from "@/store/global-store"
 import TableHeader from "../table-header"
 import AddExpensesModal from "./add-expenses"
 import { useColumnsExpensesTable } from "./expenses-cols"
+import { useSearch } from "@tanstack/react-router" 
 
 const ExpensesTypePage = () => {
-    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const search = useSearch({strict:false})
     const { data, isLoading } = useGet<ListResponse<VehicleRoleType>>(
         SETTINGS_EXPENSES,
-        // {
-        //     params: search,
-        // },
+       {
+        params:{
+            search:search.expense_type
+        }
+       }
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<VehicleRoleType>(SETTINGS_EXPENSES)
@@ -49,6 +52,8 @@ const ExpensesTypePage = () => {
                         fileName="Xarajatlar"
                         url="excel"
                         storeKey={SETTINGS_EXPENSES}
+                        searchKey="expense_type"
+                        pageKey="page"
                     />
                 }
             />

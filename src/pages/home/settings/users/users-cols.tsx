@@ -34,17 +34,7 @@ export const useColumnsUsersTable = () => {
                     return isActive ? "Aktiv" : "Aktiv emas"
                 },
             },
-
-            {
-                accessorKey: "role_name",
-                header: "Foydalanuvchi roli",
-                enableSorting: true,
-                accessorFn: (row) => row.role_name || "Mavjud emas",
-                cell: ({ row }) => {
-                    return row.getValue("role_name") || "Mavjud emas"
-                },
-                id: "role_name",
-            },
+ 
         ],
         [],
     )
