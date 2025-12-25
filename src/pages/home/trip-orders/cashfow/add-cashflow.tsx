@@ -19,6 +19,8 @@ interface CashflowForm {
     amount: number
     category: number
     comment: string
+    currency: number | string
+    currency_course: number | string
 }
 
 const AddCashflow = () => {
@@ -36,11 +38,15 @@ const AddCashflow = () => {
             amount: currentCashflow?.amount,
             category: currentCashflow?.category,
             comment: currentCashflow?.comment,
+            currency: currentCashflow?.currency,
+            currency_course: currentCashflow?.currency_course
         }
 
     })
 
-    const { handleSubmit, control, reset } = form
+    const { handleSubmit, control, reset, watch } = form
+    const selectedCurrency = watch("currency")
+
 
     const onSuccess = () => {
         toast.success(
@@ -67,7 +73,9 @@ const AddCashflow = () => {
             action: data.action,
             amount: Number(data.amount),
             category: data.category,
-            comment: data.comment
+            comment: data.comment,
+            currency:data.currency,
+            currency_course:data.currency_course
         }
 
         if (currentCashflow?.id) {
@@ -108,18 +116,39 @@ const AddCashflow = () => {
                 valueKey="id"
                 labelKey="name"
             />
+            <FormCombobox
+                required
+                label="Valyuta"
+                name="currency"
+                control={control}
+                options={[
+                    { value: 1, label: "UZS - So‘m" },
+                    { value: 2, label: "USD - AQSh dollari" },
+                ]}
+                valueKey="value"
+                labelKey="label"
+                placeholder="Valyutani tanlang"
 
-            <div>
+            />
+            {selectedCurrency === 2 && (
                 <FormNumberInput
-                    required
-                    name="amount"
-                    label="Miqdor"
                     thousandSeparator=" "
+                    name="currency_course"
+                    label="Valyuta kursi"
+                    placeholder="12 206 UZS"
                     control={control}
-                    placeholder="0 UZS"
                 />
-                <FormInput required name="comment" label="Xarajat uchun izoh" methods={form} placeholder="Misol: Yoqilg'i uchun" />
-            </div>
+            )}
+            <FormNumberInput
+                required
+                name="amount"
+                label="Miqdor"
+                thousandSeparator=" "
+                control={control}
+                placeholder="0 UZS"
+            />
+            <FormInput required name="comment" label="Xarajat uchun izoh" methods={form} placeholder="Misol: Yoqilg'i uchun" />
+
 
 
             <div className="col-span-2 flex justify-end pt-4">
