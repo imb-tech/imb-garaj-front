@@ -19,13 +19,10 @@ const VehicleTrips = () => {
   const handleRowClick = (item: TripRow) => {
     const id = item?.id
     if (!id) return
-    navigate({ 
-        search: ((prev: Record<string, unknown>) => ({ 
-            ...prev, 
-            trip: id,  // trip id ni alohida param qilib o'rnatish
-            tab: 'orders'  // agar tab ochish uchun kerak bo'lsa (optional, agar conditional rendering bo'lsa)
-        })) as any, 
-    })
+   navigate({
+            to: "/orders/$id",
+            params: { id: id.toString() },
+        })
 }
 
 
