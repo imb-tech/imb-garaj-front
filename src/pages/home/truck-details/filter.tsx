@@ -1,5 +1,15 @@
 import { ParamCombobox } from "@/components/as-params/combobox"
-import ParamDateRange from "@/components/as-params/date-picker-range"
+import { SETTINGS_SELECTABLE_VEHICLE_TYPE } from "@/constants/api-endpoints"
+import { useGet } from "@/hooks/useGet"
+
+type VehicleSelection ={
+     
+        id: number | string,
+        type: string,
+        name:string
+    
+}
+
 
 export const optionYears = (
     valueKey: string = "id",
@@ -41,10 +51,17 @@ export const monthOnly = String(new Date().getMonth() + 1).padStart(2, "0")
 export const yearOnly = new Date().getFullYear()
 
 export default function ReportsFilter() {
+
+  const { data: vehicleType } = useGet(SETTINGS_SELECTABLE_VEHICLE_TYPE, {
+        params: {
+            model_name: "vehicle-type"
+        }
+    })
+
     return (
         <aside className="flex items-center overflow-x-auto no-scrollbar gap-2 rounded-md ">
             <>
-                <ParamCombobox
+                {/* <ParamCombobox
                     paramName="region"
                     options={regions}
                     isSearch={false}
@@ -53,11 +70,13 @@ export default function ReportsFilter() {
                     addButtonProps={{
                         className: "!bg-background dark:!bg-secondary",
                     }}
-                />
+                /> */}
                 <ParamCombobox
                     paramName="truck_type"
-                    options={truckType}
+                    options={vehicleType}
                     isSearch={false}
+                    labelKey={"name"}
+                    valueKey={"id"}
                     label="Transport turi"
                     className="w-full"
                     addButtonProps={{
@@ -77,7 +96,7 @@ export default function ReportsFilter() {
                     }}
                 />
 
-                <ParamCombobox
+                {/* <ParamCombobox
                     paramName="garage"
                     options={[
                         { key: "all", name: "Barchasi" },
@@ -92,9 +111,9 @@ export default function ReportsFilter() {
                     addButtonProps={{
                         className: "!bg-background dark:!bg-secondary",
                     }}
-                />
+                /> */}
 
-                <ParamCombobox
+                {/* <ParamCombobox
                     paramName="month"
                     options={months}
                     isSearch={false}
@@ -117,65 +136,58 @@ export default function ReportsFilter() {
                     addButtonProps={{
                         className: "!bg-background dark:!bg-secondary min-w-32",
                     }}
-                />
+                /> */}
             </>
-            <ParamDateRange
+            {/* <ParamDateRange
                 addButtonProps={{
                     className:
                         "!bg-background dark:!bg-secondary min-w-32 justify-start",
                 }}
-            />
+            /> */}
         </aside>
     )
 }
 
-const statusOptions = [
-    { key: "all", name: "Barchasi" },
-    { key: "garage", name: "Yuklash uchun yo'lga chiqdi" },
-    { key: "street", name: "Yuklash uchun yetib bordi" },
-    { key: "street", name: "Yuklash boshlandi" },
-    { key: "street", name: "Yuklash yakunlandi" },
-    { key: "street", name: "Yo'lga chiqdi" },
-    { key: "street", name: "Yo'lda" },
-    { key: "street", name: "Yetib bordi" },
-    { key: "street", name: "Yuk tushirish boshlandi" },
-    { key: "street", name: "Yuk tushirish tugadi" },
-    { key: "street", name: "Yakunlandi" },
-    { key: "street", name: "Garaj mexanigi tasdiqlandi" },
-]
+// const statusOptions = [
+//     { key: "all", name: "Barchasi" },
+//     { key: "garage", name: "Yuklash uchun yo'lga chiqdi" },
+//     { key: "street", name: "Yuklash uchun yetib bordi" },
+//     { key: "street", name: "Yuklash boshlandi" },
+//     { key: "street", name: "Yuklash yakunlandi" },
+//     { key: "street", name: "Yo'lga chiqdi" },
+//     { key: "street", name: "Yo'lda" },
+//     { key: "street", name: "Yetib bordi" },
+//     { key: "street", name: "Yuk tushirish boshlandi" },
+//     { key: "street", name: "Yuk tushirish tugadi" },
+//     { key: "street", name: "Yakunlandi" },
+//     { key: "street", name: "Garaj mexanigi tasdiqlandi" },
+// ]
 
 const statusFilter = [
-    { key: "all", name: "Barchasi" },
-    { key: "garage", name: "Garajda - bo'sh" },
-    { key: "street", name: "Garajda- ta'mirda" },
-    { key: "street", name: "Garajda - boshqa sabab" },
-    { key: "street", name: "Yuklanmoqda" },
-    { key: "street", name: "Yuk tashishda" },
-    { key: "street", name: "Yuk topshirishda" },
-    { key: "street", name: "Bo'shagan (yuklashga tayor)" },
-    {
-        key: "street",
-        name: "Boshqa joyda (buzilgan, avariya, zapravka, GAI, tanafus, boshqalar) ",
-    },
+    { key: 1, name: "Bo'sh" },
+     { key:2, name: "Band" },
+    { key: 3, name: "Ta'mirda" },
+   
+ 
 ]
 
-const regions = [
-    { id: 0, name: "Barchasi" },
-    { id: 1, name: "Qoraqalpog'iston Respublikasi" },
-    { id: 2, name: "Andijon viloyati" },
-    { id: 3, name: "Buxoro viloyati" },
-    { id: 4, name: "Farg'ona viloyati" },
-    { id: 5, name: "Jizzax viloyati" },
-    { id: 6, name: "Namangan viloyati" },
-    { id: 7, name: "Navoiy viloyati" },
-    { id: 8, name: "Qashqadaryo viloyati" },
-    { id: 9, name: "Samarqand viloyati" },
-    { id: 10, name: "Sirdaryo viloyati" },
-    { id: 11, name: "Surxondaryo viloyati" },
-    { id: 12, name: "Toshkent viloyati" },
-    { id: 13, name: "Toshkent shahri" },
-    { id: 14, name: "Xorazm viloyati" },
-]
+// const regions = [
+//     { id: 0, name: "Barchasi" },
+//     { id: 1, name: "Qoraqalpog'iston Respublikasi" },
+//     { id: 2, name: "Andijon viloyati" },
+//     { id: 3, name: "Buxoro viloyati" },
+//     { id: 4, name: "Farg'ona viloyati" },
+//     { id: 5, name: "Jizzax viloyati" },
+//     { id: 6, name: "Namangan viloyati" },
+//     { id: 7, name: "Navoiy viloyati" },
+//     { id: 8, name: "Qashqadaryo viloyati" },
+//     { id: 9, name: "Samarqand viloyati" },
+//     { id: 10, name: "Sirdaryo viloyati" },
+//     { id: 11, name: "Surxondaryo viloyati" },
+//     { id: 12, name: "Toshkent viloyati" },
+//     { id: 13, name: "Toshkent shahri" },
+//     { id: 14, name: "Xorazm viloyati" },
+// ]
 
 const truckType = [
     { id: 1, name: "FURA" },

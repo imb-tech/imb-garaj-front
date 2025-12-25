@@ -14,6 +14,7 @@ export const useCostCols = () => {
                     </span>
                 ),
             },
+
             {
                 header: "Transport turi",
                 accessorKey: "truck_type",
@@ -77,6 +78,23 @@ export const useCostCols = () => {
                 cell: ({ row }) => {
                     const date = new Date(row.original.created)
                     return <span>{date.toLocaleDateString("uz-UZ")}</span>
+                },
+            },
+            {
+                header: "Transport statusi",
+                accessorKey: "status",
+                enableSorting: true,
+                cell: ({ row }) => {
+                    const typeMap: Record<number, string> = {
+                        1: "Band",
+                        2: "Bo'sh",
+                        3: "Ta'mirlanmoqda",
+                    }
+                    return (
+                        <span>
+                            {typeMap[row.original.status] || "Noma'lum"}
+                        </span>
+                    )
                 },
             },
         ],
