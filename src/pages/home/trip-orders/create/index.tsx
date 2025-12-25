@@ -135,7 +135,7 @@ const AddTripOrders = () => {
                 ]}
                 valueKey="id"
                 labelKey="name"
-                placeholder="Hududni tanlang"
+                placeholder="Buyurtmani tanlang"
             />
             <FormCombobox
                 required

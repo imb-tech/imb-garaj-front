@@ -11,11 +11,14 @@ import { useSearch } from "@tanstack/react-router"
 import { FormCombobox } from "@/components/form/combobox"
 import { FormNumberInput } from "@/components/form/number-input"
 import { useGet } from "@/hooks/useGet"
+import FormInput from "@/components/form/input"
+
 
 interface CashflowForm {
     action: number
     amount: number
     category: number
+    comment: string
 }
 
 const AddCashflow = () => {
@@ -31,7 +34,8 @@ const AddCashflow = () => {
         defaultValues: {
             action: currentCashflow?.action,
             amount: currentCashflow?.amount,
-            category: currentCashflow?.category
+            category: currentCashflow?.category,
+            comment: currentCashflow?.comment,
         }
 
     })
@@ -62,7 +66,8 @@ const AddCashflow = () => {
             order: orderId,
             action: data.action,
             amount: Number(data.amount),
-            category: data.category
+            category: data.category,
+            comment: data.comment
         }
 
         if (currentCashflow?.id) {
@@ -75,7 +80,7 @@ const AddCashflow = () => {
     if (!orderId) {
         return (
             <div className="text-sm text-muted-foreground">
-               Xarajatlar mavjud emas
+                Xarajatlar mavjud emas
             </div>
         )
     }
@@ -112,6 +117,8 @@ const AddCashflow = () => {
                 control={control}
                 placeholder="0 UZS"
             />
+            <FormInput required name="comment" label="Xarajat uchun izoh" methods={form} placeholder="Misol: Yoqilg'i uchun" />
+
 
             <div className="col-span-2 flex justify-end pt-4">
                 <Button

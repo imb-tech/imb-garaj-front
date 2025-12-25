@@ -9,12 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import Modal from "@/components/custom/modal"
 import DeleteModal from "@/components/custom/delete-modal"
 import { useGet } from "@/hooks/useGet"
@@ -23,10 +17,11 @@ import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import AddTripOrders from "./create"
-import { MoreVertical, Pencil, Trash2, ChevronDown } from "lucide-react"
+import { Trash2, ChevronDown, Edit } from "lucide-react"
 import OrderTabs from "./cashfow"
 import ParamPagination from "@/components/as-params/pagination"
 import { cn } from "@/lib/utils"
+import ParamInput from "@/components/as-params/input"
 
 const TripOrderMain = () => {
   const { id } = useParams({ strict: false })
@@ -82,17 +77,20 @@ const TripOrderMain = () => {
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center gap-4">
+
+        <ParamInput name="search" className="w-full" fullWidth />
         <Button onClick={handleCreate}>Buyurtma qo‘shish +</Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
-      </div>
 
-      {/* TABLE WRAPPER (same as DataTable) */}
+
       <div className="bg-card rounded-md p-3">
-        <Table className="select-text bg-card rounded-md">
+        <div className="flex items-center gap-3 pb-4">
+          <h1 className="text-lg">Buyurtmalar ro‘yxati</h1>
+
+        </div>
+        <Table className="select-text bg-card rounded-lg">
           <TableHeader>
             <TableRow className="border-none">
               <TableHead>#</TableHead>
@@ -156,49 +154,46 @@ const TripOrderMain = () => {
                       {order.payments?.[0]?.currency === 1
                         ? "UZS"
                         : order.payments?.[0]?.currency === 2
-                        ? "USD"
-                        : "—"}
+                          ? "USD"
+                          : "—"}
                     </TableCell>
 
                     <TableCell className="border-r border-secondary last:border-none">
                       {order.created
                         ? format(
-                            new Date(order.created),
-                            "dd.MM.yyyy HH:mm"
-                          )
+                          new Date(order.created),
+                          "dd.MM.yyyy HH:mm"
+                        )
                         : "—"}
                     </TableCell>
 
-                    {/* ACTIONS */}
+                  
                     <TableCell
-                      className="border-r border-secondary last:border-none cursor-default p-0 text-right"
+                      className="border-r border-secondary last:border-none p-0 text-right"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={(e) => handleEdit(order, e)}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Tahrirlash
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => handleDelete(order, e)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            O‘chirish
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex justify-end items-center gap-1 px-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleEdit(order, e)}
+                        >
+                          <Edit className="h-4 w-4 !text-primary" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={(e) => handleDelete(order, e)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
 
-                    {/* EXPAND */}
+
+                  
                     <TableCell
                       className="border-r border-secondary last:border-none cursor-default p-0 text-right"
                       onClick={(e) => e.stopPropagation()}
@@ -238,9 +233,8 @@ const TripOrderMain = () => {
       <Modal
         modalKey="create"
         size="max-w-2xl"
-        title={`Buyurtma ${
-          currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
-        }`}
+        title={`Buyurtma ${currentTripsOrder?.id ? "tahrirlash" : "qo‘shish"
+          }`}
       >
         <AddTripOrders />
       </Modal>
