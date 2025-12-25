@@ -25,8 +25,6 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RegionsType>(SETTINGS_REGIONS)
-   
-    
 
     const { openModal: openDeleteModal } = useModal("delete-region")
     const { openModal: openCreateModal } = useModal("create-region")
