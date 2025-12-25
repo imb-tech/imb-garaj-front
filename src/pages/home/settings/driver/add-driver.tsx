@@ -73,16 +73,6 @@ const AddDriverModal = () => {
                     methods={form}
                     placeholder="Misol: Karimov"
                 />
-
-                <FormFormatNumberInput
-                    control={form.control}
-                    format="+998 ## ### ## ##"
-                    required
-                    label={"Telefon"}
-                    name={"driver.phone"}
-                    placeholder="+998 __ ___ __ __"
-                />
-
                 <FormInput
                     required
                     name="username"
@@ -102,6 +92,15 @@ const AddDriverModal = () => {
                             "O'zgartirish uchun kiriting"
                         :   "Misol: SecurePass123!"
                     }
+                />
+
+                <FormFormatNumberInput
+                    control={form.control}
+                    format="+998 ## ### ## ##"
+                    required
+                    label={"Telefon"}
+                    name={"driver.phone"}
+                    placeholder="+998 __ ___ __ __"
                 />
 
                 <FormInput

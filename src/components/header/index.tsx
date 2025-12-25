@@ -24,7 +24,7 @@ const Header = () => {
                 >
                     <SidebarTrigger className="text-gray-500 dark:text-white" />
                     <h1 className="font-bold text-primary text-2xl ">
-                        DISTRIBUTION
+                        GARAJ
                     </h1>
                 </div>
                 {!!childPaths.length && (

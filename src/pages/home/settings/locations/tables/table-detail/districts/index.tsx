@@ -50,6 +50,7 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
             <DataTable
                 loading={isLoading}
                 columns={columns}
+                wrapperClassName="bg-background"
                 data={region_id ? data?.results : []}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}

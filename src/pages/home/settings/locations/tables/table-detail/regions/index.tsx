@@ -57,6 +57,7 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
     return (
         <>
             <DataTable
+            
                 loading={isLoading}
                 columns={simpleColumns}
                 data={data?.results}
@@ -64,6 +65,7 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
                 numeration={true}
+                wrapperClassName="bg-background"
                 head={
                     <TableHeaderLocation
                         disabled={!country_id}

@@ -1,4 +1,3 @@
-import { FormCombobox } from "@/components/form/combobox"
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
 import { SETTINGS_DISTRICTS, SETTINGS_REGIONS } from "@/constants/api-endpoints"
@@ -16,24 +15,27 @@ interface AddDestrictsModalProps {
     country_id: number
 }
 
-const AddDestrictsModal = ({ region_id, country_id }: AddDestrictsModalProps) => {
+const AddDestrictsModal = ({
+    region_id,
+    country_id,
+}: AddDestrictsModalProps) => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create-districts")
     const { getData, clearKey } = useGlobalStore()
-    
+
     const { data: regions } = useGet<ListResponse<RolesType>>(
         SETTINGS_REGIONS,
         {
             params: country_id ? { country: country_id } : undefined,
-        }
+        },
     )
 
     const currentDistrict = getData<SettingsDistrictType>(SETTINGS_DISTRICTS)
-    
+
     const form = useForm<SettingsDistrictType>({
         defaultValues: {
             ...currentDistrict,
-            region: currentDistrict?.region 
+            region: currentDistrict?.region,
         },
     })
 
@@ -63,11 +65,17 @@ const AddDestrictsModal = ({ region_id, country_id }: AddDestrictsModalProps) =>
     const onSubmit = (values: SettingsDistrictType) => {
         const formData = {
             ...values,
-            region: currentDistrict?.id ? values.region : (region_id ? String(region_id) : '')
+            region:
+                currentDistrict?.id ? values.region
+                : region_id ? String(region_id)
+                : "",
         }
-        
+
         if (currentDistrict?.id) {
-            updateMutate(`${SETTINGS_DISTRICTS}/${currentDistrict.id}`, formData)
+            updateMutate(
+                `${SETTINGS_DISTRICTS}/${currentDistrict.id}`,
+                formData,
+            )
         } else {
             if (!region_id) {
                 toast.error("Iltimos, avval viloyat tanlang")
@@ -77,10 +85,10 @@ const AddDestrictsModal = ({ region_id, country_id }: AddDestrictsModalProps) =>
         }
     }
 
-    const selectedRegion = regions?.results?.find(r => 
-        currentDistrict?.id ? 
-            String(r.id) === String(currentDistrict.region) :
-            String(r.id) === String(region_id)
+    const selectedRegion = regions?.results?.find((r) =>
+        currentDistrict?.id ?
+            String(r.id) === String(currentDistrict.region)
+        :   String(r.id) === String(region_id),
     )
 
     return (
@@ -95,26 +103,22 @@ const AddDestrictsModal = ({ region_id, country_id }: AddDestrictsModalProps) =>
                     label="Tuman nomi"
                     methods={form}
                 />
-                {currentDistrict?.id ?
-                    <FormCombobox
-                        label="Viloyat"
-                        name="region"
-                        options={regions?.results || []}
-                        control={form.control}
-                    />
-                :   <div className="space-y-2">
-                        <label className="text-sm font-medium">Viloyat</label>
-                        <div className="h-10 px-3 py-2 text-sm border rounded-md bg-muted flex items-center">
-                            {selectedRegion?.name || 
-                             (region_id ? `Viloyat ID: ${region_id}` : "Viloyat tanlanmagan")}
-                        </div>
-                        <input
-                            type="hidden"
-                            {...form.register('region')}
-                            value={region_id ? String(region_id) : ''}
-                        />
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Viloyat</label>
+
+                    <div className="h-10 px-3 py-2 text-sm border rounded-md bg-muted flex items-center">
+                        {selectedRegion?.name ||
+                            (region_id ?
+                                `Viloyat ID: ${region_id}`
+                            :   "Viloyat tanlanmagan")}
                     </div>
-                }
+
+                    <input
+                        type="hidden"
+                        {...form.register("region")}
+                        value={region_id ? String(region_id) : ""}
+                    />
+                </div>
 
                 <div className="flex items-center justify-end gap-2 md:col-span-2">
                     <Button
