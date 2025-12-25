@@ -20,15 +20,9 @@ export const useCostCols = () => {
                 accessorKey: "truck_type",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const typeMap: Record<number, string> = {
-                        1: "Fura",
-                        2: "Tent",
-                        3: "Refrigerator",
-                        4: "Yengil yuk",
-                    }
                     return (
                         <span>
-                            {typeMap[row.original.truck_type] || "Noma'lum"}
+                            {row.original.truck_type_name || "Noma'lum"}
                         </span>
                     )
                 },
@@ -46,7 +40,7 @@ export const useCostCols = () => {
                 accessorKey: "truck_passport",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <span className="font-mono text-sm">
+                    <span className="text-sm">
                         {row.original.truck_passport}
                     </span>
                 ),
@@ -56,7 +50,7 @@ export const useCostCols = () => {
                 accessorKey: "trailer_number",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <span className="text-muted-foreground">
+                    <span>
                         {row.original.trailer_number || "—"}
                     </span>
                 ),

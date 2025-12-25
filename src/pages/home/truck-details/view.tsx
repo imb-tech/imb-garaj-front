@@ -7,6 +7,7 @@ import TripOrderMain from "../trip-orders"
 import { months, optionYears } from "./filter"
 import HrProfile from "./truck-profile"
 import VehicleCashflows from "./truck-profile/truck-cashflows"
+import VehicleTrips from "./truck-trips"
 
 function ViewPage({ data }: { data: Human | undefined }) {
     const navigate = useNavigate()
@@ -14,7 +15,7 @@ function ViewPage({ data }: { data: Human | undefined }) {
         {
             value: "0",
             label: "Reyslar",
-            content: <TripOrderMain />,
+            content: <VehicleTrips />,
         },
 
         {
