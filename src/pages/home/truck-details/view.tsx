@@ -5,7 +5,6 @@ import { ParamCombobox } from "@/components/as-params/combobox"
 import ParamDateRange from "@/components/as-params/date-picker-range"
 import { months, optionYears } from "./filter"
 import VehicleCashflows from "./truck-profile/truck-cashflows"
-import { TruckTabsOne } from "./truck-profile/truck-tabs-one"
 import TripOrderMain from "../trip-orders"
 
 function ViewPage({ data }: { data: Human | undefined }) {

@@ -31,21 +31,21 @@ const AddTransport = () => {
         }
     })
 
-   const { data: driversData } = useGet<DriversType[]>(SETTINGS_SELECTABLE_USERS, {
+    const { data: driversData } = useGet<DriversType[]>(SETTINGS_SELECTABLE_USERS, {
         params: {
             role: "1"
         }
     })
 
     const form = useForm<TruckCreate>({
-        defaultValues: currentTruck || {
-            truck_number: "",
-            truck_passport: "",
-            trailer_number: "",
-            fuel: "diesel",
-            truck_type: 1,
-            trailer_type: undefined,
-            driver: 1,
+        defaultValues: {
+            truck_number: currentTruck?.truck_number,
+            truck_passport: currentTruck?.truck_passport,
+            trailer_number: currentTruck?.trailer_number,
+            fuel: currentTruck?.fuel,
+            truck_type: currentTruck?.truck_type,
+            trailer_type: currentTruck?.trailer_type,
+            driver: currentTruck?.driver,
         },
     })
 
@@ -100,7 +100,7 @@ const AddTransport = () => {
             <FormInput
                 required
                 name="truck_passport"
-                label="Truck pasport raqami"
+                label="Tex. passport raqami"
                 methods={form}
                 placeholder="Misol: AS02131234131"
             />
@@ -134,25 +134,27 @@ const AddTransport = () => {
 
             <FormCombobox
                 required
-                label="Truck turi"
+                label="Avtomobil turi"
                 name="truck_type"
                 control={form.control}
                 options={truckType}
-                placeholder="Truck turi"
+                valueKey="id"
+                labelKey="name"
+                placeholder="Avtomobil turi"
             />
 
             <FormCombobox
                 required
-                label="Trailer turi"
+                label="Tirkama turi"
                 name="trailer_type"
                 control={form.control}
                 options={trailerType}
-                placeholder="Trailer turi"
+                placeholder="Tirkama turi"
             />
 
             <FormNumberInput
                 name="trailer_number"
-                label="Trailer raqami"
+                label="Tirkama raqami"
                 control={control}
                 placeholder="Misol: 1"
             />
