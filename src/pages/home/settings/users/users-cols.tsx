@@ -24,15 +24,7 @@ export const useColumnsUsersTable = () => {
                 header: "Foydalanuvchi roli",
                 enableSorting: true,
             },
-            {
-                accessorKey: "is_staff",
-                header: "Xodim",
-                enableSorting: true,
-                cell: ({ row }) => {
-                    const isStaff = row.getValue("is_staff")
-                    return isStaff ? "Xodim" : "Xodim emas"
-                },
-            },
+
             {
                 accessorKey: "is_active",
                 header: "Aktiv",
@@ -42,14 +34,16 @@ export const useColumnsUsersTable = () => {
                     return isActive ? "Aktiv" : "Aktiv emas"
                 },
             },
+
             {
-                accessorKey: "is_superuser",
-                header: "Super admin",
+                accessorKey: "role_name",
+                header: "Foydalanuvchi roli",
                 enableSorting: true,
+                accessorFn: (row) => row.role_name || "Mavjud emas",
                 cell: ({ row }) => {
-                    const isActive = row.getValue("is_superuser")
-                    return isActive ? "Super admin" : "Oddiy foydalanuvchi"
+                    return row.getValue("role_name") || "Mavjud emas"
                 },
+                id: "role_name",
             },
         ],
         [],

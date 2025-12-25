@@ -6,7 +6,7 @@ export const  useColumnDestricts = () => {
         () => [
             {
                 accessorKey: "name",
-                header: "Viloyat nomi",
+                header: "Tuman nomi",
                 enableSorting: true,
                 cell: ({ row }) => (
                     <div className="min-w-[180px] w-[220px] truncate">

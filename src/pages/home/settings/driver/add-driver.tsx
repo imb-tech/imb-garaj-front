@@ -20,7 +20,10 @@ const AddDriverModal = () => {
     const currentDriver = getData<DriversType>(SETTINGS_DRIVERS)
 
     const form = useForm<DriversType>({
-        defaultValues: currentDriver,
+               defaultValues: {
+            ...currentDriver,
+            password: "" 
+        },
     })
 
     const { handleSubmit, reset } = form
@@ -105,6 +108,14 @@ const AddDriverModal = () => {
 
                 <FormInput
                     required
+                    registerOptions={{
+                        maxLength: {
+                            value: 9,
+                            message:
+                                "Passport seriya 9 ta belgidan iborat bo'lishi kerak",
+                        },
+                    }}
+                    uppercase={true}
                     name="driver.passport_serial"
                     label="Pasport raqami"
                     methods={form}
@@ -132,6 +143,7 @@ const AddDriverModal = () => {
 
                 <FormInput
                     required
+                    uppercase={true}
                     name="driver.driver_license"
                     label="Haydovchilik guvohnomasi"
                     methods={form}
@@ -155,25 +167,11 @@ const AddDriverModal = () => {
                     placeholder="15/12/2025"
                 />
 
-                <div className="md:col-span-2 pt-1">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <FormCheckbox
-                            name="is_staff"
-                            label="Xodim"
-                            control={form.control}
-                        />
-                        <FormCheckbox
-                            name="is_active"
-                            label="Aktiv"
-                            control={form.control}
-                        />
-                        <FormCheckbox
-                            name="is_superuser"
-                            label="Super foydalanuvchi"
-                            control={form.control}
-                        />
-                    </div>
-                </div>
+                <FormCheckbox
+                    name="is_active"
+                    label="Aktiv"
+                    control={form.control}
+                />
 
                 <div className="flex items-center justify-end gap-2 md:col-span-2">
                     <Button

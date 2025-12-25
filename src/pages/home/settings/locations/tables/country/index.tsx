@@ -17,11 +17,9 @@ import { Key } from "react"
 import { useColumnsCountriesTable } from "./country-cols"
 import { CountryRowTable } from "./country-row"
 
-interface CountriesTableProps {
-    onAddClick: () => void
-}
+ 
 
-const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
+const CountriesTable = () => {
     const { data } = useGet<ListResponse<RolesType>>(SETTINGS_COUNTRIES)
     const { getData } = useGlobalStore()
     const selectedCountry = getData(SETTINGS_COUNTRIES) as RolesType | null
@@ -30,18 +28,7 @@ const CountriesTable = ({ onAddClick }: CountriesTableProps) => {
 
     return (
         <div className="overflow-x-auto">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-                <div className="w-full sm:w-[360px]">
-                    <ParamInput fullWidth placeholder="Qidirish..." />
-                </div>
-                <Button
-                    className="flex items-center gap-2"
-                    onClick={onAddClick}
-                >
-                    <Plus size={14} />
-                    Qo'shish
-                </Button>
-            </div>
+ 
 
             <div className="rounded-md border">
                 <Table>
