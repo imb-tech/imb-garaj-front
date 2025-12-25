@@ -19,14 +19,17 @@ const AddUserModal = () => {
     const currentDriver = getData<UserType>(SETTINGS_USERS)
     const { data: userRole } = useGet(SETTINGS_ROLES)
     const form = useForm<UserType>({
-        defaultValues: currentDriver,
+        defaultValues: {
+            ...currentDriver,
+            password: "",
+        },
     })
 
     const { handleSubmit, reset } = form
 
     const onSuccess = () => {
         toast.success(
-            `Haydovchi muvaffaqiyatli ${currentDriver?.id ? "tahrirlandi!" : "qo'shildi"}`,
+            `Foydalanuvchi muvaffaqiyatli ${currentDriver?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
         clearKey(SETTINGS_USERS)
@@ -70,7 +73,7 @@ const AddUserModal = () => {
                     name="last_name"
                     label="Familiya"
                     methods={form}
-                    placeholder="Misol: Aliyevich"
+                    placeholder="Misol: Aliyev"
                 />
 
                 <FormInput
@@ -93,35 +96,20 @@ const AddUserModal = () => {
                     }
                 />
 
-                <div className="md:col-span-2">
-                    <FormCombobox
-                        options={userRole?.results ?? []}
-                        name="role"
+                <FormCombobox
+                    options={userRole?.results ?? []}
+                    name="role"
+                    control={form.control}
+                    labelKey="name"
+                    valueKey="id"
+                    label="Foydalanuvchi roli"
+                />
+                <div className="flex items-center justify-start mt-2">
+                    <FormCheckbox
+                        name="is_active"
+                        label="Aktiv"
                         control={form.control}
-                        labelKey="name"
-                        valueKey="id"
-                        label="Foydalanuvchi roli"
                     />
-                </div>
-
-                <div className="md:col-span-2 pt-1">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <FormCheckbox
-                            name="is_staff"
-                            label="Xodim"
-                            control={form.control}
-                        />
-                        <FormCheckbox
-                            name="is_active"
-                            label="Aktiv"
-                            control={form.control}
-                        />
-                        <FormCheckbox
-                            name="is_superuser"
-                            label="Super foydalanuvchi"
-                            control={form.control}
-                        />
-                    </div>
                 </div>
 
                 <div className="md:col-span-2 flex justify-end pt-2">

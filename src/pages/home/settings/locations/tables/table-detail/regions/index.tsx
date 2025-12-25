@@ -6,10 +6,10 @@ import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useSearch } from "@tanstack/react-router"
+import { useEffect } from "react"
 import TableHeaderLocation from "../../table-header"
 import AddRegionsModal from "./add-regions"
 import { useColumnsRegionsTable } from "./regions-cols"
-
 const RegionsTable = ({ country_id }: { country_id: number }) => {
     const navigate = useNavigate()
     const search = useSearch({ strict: false })
@@ -48,16 +48,32 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
         })
 
         navigate({
-            search: updateSearch as any, 
+            search: updateSearch as any,
         })
     }
+
+    useEffect(() => {
+        if (data?.results?.length && !search.region && country_id) {
+            const firstRegion = data.results[0]
+
+            const updateSearch = (
+                prev: typeof search,
+            ): Partial<typeof search> => ({
+                ...prev,
+                region: firstRegion.id,
+            })
+
+            navigate({
+                search: updateSearch as any,
+            })
+        }
+    }, [data, search.region, country_id, navigate])
 
     const simpleColumns = useColumnsRegionsTable()
 
     return (
         <>
             <DataTable
-            
                 loading={isLoading}
                 columns={simpleColumns}
                 data={data?.results}

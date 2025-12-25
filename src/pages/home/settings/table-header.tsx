@@ -3,7 +3,7 @@ import DownloadAsExcel from "@/components/download-as-excel"
 import { Button } from "@/components/ui/button"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { CirclePlus } from "lucide-react"
+import { Plus } from "lucide-react"
 
 interface TableHeaderProps {
     fileName: string
@@ -29,9 +29,9 @@ const TableHeader = ({ fileName, storeKey }: TableHeaderProps) => {
                 <DownloadAsExcel url={"settings_url"} name={`${fileName}`} />
 
                 <Button
-                    className="text-white bg-primary hover:bg-primary/90"
+                    className="flex items-center gap-2"
                     onClick={handleAdd}
-                    icon={<CirclePlus size={18} />}
+                    icon={<Plus size={18} />}
                 >
                     Qo'shish
                 </Button>
