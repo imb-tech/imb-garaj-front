@@ -24,7 +24,7 @@ export const CountryRowTable = ({
     index,
     colSpan,
 }: CountryRowTableType) => {
-    const search = useSearch({ strict:false })
+    const search = useSearch({ strict: false })
     const { setData } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("country-modal")
     const { openModal: openDeleteModal } = useModal("delete-country")
@@ -41,12 +41,18 @@ export const CountryRowTable = ({
     const handleRowClick = () => {
         const hasId = country === String(countries.id)
 
-        navigate({
-            search: (prev: Record<string, unknown>) => ({
+        const updateSearch = (prev: Record<string, unknown>) => {
+            const updated = {
                 ...prev,
                 country: hasId ? undefined : String(countries.id),
                 region: undefined,
-            }),
+            }
+
+            return updated as Record<string, unknown>
+        }
+
+        navigate({
+            search: updateSearch as any,
         })
     }
 

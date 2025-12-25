@@ -1,6 +1,6 @@
 import FormInput from "@/components/form/input"
 import { Button } from "@/components/ui/button"
-import { SETTINGS_ROLES } from "@/constants/api-endpoints"
+import {  SETTINGS_CARGO_TYPE } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
@@ -13,7 +13,7 @@ const AddCargoModal = () => {
     const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
-    const currentRole = getData<RolesType>(SETTINGS_ROLES)
+    const currentRole = getData<RolesType>( SETTINGS_CARGO_TYPE)
 
     const form = useForm<RolesType>({
         defaultValues: currentRole,
@@ -26,9 +26,9 @@ const AddCargoModal = () => {
             `Yuk turi muvaffaqiyatli ${currentRole?.id ? "tahrirlandi!" : "qo'shildi"}`,
         )
         reset()
-        clearKey(SETTINGS_ROLES)
+        clearKey( SETTINGS_CARGO_TYPE)
         closeModal()
-        queryClient.refetchQueries({ queryKey: [SETTINGS_ROLES] })
+        queryClient.refetchQueries({ queryKey: [ SETTINGS_CARGO_TYPE] })
     }
 
     const { mutate: postMutate, isPending: isPendingCreate } = usePost({
@@ -43,9 +43,9 @@ const AddCargoModal = () => {
 
     const onSubmit = (values: RolesType) => {
         if (currentRole?.id) {
-            updateMutate(`${SETTINGS_ROLES}/${currentRole.id}`, values)
+            updateMutate(`${ SETTINGS_CARGO_TYPE}/${currentRole.id}`, values)
         } else {
-            postMutate(SETTINGS_ROLES, values)
+            postMutate( SETTINGS_CARGO_TYPE, values)
         }
     }
 
