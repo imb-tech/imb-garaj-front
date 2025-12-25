@@ -38,6 +38,9 @@ export const SETTINGS_SELECTABLE_DISTRICT = "common/selectable/district"
 export const SETTINGS_SELECTABLE_PAYMENT_TYPE = "common/selectable/payment-type"
 export const SETTINGS_SELECTABLE_CARGO_TYPE = "common/selectable/cargo-type"
 export const SETTINGS_SELECTABLE_EXPENSE_CATEGORY = "common/selectable/expense-category"
+export const COMMON_SELECTABLE_VEHICLE_TYPE = "common/vehicle-types"
+
+
 
 /** ===== VEHICLES ===== */
 export const VEHICLES = "vehicles"
