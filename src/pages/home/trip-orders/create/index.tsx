@@ -48,7 +48,7 @@ const AddTripOrders = () => {
     })
     const { data: cargoType } = useGet<ClientType[]>(SETTINGS_SELECTABLE_CARGO_TYPE, {
         params: {
-            model_name: "payment-type"
+            model_name: "cargo-type"
         }
     })
 
