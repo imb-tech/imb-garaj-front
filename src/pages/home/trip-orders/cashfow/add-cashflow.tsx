@@ -109,15 +109,17 @@ const AddCashflow = () => {
                 labelKey="name"
             />
 
-            <FormNumberInput
-                required
-                name="amount"
-                label="Miqdor"
-                thousandSeparator=" "
-                control={control}
-                placeholder="0 UZS"
-            />
-            <FormInput required name="comment" label="Xarajat uchun izoh" methods={form} placeholder="Misol: Yoqilg'i uchun" />
+            <div>
+                <FormNumberInput
+                    required
+                    name="amount"
+                    label="Miqdor"
+                    thousandSeparator=" "
+                    control={control}
+                    placeholder="0 UZS"
+                />
+                <FormInput required name="comment" label="Xarajat uchun izoh" methods={form} placeholder="Misol: Yoqilg'i uchun" />
+            </div>
 
 
             <div className="col-span-2 flex justify-end pt-4">

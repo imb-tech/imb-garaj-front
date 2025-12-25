@@ -66,7 +66,7 @@ const AddTripOrders = () => {
             cargo_type:currentTripOrder?.cargo_type,
             client:currentTripOrder?.client
         },
-    })
+    }) 
 
     const { handleSubmit, control, reset, watch } = form
 

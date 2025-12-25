@@ -10,6 +10,7 @@ import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import ReportsFilter from "../truck-details/filter"
 import { useCostCols } from "./cols"
 import AddTransport from "./create"
+import { Plus } from "lucide-react"
 
 const FinanceStatisticMain = () => {
     const search: any = useSearch({ strict: false })
@@ -42,23 +43,20 @@ const FinanceStatisticMain = () => {
         setData(VEHICLES, row.original)
         openDeleteModal()
     }
-    const handleRowClick =(item:any)=>{
+    const handleRowClick = (item: any) => {
         const id = item?.id
-        if (!id) return 
+        if (!id) return
 
         navigate({
-            to:"/truck-detail/$id",
-            params:{id:id.toString()}
+            to: "/truck-detail/$id",
+            params: { id: id.toString() }
         })
     }
 
     const columns = useCostCols()
     return (
         <div className="space-y-3">
-            <div className="flex sm:justify-end mb-3  gap-4">
-                <Button onClick={handleCreate}>Transport qo'shish +</Button>
-                <ReportsFilter />
-            </div>
+
 
             <DataTable
                 columns={columns}
@@ -69,8 +67,12 @@ const FinanceStatisticMain = () => {
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
                 head={
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center justify-between gap-3 mb-3">
                         <h1 className="text-xl">{`Transportlar ro'yxati`}</h1>
+                        <div className="flex justify-between mb-3  gap-4">
+                            <ReportsFilter />
+                            <Button onClick={handleCreate}><Plus className="h-4" /> Transport qo'shish </Button>
+                        </div>
                     </div>
                 }
                 paginationProps={{
