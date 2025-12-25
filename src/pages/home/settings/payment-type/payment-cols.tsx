@@ -6,7 +6,7 @@ export const useColumnsPaymentTable = () => {
         () => [
             {
                 accessorKey: "name",
-                header: "Rol turi",
+                header: "To'lov turi",
                 enableSorting: true,
             },
         ],
