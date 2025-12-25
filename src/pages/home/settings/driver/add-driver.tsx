@@ -20,9 +20,9 @@ const AddDriverModal = () => {
     const currentDriver = getData<DriversType>(SETTINGS_DRIVERS)
 
     const form = useForm<DriversType>({
-               defaultValues: {
+        defaultValues: {
             ...currentDriver,
-            password: "" 
+            password: "",
         },
     })
 
@@ -50,12 +50,15 @@ const AddDriverModal = () => {
 
     const onSubmit = (values: DriversType) => {
         if (currentDriver?.id) {
-            updateMutate(`${SETTINGS_DRIVERS}/${currentDriver.id}`, values)
+            const { password, ...restValues } = values
+
+            const payload = password ? values : restValues
+
+            updateMutate(`${SETTINGS_DRIVERS}/${currentDriver.id}`, payload)
         } else {
             postMutate(SETTINGS_DRIVERS, values)
         }
     }
-
     return (
         <div className="w-full max-w-4xl mx-auto p-1">
             <form
@@ -85,7 +88,7 @@ const AddDriverModal = () => {
                 />
 
                 <FormInput
-                    required={currentDriver?.id ? false : true}
+                    required={!currentDriver?.id}
                     type="password"
                     name="password"
                     label="Parol"

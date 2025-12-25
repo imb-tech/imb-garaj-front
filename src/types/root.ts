@@ -42,5 +42,16 @@ type SearchParams = {
     region_search?: string
     district_search?:string
     order?:number|string
+    user_search?:string
+    first_name?:string
+    payment_type?:string
+    expense_type?:string
+    driver_search?:string
+    customer_search?:string
+    cargo_search?:string
+    country_search?:string
+    vehicle_search?:string
+    roles_search?:string
     trip?:string|number
 }
+

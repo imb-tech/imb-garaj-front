@@ -15,7 +15,9 @@ const Customers = () => {
     const { data, isLoading } = useGet<ListResponse<CustomersType>>(
         SETTINGS_CUSTOMERS,
         {
-            params: search,
+            params:{
+                search:search.customer_search
+            },
         },
     )
     const { getData, setData } = useGlobalStore()
@@ -50,6 +52,8 @@ const Customers = () => {
                         fileName="Mijozlar"
                         url="excel"
                         storeKey={SETTINGS_CUSTOMERS}
+                        pageKey="page"
+                        searchKey="customer_search"
                     />
                 }
             />

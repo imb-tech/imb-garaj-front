@@ -11,12 +11,14 @@ import AddRolesModal from "./add-roles"
 import { useColumnsRolesTable } from "./roles-cols"
 
 const RolesPage = () => {
-    // const search = useSearch({ from: "/_main/_settings/roles/" })
+    const search = useSearch({ strict:false })
     const { data, isLoading } = useGet<ListResponse<RolesType>>(
         SETTINGS_ROLES,
-        // {
-        //     params: search,
-        // },
+        {
+            params:{
+                search:search.roles_search
+            }
+        }
     )
     const { getData, setData } = useGlobalStore()
     const item = getData<RolesType>(SETTINGS_ROLES)
@@ -50,6 +52,8 @@ const RolesPage = () => {
                         fileName="Rollar"
                         url="excel"
                         storeKey={SETTINGS_ROLES}
+                        searchKey="roles_search"
+                        pageKey="page"
                     />
                 }
             />

@@ -6,8 +6,12 @@ export const SELECTABLE_USERS = "hr/"
 export const CLIENTS_AVAILABLE = "hr/"
 export const MANAGERS_ORDERS_CREATE = "hr/"
 export const MANAGERS_ORDERS_NEW = "hr/"
+
+
+/** ===== TRIPS ===== */
 export const TRIPS = "trips"
 export const TRIPS_ORDERS = "trips/orders"
+export const TRIPS_ORDERS_PAYMENT ="trips/order-payments"
 
 export const SHIFTS = "hr/"
 export const LOGIN = "auth/login"

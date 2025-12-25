@@ -8,9 +8,16 @@ import { useGlobalStore } from "@/store/global-store"
 import TableHeader from "../table-header"
 import AddUserModal from "./add-users"
 import { useColumnsUsersTable } from "./users-cols"
+import { useSearch } from "@tanstack/react-router"
 
 const UsersPage = () => {
-    const { data, isLoading } = useGet<ListResponse<UserType>>(SETTINGS_USERS)
+    const search = useSearch({strict:false})
+    const { data, isLoading } = useGet<ListResponse<UserType>>(SETTINGS_USERS,{
+        params:{
+            search:search.first_name
+        }
+     
+    })
     const { getData, setData } = useGlobalStore()
     const item = getData<UserType>(SETTINGS_USERS)
 
@@ -43,6 +50,9 @@ const UsersPage = () => {
                         fileName="Haydovchilar"
                         url="excel"
                         storeKey={SETTINGS_USERS}
+                         searchKey="first_name"
+                        pageKey="page"
+
                     />
                 }
             />

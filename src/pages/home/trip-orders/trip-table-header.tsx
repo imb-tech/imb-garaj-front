@@ -1,25 +1,21 @@
-import ParamInput from "@/components/as-params/input"
-import DownloadAsExcel from "@/components/download-as-excel"
 import { Button } from "@/components/ui/button"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { Plus } from "lucide-react"
+import { CirclePlus } from "lucide-react"
 
 interface TableHeaderProps {
-    fileName: string
     storeKey?: string
-    url: string
-    searchKey: string
-    pageKey: string
+    modalKey: string
+
+    heading: string
 }
 
-const TableHeader = ({
-    fileName,
+const TableHeaderTripsOrders = ({
     storeKey,
-    searchKey,
-    pageKey,
+    modalKey,
+    heading,
 }: TableHeaderProps) => {
-    const { openModal: openCreateModal } = useModal("create")
+    const { openModal: openCreateModal } = useModal(modalKey)
     const { clearKey } = useGlobalStore()
 
     const handleAdd = () => {
@@ -31,14 +27,12 @@ const TableHeader = ({
 
     return (
         <div className="flex items-center justify-between gap-3 mb-3">
-            <ParamInput fullWidth searchKey={searchKey} pageKey={pageKey} />
+            <h3 className="text-lg font-medium">{heading}</h3>
             <div className="flex items-center gap-3">
-                <DownloadAsExcel url={"settings_url"} name={`${fileName}`} />
-
                 <Button
                     className="flex items-center gap-2"
                     onClick={handleAdd}
-                    icon={<Plus size={18} />}
+                    icon={<CirclePlus size={18} />}
                 >
                     Qo'shish
                 </Button>
@@ -47,4 +41,4 @@ const TableHeader = ({
     )
 }
 
-export default TableHeader
+export default TableHeaderTripsOrders
