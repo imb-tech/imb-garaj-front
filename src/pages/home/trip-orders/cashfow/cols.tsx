@@ -41,6 +41,12 @@ export const useCostCols = () => {
                 },
             },
             {
+                header: "To'lov turi",
+                accessorKey: "payment_type_name",
+                enableSorting: true,
+            },
+
+            {
                 header: "Kategoriya",
                 accessorKey: "category_name",
                 cell: ({ getValue }) => <span>{getValue<number>()}</span>,

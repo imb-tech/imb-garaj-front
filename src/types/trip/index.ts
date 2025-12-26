@@ -92,6 +92,7 @@ type TripOrdersRow = {
             currency: number
             currency_course: string
             amount: string
+            payment_type:number
         },
     ]
 }
