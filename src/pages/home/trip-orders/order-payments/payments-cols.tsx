@@ -12,11 +12,26 @@ export const useColumnsOrderPayment = () => {
             {
                 header: "Pul birligi",
                 accessorKey: "currency",
-                cell: ({ getValue }) => (
-                    <span className="text-muted-foreground">
-                        {getValue<string>() || "—"}
-                    </span>
-                ),
+                cell: ({ getValue }) => {
+                    const currencyValue = getValue<number>()
+
+                    if (!currencyValue) {
+                        return <span>—</span>
+                    }
+
+                    const currencyMap = {
+                        1: "UZS - So'm",
+                        2: "USD - AQSh dollari",
+                    }
+
+                    return (
+                        <span>
+                            {currencyMap[
+                                currencyValue as keyof typeof currencyMap
+                            ] || "—"}
+                        </span>
+                    )
+                },
             },
 
             {

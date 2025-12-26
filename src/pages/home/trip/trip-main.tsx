@@ -10,6 +10,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
 import ParamInput from "@/components/as-params/input"
+import { PlusCircle } from "lucide-react"
 
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
@@ -54,7 +55,11 @@ const ShiftStatisticMain = () => {
         <div className="space-y-3">
             <div className="flex justify-between items-center mb-3 gap-4">
                 <ParamInput name="driver_name" fullWidth searchKey="driver_name"/>
-                <Button onClick={handleCreate}>Reys qo'shish +</Button>
+                
+                <Button className="flex items-center gap-2" onClick={handleCreate}>
+                    <PlusCircle size={16}/>
+                    Qo'shish
+                </Button>
             </div>
 
             <DataTable
@@ -65,14 +70,14 @@ const ShiftStatisticMain = () => {
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
-                onView={(row) => {
-                    navigate({
-                        to: "/trip-orders/$id",
-                        params: {
-                            id: String(row.original.id),
-                        },
-                    })
-                }}
+                // onView={(row) => {
+                //     navigate({
+                //         to: "/trip-orders/$id",
+                //         params: {
+                //             id: String(row.original.id),
+                //         },
+                //     })
+                // }}
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Reyslar ro'yxati</h1>

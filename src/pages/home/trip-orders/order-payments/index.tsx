@@ -50,7 +50,7 @@ const TripDetailPayment = () => {
                 }}
                 head={
                     <TableHeaderTripsOrders
-                        modalKey="create-order-cashflow"
+                        modalKey="create-order-payment"
                         storeKey={TRIPS_ORDERS_PAYMENT}
                         heading="To'lovlar ro'yxati"
                     />

@@ -1,31 +1,32 @@
-
+import DeleteModal from "@/components/custom/delete-modal"
+import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
-import { COMMON_SELECTABLE_VEHICLE_TYPE, SETTINGS_SELECTABLE_USERS, TRIPS } from "@/constants/api-endpoints"
+import { TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
+import { useModal } from "@/hooks/useModal"
+import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { useCostCols } from "./cols"
-import { ParamCombobox } from "@/components/as-params/combobox"
-import ParamDateRange from "@/components/as-params/date-picker-range"
+import AddTrip from "./truck-trips-add"
+import TruckTripsHeader from "./truck-trips-header"
 
 const VehicleTrips = () => {
+    const { setData, getData } = useGlobalStore()
     const navigate = useNavigate()
+    const { openModal: openCreateModal } = useModal("post-trips")
+    const { openModal: openDeleteModal } = useModal("delete")
+
     const params = useParams({ strict: false })
     const search = useSearch({ strict: false })
     const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS, {
         params: {
             vehicle: params.id,
-            ...search
-        }
+            ...search,
+        },
     })
+    const item = getData<TripRow>(TRIPS)
+
     const columns = useCostCols()
-
-    const { data: driversData } = useGet<DriversType[]>(SETTINGS_SELECTABLE_USERS, {
-        params: {
-            role: "1"
-        }
-    })
-
-    const { data: vehicleData } = useGet<ListResponse<VehicleType>>(COMMON_SELECTABLE_VEHICLE_TYPE)
 
     const handleRowClick = (item: TripRow) => {
         const id = item?.id
@@ -36,11 +37,18 @@ const VehicleTrips = () => {
         })
     }
 
+    const handleEdit = (item: TripRow) => {
+        setData(TRIPS, item)
+        openCreateModal()
+    }
+    const handleDelete = (row: { original: TripRow }) => {
+        setData(TRIPS, row.original)
+        openDeleteModal()
+    }
+
     return (
         <div className="space-y-3">
-            <div className="flex justify-between items-center mb-3 gap-4">
-
-            </div>
+            <div className="flex justify-between items-center mb-3 gap-4"></div>
 
             <DataTable
                 loading={isLoading}
@@ -48,55 +56,21 @@ const VehicleTrips = () => {
                 data={data?.results}
                 numeration
                 onRowClick={handleRowClick}
-                head={
-                    <div className="flex items-center gap-3 mb-3">
-                        <h1 className="text-xl">Reyslar ro'yxati</h1>
-                        <div className="flex flex-1 justify-end items-center gap-3">
-                            <ParamCombobox
-                                paramName="drivers"
-                                options={driversData ?? [] }
-                                valueKey="id"
-                                labelKey="first_name"
-                                label="Haydovchilar"
-                                className="w-full"
-                                addButtonProps={{
-                                    className: "!bg-background dark:!bg-secondary",
-                                }}
-                            />
-
-                            <ParamCombobox
-                                paramName="truck_type"
-                                options={vehicleData?.results ?? []}
-                                valueKey="id"
-                                labelKey="type"
-                                label="Transportlar"
-                                className="w-full"
-                                addButtonProps={{
-                                    className: "!bg-background dark:!bg-secondary",
-                                }}
-                            />
-
-
-
-
-                            <ParamDateRange
-                                addButtonProps={{
-                                    className:
-                                        "!bg-background dark:!bg-secondary min-w-32 justify-start",
-                                }}
-                                from="from_date"
-                                to="to_date"
-                            />
-                        </div>
-                    </div>
-                }
+                onEdit={({ original }) => handleEdit(original)}
+                onDelete={handleDelete}
+                head={<TruckTripsHeader   />}
                 paginationProps={{
                     totalPages: 3,
                 }}
             />
-
-
-
+            <DeleteModal path={TRIPS} id={item?.id} />
+            <Modal
+                size="max-w-2xl"
+                title={item?.id ? "Reysni tahrirlash" : "Reys qo'shish "}
+                modalKey="post-trips"
+            >
+                <AddTrip />
+            </Modal>
         </div>
     )
 }

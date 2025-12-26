@@ -18,6 +18,7 @@ import ParamPagination from "@/components/as-params/pagination"
 import { cn } from "@/lib/utils"
 import TripOrderDetailRow from "../truck-trip-cashflows"
 import TruckTripCashflowRow from "../truck-trip-cashflows"
+import EmptyBox from "@/components/custom/empty-box"
 
 const TruckTripOrderMain = () => {
     const params = useParams({ strict: false })
@@ -30,7 +31,7 @@ const TruckTripOrderMain = () => {
         TRIPS_ORDERS,
         {
             params: {
-                id: params.id,
+                order: params.id,
             },
         }
     )
@@ -161,8 +162,10 @@ const TruckTripOrderMain = () => {
                                 </React.Fragment>
                             )
                         })}
+ 
                     </TableBody>
                 </Table>
+
             </div>
 
             <div className="pt-4 flex justify-center">
