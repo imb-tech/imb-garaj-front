@@ -89,7 +89,7 @@ const TripOrderMain = () => {
                     <Button>
                         <ArrowLeft size={16} />
                     </Button>
-                    <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
+                    <h1 className="font-bold">Buyurtmalar ro‘yxati</h1>
                 </div>
                 <div className="flex justify-end">
                     <Button onClick={handleCreate}>
