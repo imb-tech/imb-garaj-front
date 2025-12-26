@@ -8,7 +8,6 @@ import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -29,24 +28,7 @@ const AddTrip = () => {
         },
     })
 
-    const { handleSubmit, control, reset, watch, setValue } = form
-
-    const selectedVehicleId = watch("vehicle")
-
-    useEffect(() => {
-        if (!selectedVehicleId || !vehicleData?.results) return
-
-        const selectedVehicle = vehicleData.results.find(
-            (v) => v.id === selectedVehicleId,
-        )
-
-        if (selectedVehicle?.driver) {
-            setValue("driver", selectedVehicle.driver, {
-                shouldValidate: true,
-                shouldDirty: true,
-            })
-        }
-    }, [selectedVehicleId, vehicleData, setValue])
+    const { handleSubmit, control, reset } = form
 
     const onSuccess = () => {
         toast.success(
