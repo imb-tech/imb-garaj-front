@@ -1,5 +1,4 @@
 import { FormCombobox } from "@/components/form/combobox"
-import FormInput from "@/components/form/input"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
 import {
@@ -129,12 +128,13 @@ const AddPayment = () => {
                 control={control}
                 placeholder="0 UZS"
             />
-            <FormInput
+            <FormNumberInput
                 required
                 name="currency_amount"
-                label="To'lov uchun izoh"
-                methods={form}
-                placeholder="Misol: Yoqilg'i uchun"
+                label="Valyuta miqdori"
+                thousandSeparator=" "
+                control={control}
+                 
             />
 
             <FormCombobox
