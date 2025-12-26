@@ -15,7 +15,9 @@ const Customers = () => {
     const { data, isLoading } = useGet<ListResponse<CustomersType>>(
         SETTINGS_CUSTOMERS,
         {
-            params: search,
+            params:{
+                search:search.customer_search
+            },
         },
     )
     const { getData, setData } = useGlobalStore()
@@ -42,18 +44,23 @@ const Customers = () => {
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
                 numeration={true}
+                paginationProps={{
+                    totalPages: data?.total_pages,
+                }}
                 head={
                     <TableHeader
                         fileName="Mijozlar"
                         url="excel"
                         storeKey={SETTINGS_CUSTOMERS}
+                        pageKey="page"
+                        searchKey="customer_search"
                     />
                 }
             />
-            <DeleteModal path={SETTINGS_CUSTOMERS} id={item?.uuid} />
+            <DeleteModal path={SETTINGS_CUSTOMERS} id={item?.id} />
             <Modal
-                size="max-w-4xl"
-                title={`Mijoz ${item?.uuid ? "tahrirlash" : "qo'shish"}`}
+                size="max-w-2xl"
+                title={`Mijoz ${item?.id ? "tahrirlash" : "qo'shish"}`}
                 modalKey={"create"}
             >
                 <AddCustomersModal />

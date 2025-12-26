@@ -173,6 +173,7 @@ type Product = {
 type TruckType = {
     id: number
     name: string
+    truck_type_name:string
 }
 
 type UnloadingPoint = {

@@ -14,7 +14,7 @@ type User = {
     uuid: string
     full_name: string
     phone: string | null
-    actions: unknown | null
+    actions: string[]
     username: string
 }
 
@@ -75,7 +75,12 @@ type NotificationItem = {
 
 
 type ListResponse<T> = {
+    page_size: number
     total_pages: number
     count: number
     results: T[]
+}
+
+type SelectableResponse<T> = {
+    data?:T[]
 }

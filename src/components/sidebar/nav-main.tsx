@@ -1,38 +1,25 @@
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
     SidebarGroup,
+    SidebarGroupContent,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
+    SidebarTrigger,
     useSidebar,
 } from "@/components/ui/sidebar"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { MenuItem, useItems, usePaths } from "@/hooks/usePaths"
-import { cn } from "@/lib/utils"
-import {
-    Link,
-    useLocation,
-    useMatches,
-    useNavigate,
-} from "@tanstack/react-router"
-import { ChevronRight } from "lucide-react"
+import { Link, useLocation } from "@tanstack/react-router"
 
 export function NavMain() {
     const { toggleSidebar, open: sidebarOpen } = useSidebar()
     const mobile = useIsMobile()
     const location = useLocation()
-    const navigate = useNavigate()
+
     const pathname = location.pathname
-    const matchest = useMatches()
 
     const { filteredItems } = usePaths()
-    const All = useItems()
+    const allPaths = useItems()
 
     const hasActivePathDeep = (item: MenuItem, pathname: string): boolean => {
         if (pathname.includes(item.path)) {
@@ -49,118 +36,65 @@ export function NavMain() {
     }
 
     return (
-        <SidebarGroup>
-            <SidebarMenu>
-                {All.map(({ label, icon, path, ...item }) => {
-                    const hasSubItems = !!item?.items?.[0]?.label
-                    const isParentActive = hasActivePathDeep(
-                        { label, icon, path, ...item },
-                        pathname,
-                    )
+        <SidebarGroup className={"h-full"}>
+            <SidebarGroupContent className="flex flex-col gap-2">
+                <SidebarMenu>
+                    <SidebarMenuItem className="mb-3 lg:hidden">
+                        <div className="flex  items-center min-w-[180px]">
+                            <SidebarTrigger className="text-gray-500 dark:text-white" />
+                            <Link
+                                className="flex justify-start  items-center gap-1"
+                                color="foreground"
+                                to="/"
+                            >
+                                <img
+                                    alt="logo"
+                                    src="/images/logo.png"
+                                    width={40}
+                                />
+                                <p className="font-bold text-inherit whitespace-nowrap">
+                                    IMB HR
+                                </p>
+                            </Link>
+                        </div>
+                    </SidebarMenuItem>
+                    {allPaths.map(({ label, icon, path, ...item }) => {
+                        const isParentActive = hasActivePathDeep(
+                            { label, icon, path, ...item },
+                            pathname,
+                        )
 
-                    return (
-                        <Collapsible
-                            key={label}
-                            asChild
-                            defaultOpen={sidebarOpen && isParentActive}
-                            className="group/collapsible"
-                        >
-                            <SidebarMenuItem>
-                                {hasSubItems ?
-                                    sidebarOpen ?
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton
-                                                tooltip={label}
-                                                className={cn(
-                                                    isParentActive &&
-                                                        "bg-primary/15 text-primary",
-                                                )}
-                                            >
-                                                {icon}
-                                                <span>{label}</span>
-                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                    :   <SidebarMenuButton
-                                            tooltip={label}
-                                            className={cn(
-                                                isParentActive &&
-                                                    "bg-primary/15 text-primary",
-                                            )}
-                                            onClick={() => {
-                                                if (mobile) {
-                                                    toggleSidebar()
-                                                }
-                                                navigate({ to: path })
-                                            }}
-                                        >
-                                            {icon}
-                                            {sidebarOpen && (
-                                                <span>{label}</span>
-                                            )}
-                                        </SidebarMenuButton>
-
-                                :   <Link href={path} className="w-full">
-                                        <SidebarMenuButton
-                                            tooltip={label}
-                                            className={cn(
-                                                isParentActive &&
-                                                    "bg-primary/15 text-primary",
-                                            )}
-                                            onClick={() => {
-                                                if (mobile) toggleSidebar()
-                                            }}
-                                        >
-                                            {icon}
-                                            {sidebarOpen && (
-                                                <span>{label}</span>
-                                            )}
-                                        </SidebarMenuButton>
-                                    </Link>
-                                }
-
-                                {hasSubItems && sidebarOpen && (
-                                    <CollapsibleContent className="bg-background/70 mt-2 rounded-xl p-2 pl-4 space-y-1">
-                                        {item.items?.map((subItem) => (
-                                            <SidebarMenuSubItem
-                                                key={subItem.label}
-                                            >
-                                                <SidebarMenuSubButton
-                                                    asChild
-                                                    className={cn(
-                                                        "border-b hover:rounded-b-md rounded-b-none",
-                                                        hasActivePathDeep(
-                                                            subItem,
-                                                            pathname,
-                                                        ) && "rounded-b-md",
-                                                    )}
-                                                    isActive={hasActivePathDeep(
-                                                        subItem,
-                                                        pathname,
-                                                    )}
-                                                >
-                                                    <Link
-                                                        href={subItem.path}
-                                                        onClick={() => {
-                                                            if (mobile)
-                                                                toggleSidebar()
-                                                        }}
-                                                    >
-                                                        <span className="w-1.5 h-1.5 rounded-full dark:bg-white bg-zinc-600"></span>
-                                                        <span>
-                                                            {subItem.label}
-                                                        </span>
-                                                    </Link>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
-                                        ))}
-                                    </CollapsibleContent>
-                                )}
-                            </SidebarMenuItem>
-                        </Collapsible>
-                    )
-                })}
-            </SidebarMenu>
+                        return (
+                            <Link
+                                to={path}
+                                key={label}
+                                activeProps={{
+                                    className:
+                                        "[&_button]:bg-primary/10   hover:[&_button]:bg-primary/10  hover:[&_button]:text-primary  text-primary ",
+                                }}
+                                className={`rounded-lg ${
+                                    isParentActive ?
+                                        "[&_button]:bg-primary/10  text-primary "
+                                    :   ""
+                                }`}
+                            >
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        className="flex items-center gap-4"
+                                        tooltip={label}
+                                        onClick={() => {
+                                            if (mobile) toggleSidebar()
+                                        }}
+                                    >
+                                        <span>{icon}</span>
+                                        <span>{label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </Link>
+                        )
+                    })}
+                </SidebarMenu>
+            </SidebarGroupContent>
         </SidebarGroup>
     )
 }
