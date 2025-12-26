@@ -162,7 +162,7 @@ const TripOrderMain = () => {
                                             {order.cargo_type_name ?? "—"}
                                         </TableCell>
 
-                                        <TableCell className="border-r border-secondary last:border-none font-semibold">
+                                        <TableCell className="border-r border-secondary last:border-none ">
                                             {order.payments?.[0]?.amount ?
                                                 Number(order.payments[0].amount)
                                                     .toLocaleString("uz-UZ")

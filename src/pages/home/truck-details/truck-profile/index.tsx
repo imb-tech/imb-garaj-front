@@ -43,7 +43,7 @@ function TruckProfile({ data }: Props) {
                         {vehicleDetail?.truck_number || "Mavjud emas"}
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <Truck size={18} />
                         <span className="font-medium">
                             {"Avtomobil raqami"}:
@@ -53,7 +53,7 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 ">
                         <Truck size={18} />
                         <span className="font-medium">
                             {"Avtomobil hujjati"}:
@@ -63,7 +63,7 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <User size={18} />
                         <span className="font-medium">{"Haydovchi"}:</span>
                         <span>
@@ -71,7 +71,7 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <CalendarDays size={18} />
                         <span className="font-medium">
                             {"Ro‘yxatdan o‘tgan sana"}:
