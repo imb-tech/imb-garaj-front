@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
     ORDER_CASHFLOWS,
     SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
+    SETTINTS_PAYMENT_TYPE,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
@@ -31,6 +32,7 @@ const AddCashflow = () => {
     const { closeModal } = useModal("create-order-cashflow")
     const search = useSearch({ strict: false })
     const orderId = Number(search.order)
+    const {data:paymentTypes} = useGet<ListResponse<RolesType>>(SETTINTS_PAYMENT_TYPE)
     const { data: categoryData } = useGet<ExpenseCategory[]>(
         SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
     )
@@ -128,23 +130,12 @@ const AddCashflow = () => {
                 label="Valyuta"
                 name="currency"
                 control={control}
-                options={[
-                    { value: 1, label: "UZS - So‘m" },
-                    { value: 2, label: "USD - AQSh dollari" },
-                ]}
-                valueKey="value"
-                labelKey="label"
-                placeholder="Valyutani tanlang"
+                options={paymentTypes?.results}
+                valueKey="id"
+                labelKey="name"
+                placeholder="To'lov turini tanlang"
             />
-            {selectedCurrency === 2 && (
-                <FormNumberInput
-                    thousandSeparator=" "
-                    name="currency_course"
-                    label="Valyuta kursi"
-                    placeholder="12 206 UZS"
-                    control={control}
-                />
-            )}
+         
             <FormNumberInput
                 required
                 name="amount"
@@ -154,12 +145,12 @@ const AddCashflow = () => {
                 placeholder="0 UZS"
             />
             <FormInput
-                required
-                name="comment"
-                label="Xarajat uchun izoh"
-                methods={form}
-                placeholder="Misol: Yoqilg'i uchun"
+            required
+            name="comment"
+            label="Izoh"
+            methods={form}
             />
+           
 
             <div className="col-span-2 flex justify-end pt-4">
                 <Button
