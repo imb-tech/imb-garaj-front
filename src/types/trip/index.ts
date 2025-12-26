@@ -32,6 +32,7 @@ type TripRow = {
 }
 
 type Truck = {
+    truck_type_name: string
     status: number
     driver_name: string
     id: number

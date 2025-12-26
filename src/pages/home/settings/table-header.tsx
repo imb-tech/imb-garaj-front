@@ -3,7 +3,7 @@ import DownloadAsExcel from "@/components/download-as-excel"
 import { Button } from "@/components/ui/button"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { Plus } from "lucide-react"
+import { Plus, PlusCircle } from "lucide-react"
 
 interface TableHeaderProps {
     fileName: string
@@ -38,7 +38,7 @@ const TableHeader = ({
                 <Button
                     className="flex items-center gap-2"
                     onClick={handleAdd}
-                    icon={<Plus size={18} />}
+                    icon={<PlusCircle size={18} />}
                 >
                     Qo'shish
                 </Button>
