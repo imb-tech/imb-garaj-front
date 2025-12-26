@@ -3,8 +3,8 @@ import FormInput from "@/components/form/input"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
 import {
-    ORDER_CASHFLOWS,
     SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
+    TRIPS_ORDERS_PAYMENT,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
@@ -21,6 +21,8 @@ interface CashflowForm {
     amount: number
     category: number
     comment: string
+    currency: number | string
+    currency_course: number | string
 }
 
 const AddPayment = () => {
@@ -33,7 +35,7 @@ const AddPayment = () => {
         SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
     )
     const currentCashflow = getData<CashflowForm & { id?: number }>(
-        ORDER_CASHFLOWS,
+        TRIPS_ORDERS_PAYMENT,
     )
 
     const form = useForm<CashflowForm>({
@@ -42,20 +44,23 @@ const AddPayment = () => {
             amount: currentCashflow?.amount,
             category: currentCashflow?.category,
             comment: currentCashflow?.comment,
+            currency: currentCashflow?.currency,
+            currency_course: currentCashflow?.currency_course
         },
     })
 
-    const { handleSubmit, control, reset } = form
+    const { handleSubmit, control, reset, watch } = form
+    const selectedCurrency = watch("currency")
 
     const onSuccess = () => {
         toast.success(
             currentCashflow?.id ? "To'lov tahrirlandi!" : "To'lov qo‘shildi!",
         )
         reset()
-        clearKey(ORDER_CASHFLOWS)
+        clearKey(TRIPS_ORDERS_PAYMENT)
         closeModal()
         queryClient.invalidateQueries({
-            queryKey: [ORDER_CASHFLOWS],
+            queryKey: [TRIPS_ORDERS_PAYMENT],
         })
     }
 
@@ -71,12 +76,14 @@ const AddPayment = () => {
             amount: Number(data.amount),
             category: data.category,
             comment: data.comment,
+            currency: data.currency,
+            currency_course: data.currency_course
         }
 
         if (currentCashflow?.id) {
-            update(`${ORDER_CASHFLOWS}/${currentCashflow.id}`, payload)
+            update(`${TRIPS_ORDERS_PAYMENT}/${currentCashflow.id}`, payload)
         } else {
-            create(ORDER_CASHFLOWS, payload)
+            create(TRIPS_ORDERS_PAYMENT, payload)
         }
     }
 
@@ -114,6 +121,29 @@ const AddPayment = () => {
                 valueKey="id"
                 labelKey="name"
             />
+            <FormCombobox
+                required
+                label="Valyuta"
+                name="currency"
+                control={control}
+                options={[
+                    { value: 1, label: "UZS - So‘m" },
+                    { value: 2, label: "USD - AQSh dollari" },
+                ]}
+                valueKey="value"
+                labelKey="label"
+                placeholder="Valyutani tanlang"
+
+            />
+            {selectedCurrency === 2 && (
+                <FormNumberInput
+                    thousandSeparator=" "
+                    name="currency_course"
+                    label="Valyuta kursi"
+                    placeholder="12 206 UZS"
+                    control={control}
+                />
+            )}
 
             <div>
                 <FormNumberInput
