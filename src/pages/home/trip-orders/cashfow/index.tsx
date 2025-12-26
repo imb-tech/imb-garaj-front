@@ -44,6 +44,7 @@ const TripOrderDetailRow = () => {
 
     return (
         <div>
+            <div className="overflow-x-auto">
             <DataTable
                 loading={isLoading}
                 columns={columns}
@@ -62,6 +63,8 @@ const TripOrderDetailRow = () => {
                     />
                 }
             />
+            </div>
+         
 
             <Modal
                 modalKey="create-order-cashflow"

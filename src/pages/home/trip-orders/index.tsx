@@ -1,5 +1,6 @@
 import ParamPagination from "@/components/as-params/pagination"
 import DeleteModal from "@/components/custom/delete-modal"
+import EmptyBox from "@/components/custom/empty-box"
 import Modal from "@/components/custom/modal"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,13 +18,13 @@ import { cn } from "@/lib/utils"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { format } from "date-fns"
-import { ArrowLeft, ChevronDown, Edit, Trash2 } from "lucide-react"
+import { ArrowLeft, ChevronDown, CirclePlus, Edit, PlusCircle, Trash2 } from "lucide-react"
 import * as React from "react"
 import AddTripOrders from "./create"
 import ViewPageCashFlows from "./view"
 
 const TripOrderMain = () => {
-    const { id } = useParams({ strict: false })
+    const params = useParams({ strict: false })
     const search = useSearch({ strict: false })
     const navigate = useNavigate()
 
@@ -40,7 +41,7 @@ const TripOrderMain = () => {
         TRIPS_ORDERS,
         {
             params: {
-                id,
+                trip: params.id,
                 page,
             },
         },
@@ -74,20 +75,28 @@ const TripOrderMain = () => {
         openDeleteModal()
     }
 
+    const handleToBack = () => {
+        window.history.back()
+    }
+
     return (
         <div className="space-y-3">
-            <div className="flex justify-end">
-                <Button onClick={handleCreate}>Buyurtma qo‘shish +</Button>
-            </div>
-
-            <div
-                className="flex items-center gap-3 cursor-pointer"
-                onClick={() => navigate({ to: "/trip" })}
-            >
-                <Button>
-                    <ArrowLeft size={16} />
-                </Button>
-                <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
+            <div className="flex items-center justify-between">
+                <div
+                    className="flex items-center gap-3 cursor-pointer"
+                    onClick={handleToBack}
+                >
+                    <Button>
+                        <ArrowLeft size={16} />
+                    </Button>
+                    <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
+                </div>
+                <div className="flex justify-end">
+                    <Button onClick={handleCreate}>
+                        <CirclePlus size={18} />
+                        Qo'shish
+                    </Button>
+                </div>
             </div>
 
             {/* TABLE WRAPPER (same as DataTable) */}
@@ -149,15 +158,15 @@ const TripOrderMain = () => {
                                             {order.unloading_name}
                                         </TableCell>
 
-                                        <TableCell className="border-r border-secondary last:border-none text-muted-foreground">
+                                        <TableCell className="border-r border-secondary last:border-none">
                                             {order.cargo_type_name ?? "—"}
                                         </TableCell>
 
                                         <TableCell className="border-r border-secondary last:border-none font-semibold">
                                             {order.payments?.[0]?.amount ?
-                                                Number(
-                                                    order.payments[0].amount,
-                                                ).toLocaleString("uz-UZ")
+                                                Number(order.payments[0].amount)
+                                                    .toLocaleString("uz-UZ")
+                                                    .replace(/,/g, " ")  
                                             :   "—"}
                                         </TableCell>
 
@@ -245,6 +254,9 @@ const TripOrderMain = () => {
                         })}
                     </TableBody>
                 </Table>
+                {!isLoading && (
+                    <EmptyBox data={data?.results} height="h-[300px]" />
+                )}
             </div>
 
             <div className="pt-4 flex justify-center">

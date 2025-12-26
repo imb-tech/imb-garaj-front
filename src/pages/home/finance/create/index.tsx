@@ -95,6 +95,7 @@ const AddTransport = () => {
                 label="Avtoraqam"
                 methods={form}
                 placeholder="Misol: 01A345AD"
+                uppercase
             />
 
             <FormInput
@@ -103,6 +104,7 @@ const AddTransport = () => {
                 label="Tex. passport raqami"
                 methods={form}
                 placeholder="Misol: AS02131234131"
+                uppercase
             />
 
             <FormCombobox

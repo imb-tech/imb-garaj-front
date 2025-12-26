@@ -12,23 +12,72 @@ export const useColumnsOrderPayment = () => {
             {
                 header: "Pul birligi",
                 accessorKey: "currency",
-                cell: ({ getValue }) => (
-                    <span className="text-muted-foreground">
-                        {getValue<string>() || "—"}
-                    </span>
-                ),
-            },
+                cell: ({ getValue }) => {
+                    const currencyValue = getValue<number>()
 
-            {
-                header: "Pul birlig kursi",
-                accessorKey: "currency_course",
-                cell: ({ getValue }) => <span>{getValue<number>()}</span>,
-            },
+                    if (!currencyValue) {
+                        return <span>—</span>
+                    }
 
+                    const currencyMap = {
+                        1: "UZS - So'm",
+                        2: "USD - AQSh dollari",
+                    }
+
+                    return (
+                        <span>
+                            {currencyMap[
+                                currencyValue as keyof typeof currencyMap
+                            ] || "—"}
+                        </span>
+                    )
+                },
+            },
             {
                 header: "Miqdor",
                 accessorKey: "amount",
-                enableSorting: true,
+                cell: ({ getValue }) => {
+                    const value = getValue<string>()
+                    if (!value) return <span className="">—</span>
+
+                    const num = Number(value)
+                    if (isNaN(num)) return <span className="">{value}</span>
+
+                    return (
+                        <span className="">
+                            {num.toLocaleString("uz-UZ").replace(/,/g, " ")}
+                        </span>
+                    )
+                },
+            },
+
+            {
+                header: "Pul birligi kursi",
+                accessorKey: "currency_course",
+                cell: ({ getValue }) => {
+                    const value = getValue<number | string>()
+
+                    if (value === null || value === undefined || value === "") {
+                        return <span className="text-muted-foreground">—</span>
+                    }
+                    const num =
+                        typeof value === "string" ? parseFloat(value) : value
+                    if (isNaN(num)) {
+                        return (
+                            <span className="text-muted-foreground">
+                                {String(value)}
+                            </span>
+                        )
+                    }
+                    const formatted = num
+                        .toLocaleString("uz-UZ", {
+                            minimumFractionDigits: num < 1 ? 4 : 2,
+                            maximumFractionDigits: 4,
+                        })
+                        .replace(/,/g, " ")
+
+                    return <span className="font-medium">{formatted}</span>
+                },
             },
         ],
         [],
