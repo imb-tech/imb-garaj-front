@@ -123,3 +123,13 @@ type OrderPaymentType = {
     order: number
     payment_type: number
 }
+
+
+
+//   "currency": 1,
+//   "currency_course": "-7354.24",
+//   "amount": "-284127952717280608.1",
+//   "currency_amount": "1844",
+//   "order": 0,
+//   "payment_type": 0
+// }

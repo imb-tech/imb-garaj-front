@@ -7,10 +7,10 @@ import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
+import { PlusCircle } from "lucide-react"
 import ReportsFilter from "../truck-details/filter"
 import { useCostCols } from "./cols"
 import AddTransport from "./create"
-import { Plus } from "lucide-react"
 
 const FinanceStatisticMain = () => {
     const search: any = useSearch({ strict: false })
@@ -49,15 +49,13 @@ const FinanceStatisticMain = () => {
 
         navigate({
             to: "/truck-detail/$id",
-            params: { id: id.toString() }
+            params: { id: id.toString() },
         })
     }
 
     const columns = useCostCols()
     return (
         <div className="space-y-3">
-
-
             <DataTable
                 columns={columns}
                 loading={isLoading}
@@ -71,7 +69,11 @@ const FinanceStatisticMain = () => {
                         <h1 className="text-xl">{`Transportlar ro'yxati`}</h1>
                         <div className="flex justify-between mb-3  gap-4">
                             <ReportsFilter />
-                            <Button onClick={handleCreate}><Plus className="h-4" /> Transport qo'shish </Button>
+                            <Button onClick={handleCreate}>
+                                {" "}
+                                <PlusCircle size={18} />
+                                Qo'shish{" "}
+                            </Button>
                         </div>
                     </div>
                 }
