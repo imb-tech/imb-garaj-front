@@ -10,7 +10,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
 import ParamInput from "@/components/as-params/input"
-import { PlusCircle } from "lucide-react"
+import { CirclePlus, PlusCircle } from "lucide-react"
 
 const ShiftStatisticMain = () => {
     const navigate = useNavigate()
@@ -57,7 +57,7 @@ const ShiftStatisticMain = () => {
                 <ParamInput name="driver_name" fullWidth searchKey="driver_name"/>
                 
                 <Button className="flex items-center gap-2" onClick={handleCreate}>
-                    <PlusCircle size={16}/>
+                    <CirclePlus size={18}/>
                     Qo'shish
                 </Button>
             </div>

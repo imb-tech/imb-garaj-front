@@ -33,17 +33,51 @@ export const useColumnsOrderPayment = () => {
                     )
                 },
             },
-
-            {
-                header: "Pul birlig kursi",
-                accessorKey: "currency_course",
-                cell: ({ getValue }) => <span>{getValue<number>()}</span>,
-            },
-
             {
                 header: "Miqdor",
                 accessorKey: "amount",
-                enableSorting: true,
+                cell: ({ getValue }) => {
+                    const value = getValue<string>()
+                    if (!value) return <span className="">—</span>
+
+                    const num = Number(value)
+                    if (isNaN(num)) return <span className="">{value}</span>
+
+                    return (
+                        <span className="">
+                            {num.toLocaleString("uz-UZ").replace(/,/g, " ")}
+                        </span>
+                    )
+                },
+            },
+
+            {
+                header: "Pul birligi kursi",
+                accessorKey: "currency_course",
+                cell: ({ getValue }) => {
+                    const value = getValue<number | string>()
+
+                    if (value === null || value === undefined || value === "") {
+                        return <span className="text-muted-foreground">—</span>
+                    }
+                    const num =
+                        typeof value === "string" ? parseFloat(value) : value
+                    if (isNaN(num)) {
+                        return (
+                            <span className="text-muted-foreground">
+                                {String(value)}
+                            </span>
+                        )
+                    }
+                    const formatted = num
+                        .toLocaleString("uz-UZ", {
+                            minimumFractionDigits: num < 1 ? 4 : 2,
+                            maximumFractionDigits: 4,
+                        })
+                        .replace(/,/g, " ")
+
+                    return <span className="font-medium">{formatted}</span>
+                },
             },
         ],
         [],

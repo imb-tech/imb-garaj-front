@@ -53,5 +53,9 @@ type SearchParams = {
     vehicle_search?:string
     roles_search?:string
     trip?:string|number
+    drivers? :string
+    truck_type?:string
+    from_date ?:string
+    to_date?:string
 }
 

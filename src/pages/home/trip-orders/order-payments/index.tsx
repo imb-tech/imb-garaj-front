@@ -38,6 +38,7 @@ const TripDetailPayment = () => {
 
     return (
         <div>
+            <div className="overflow-x-auto">
             <DataTable
                 loading={isLoading}
                 columns={columns}
@@ -48,6 +49,7 @@ const TripDetailPayment = () => {
                 paginationProps={{
                     totalPages: data?.total_pages ?? 1,
                 }}
+                    tableWrapperClassName="max-h-[400px] overflow-auto"
                 head={
                     <TableHeaderTripsOrders
                         modalKey="create-order-payment"
@@ -56,6 +58,7 @@ const TripDetailPayment = () => {
                     />
                 }
             />
+            </div>
 
             <Modal
                 modalKey="create-order-payment"

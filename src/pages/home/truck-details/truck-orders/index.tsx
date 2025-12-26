@@ -1,5 +1,3 @@
-import * as React from "react"
-import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import {
     Table,
@@ -9,16 +7,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
-import { TRIPS_ORDERS } from "@/constants/api-endpoints"
-import { ChevronDown, } from "lucide-react"
+import { format } from "date-fns"
+import { ChevronDown } from "lucide-react"
+import * as React from "react"
 
 import ParamPagination from "@/components/as-params/pagination"
 import { cn } from "@/lib/utils"
-import TripOrderDetailRow from "../truck-trip-cashflows"
 import TruckTripCashflowRow from "../truck-trip-cashflows"
-import EmptyBox from "@/components/custom/empty-box"
 
 const TruckTripOrderMain = () => {
     const params = useParams({ strict: false })
@@ -33,7 +31,7 @@ const TruckTripOrderMain = () => {
             params: {
                 order: params.id,
             },
-        }
+        },
     )
 
     const toggleExpand = (orderId: number) => {
@@ -46,11 +44,9 @@ const TruckTripOrderMain = () => {
         })
     }
 
-
     return (
         <div className="space-y-3">
-            <div className="flex justify-end">
-            </div>
+            <div className="flex justify-end"></div>
 
             <div className="flex items-center gap-3">
                 <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
@@ -76,7 +72,10 @@ const TruckTripOrderMain = () => {
                     <TableBody>
                         {isLoading && (
                             <TableRow className="border-none">
-                                <TableCell colSpan={9} className="text-center py-6">
+                                <TableCell
+                                    colSpan={9}
+                                    className="text-center py-6"
+                                >
                                     Yuklanmoqda...
                                 </TableCell>
                             </TableRow>
@@ -92,12 +91,16 @@ const TruckTripOrderMain = () => {
                                         className={cn(
                                             "cursor-pointer border-none transition-colors",
                                             "hover:bg-gray-200 dark:hover:bg-secondary",
-                                            index % 2 !== 0 && "bg-secondary/70",
-                                            isExpanded && "bg-secondary"
+                                            index % 2 !== 0 &&
+                                                "bg-secondary/70",
+                                            isExpanded && "bg-secondary",
                                         )}
                                     >
                                         <TableCell className="border-r border-secondary last:border-none">
-                                            {(page - 1) * (data.page_size ?? 10) + index + 1}
+                                            {(page - 1) *
+                                                (data.page_size ?? 10) +
+                                                index +
+                                                1}
                                         </TableCell>
 
                                         <TableCell className="border-r border-secondary last:border-none">
@@ -113,29 +116,35 @@ const TruckTripOrderMain = () => {
                                         </TableCell>
 
                                         <TableCell className="border-r border-secondary last:border-none font-semibold">
-                                            {order.payments?.[0]?.amount
-                                                ? Number(order.payments[0].amount).toLocaleString("uz-UZ")
-                                                : "—"}
+                                            {order.payments?.[0]?.amount ?
+                                                Number(
+                                                    order.payments[0].amount,
+                                                ).toLocaleString("uz-UZ")
+                                            :   "—"}
                                         </TableCell>
 
                                         <TableCell className="border-r border-secondary last:border-none">
-                                            {order.payments?.[0]?.currency === 1
-                                                ? "UZS"
-                                                : order.payments?.[0]?.currency === 2
-                                                    ? "USD"
-                                                    : "—"}
+                                            {(
+                                                order.payments?.[0]
+                                                    ?.currency === 1
+                                            ) ?
+                                                "UZS"
+                                            : (
+                                                order.payments?.[0]
+                                                    ?.currency === 2
+                                            ) ?
+                                                "USD"
+                                            :   "—"}
                                         </TableCell>
 
                                         <TableCell className="border-r border-secondary last:border-none">
-                                            {order.created
-                                                ? format(
+                                            {order.created ?
+                                                format(
                                                     new Date(order.created),
-                                                    "dd.MM.yyyy HH:mm"
+                                                    "dd.MM.yyyy HH:mm",
                                                 )
-                                                : "—"}
+                                            :   "—"}
                                         </TableCell>
-
-
 
                                         <TableCell
                                             className="border-r border-secondary last:border-none cursor-default p-0 text-right"
@@ -145,7 +154,8 @@ const TruckTripOrderMain = () => {
                                                 <ChevronDown
                                                     className={cn(
                                                         "transition-transform",
-                                                        isExpanded && "rotate-180"
+                                                        isExpanded &&
+                                                            "rotate-180",
                                                     )}
                                                 />
                                             </Button>
@@ -154,18 +164,19 @@ const TruckTripOrderMain = () => {
 
                                     {isExpanded && (
                                         <TableRow className="border-none bg-secondary">
-                                            <TableCell colSpan={9} className="p-0">
-                                                <TruckTripCashflowRow/>
+                                            <TableCell
+                                                colSpan={9}
+                                                className="p-0"
+                                            >
+                                                <TruckTripCashflowRow />
                                             </TableCell>
                                         </TableRow>
                                     )}
                                 </React.Fragment>
                             )
                         })}
- 
                     </TableBody>
                 </Table>
-
             </div>
 
             <div className="pt-4 flex justify-center">
@@ -174,9 +185,6 @@ const TruckTripOrderMain = () => {
                     disabled={isLoading}
                 />
             </div>
-
-
-
         </div>
     )
 }

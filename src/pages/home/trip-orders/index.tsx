@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { format } from "date-fns"
-import { ArrowLeft, ChevronDown, Edit, PlusCircle, Trash2 } from "lucide-react"
+import { ArrowLeft, ChevronDown, CirclePlus, Edit, PlusCircle, Trash2 } from "lucide-react"
 import * as React from "react"
 import AddTripOrders from "./create"
 import ViewPageCashFlows from "./view"
@@ -75,26 +75,28 @@ const TripOrderMain = () => {
         openDeleteModal()
     }
 
+    const handleToBack = () => {
+        window.history.back()
+    }
+
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-        
-
-            <div
-                className="flex items-center gap-3 cursor-pointer"
-                onClick={() => navigate({ to: "/trip" })}
-            >
-                <Button>
-                    <ArrowLeft size={16} />
-                </Button>
-                <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
-            </div>
+                <div
+                    className="flex items-center gap-3 cursor-pointer"
+                    onClick={handleToBack}
+                >
+                    <Button>
+                        <ArrowLeft size={16} />
+                    </Button>
+                    <h1 className="text-xl">Buyurtmalar ro‘yxati</h1>
+                </div>
                 <div className="flex justify-end">
-                <Button onClick={handleCreate}>
-                    <PlusCircle/>
-                    Qo'shish
-                </Button>
-            </div>
+                    <Button onClick={handleCreate}>
+                        <CirclePlus size={18} />
+                        Qo'shish
+                    </Button>
+                </div>
             </div>
 
             {/* TABLE WRAPPER (same as DataTable) */}
@@ -162,9 +164,9 @@ const TripOrderMain = () => {
 
                                         <TableCell className="border-r border-secondary last:border-none font-semibold">
                                             {order.payments?.[0]?.amount ?
-                                                Number(
-                                                    order.payments[0].amount,
-                                                ).toLocaleString("uz-UZ")
+                                                Number(order.payments[0].amount)
+                                                    .toLocaleString("uz-UZ")
+                                                    .replace(/,/g, " ")  
                                             :   "—"}
                                         </TableCell>
 

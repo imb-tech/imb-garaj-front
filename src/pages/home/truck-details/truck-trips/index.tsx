@@ -32,7 +32,7 @@ const VehicleTrips = () => {
         const id = item?.id
         if (!id) return
         navigate({
-            to: "/orders/$id",
+            to: "/trip-orders/$id",
             params: { id: id.toString() },
         })
     }
@@ -58,7 +58,7 @@ const VehicleTrips = () => {
                 onRowClick={handleRowClick}
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
-                head={<TruckTripsHeader   />}
+                head={<TruckTripsHeader />}
                 paginationProps={{
                     totalPages: 3,
                 }}
