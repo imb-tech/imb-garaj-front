@@ -71,7 +71,7 @@ const AddPayment = () => {
         if (!orderId) return
 
         const payload = {
-            ...currentCashflow,
+            ...data,
             order: orderId,
         }
 

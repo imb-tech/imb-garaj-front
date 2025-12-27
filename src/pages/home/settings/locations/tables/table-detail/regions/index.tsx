@@ -13,6 +13,8 @@ import { useColumnsRegionsTable } from "./regions-cols"
 const RegionsTable = ({ country_id }: { country_id: number }) => {
     const navigate = useNavigate()
     const search = useSearch({ strict: false })
+    const selectedRegionId =
+        search.region != null ? Number(search.region) : undefined
 
     const { data, isLoading } = useGet<ListResponse<RegionsType>>(
         `${SETTINGS_REGIONS}`,
@@ -98,9 +100,20 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                         pageKey="page"
                     />
                 }
-                rowColor={(row: any) =>
-                    search.region === row.id ? "bg-secondary" : ""
-                }
+                rowColor={(r: any) => {
+                    const rowId = Number(r?.original?.id ?? r?.id)
+                    const isSelected = selectedRegionId === rowId
+
+                    return isSelected ?
+                            [
+                                "[&>td]:!bg-primary/10",
+                                "hover:[&>td]:!bg-primary/15",
+                                "[&>td]:border-y-2 [&>td]:border-primary/60",
+                                "[&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2",
+                                "[&>td]:!rounded-none",
+                            ].join(" ")
+                        :   ""
+                }}
             />
 
             <DeleteModal
