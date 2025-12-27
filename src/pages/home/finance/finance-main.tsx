@@ -25,7 +25,11 @@ const FinanceStatisticMain = () => {
     const { data: vehiclesData, isLoading } = useGet<ListResponse<Truck>>(
         VEHICLES,
         {
-            params: search,
+            params: {
+                search: search,
+                page: search.page,
+                page_size: search.page_size,
+            },
         },
     )
 
@@ -78,7 +82,9 @@ const FinanceStatisticMain = () => {
                     </div>
                 }
                 paginationProps={{
-                    totalPages: 2,
+                    totalPages: vehiclesData?.total_pages,
+                    paramName: "page",
+                    pageSizeParamName: "page_size",
                 }}
             />
 

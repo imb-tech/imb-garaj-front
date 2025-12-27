@@ -45,6 +45,7 @@ type Truck = {
     truck_type: number
     trailer_type: number | null
     driver: number
+    page:string
 }
 
 type CargoItem = {

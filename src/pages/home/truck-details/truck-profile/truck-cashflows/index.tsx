@@ -5,16 +5,25 @@ import { VEHICLES_CASHFLOWS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useParams } from "@tanstack/react-router"
+import { useParams, useSearch } from "@tanstack/react-router"
 import AddVehicleCashflowModal from "./add-cashflows"
 import { useColumnsCashflowsTable } from "./cashflows-cols"
 import TableTruckHeader from "./truck-header"
 
 const VehicleCashflows = () => {
+    const search = useSearch({ strict: false })
     const params = useParams({ strict: false })
     const id = params.id
-    const { data, isLoading } =
-        useGet<ListResponse<VehicleCashflowsType>>(VEHICLES_CASHFLOWS)
+    const { data, isLoading } = useGet<ListResponse<VehicleCashflowsType>>(
+        VEHICLES_CASHFLOWS,
+        {
+            params: {
+                search: search.cashflow_search,
+                page: search.page,
+                page_size: search.page_size,
+            },
+        },
+    )
     const { getData, setData } = useGlobalStore()
     const item = getData<VehicleCashflowsType>(VEHICLES_CASHFLOWS)
 
@@ -38,8 +47,11 @@ const VehicleCashflows = () => {
                 data={data?.results}
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
+                numeration
                 paginationProps={{
                     totalPages: data?.total_pages,
+                    paramName: "page",
+                    pageSizeParamName: "page_size",
                 }}
                 head={
                     <TableTruckHeader
