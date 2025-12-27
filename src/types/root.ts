@@ -57,5 +57,7 @@ type SearchParams = {
     truck_type?:string
     from_date ?:string
     to_date?:string
+    driver_name?:string
+    cashflow_search?:string
 }
 

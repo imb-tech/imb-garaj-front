@@ -20,6 +20,8 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
             params: {
                 country: country_id,
                 search: search.region_search,
+                page: 1,
+                page_size: 1000,
             },
         },
     )
@@ -81,6 +83,10 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
                 numeration={true}
+                viewAll={true}
+                paginationProps={{
+                    totalPages: 1,
+                }}
                 wrapperClassName="bg-background"
                 head={
                     <TableHeaderLocation

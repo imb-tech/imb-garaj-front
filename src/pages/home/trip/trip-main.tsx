@@ -1,3 +1,4 @@
+import ParamInput from "@/components/as-params/input"
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { Button } from "@/components/ui/button"
@@ -6,13 +7,13 @@ import { TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import { CirclePlus } from "lucide-react"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
-import ParamInput from "@/components/as-params/input"
-import { CirclePlus, PlusCircle } from "lucide-react"
 
 const ShiftStatisticMain = () => {
+    const search = useSearch({ strict: false })
     const navigate = useNavigate()
     const { getData, setData, clearKey } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("create")
@@ -20,7 +21,13 @@ const ShiftStatisticMain = () => {
 
     const currentTrip = getData<TripRow>(TRIPS)
 
-    const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS)
+    const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS, {
+        params: {
+            search:search.driver_name,
+            page: search.page,
+            page_size: search.page_size,
+        },
+    })
 
     const columns = useCostCols()
 
@@ -49,15 +56,20 @@ const ShiftStatisticMain = () => {
         })
     }
 
-
-
     return (
         <div className="space-y-3">
             <div className="flex justify-between items-center mb-3 gap-4">
-                <ParamInput name="driver_name" fullWidth searchKey="driver_name"/>
-                
-                <Button className="flex items-center gap-2" onClick={handleCreate}>
-                    <CirclePlus size={18}/>
+                <ParamInput
+                    name="driver_name"
+                    fullWidth
+                    searchKey="driver_name"
+                />
+
+                <Button
+                    className="flex items-center gap-2"
+                    onClick={handleCreate}
+                >
+                    <CirclePlus size={18} />
                     Qo'shish
                 </Button>
             </div>
@@ -84,7 +96,9 @@ const ShiftStatisticMain = () => {
                     </div>
                 }
                 paginationProps={{
-                    totalPages: 3,
+                    totalPages: data?.total_pages,
+                    paramName: "page",
+                    pageSizeParamName: "page_size",
                 }}
             />
 

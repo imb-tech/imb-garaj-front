@@ -21,7 +21,11 @@ const TripOrderDetailRow = () => {
     const { data, isLoading } = useGet<ListResponse<CashflowRow>>(
         ORDER_CASHFLOWS,
         {
-            params: { order: orderId },
+            params: {
+                order: orderId,
+                page: 1,
+                page_size: 1000,
+            },
         },
     )
 
@@ -45,26 +49,25 @@ const TripOrderDetailRow = () => {
     return (
         <div>
             <div className="overflow-x-auto">
-            <DataTable
-                loading={isLoading}
-                columns={columns}
-                data={data?.results}
-                numeration
-                onEdit={({ original }) => handleEdit(original)}
-                onDelete={handleDelete}
-                paginationProps={{
-                    totalPages: data?.total_pages ?? 1,
-                }}
-                head={
-                    <TableHeaderTripsOrders
-                        modalKey="create-order-cashflow"
-                        storeKey={ORDER_CASHFLOWS}
-                        heading="Xarajatlar ro'yxati"
-                    />
-                }
-            />
+                <DataTable
+                    loading={isLoading}
+                    columns={columns}
+                    data={data?.results}
+                    numeration
+                    onEdit={({ original }) => handleEdit(original)}
+                    onDelete={handleDelete}
+                    paginationProps={{
+                        totalPages: 1,
+                    }}
+                    head={
+                        <TableHeaderTripsOrders
+                            modalKey="create-order-cashflow"
+                            storeKey={ORDER_CASHFLOWS}
+                            heading="Xarajatlar ro'yxati"
+                        />
+                    }
+                />
             </div>
-         
 
             <Modal
                 modalKey="create-order-cashflow"

@@ -48,7 +48,26 @@ const AddDriverModal = () => {
 
     const isPending = isPendingCreate || isPendingUpdate
 
-    const onSubmit = (values: DriversType) => {
+    const onSubmit = async (values: DriversType) => {
+        const isValid = await form.trigger()
+
+        if (!isValid) {
+            toast.error("Iltimos, barcha maydonlarni to'g'ri to'ldiring")
+            return
+        }
+
+        const phoneValue = values.driver.phone || ""
+        const digitsOnly = phoneValue.replace(/\D/g, "")
+
+        if (digitsOnly.length !== 9) {
+            form.setError("driver.phone", {
+                type: "manual",
+                message: "Telefon raqam 12 ta raqamdan iborat bo'lishi kerak",
+            })
+            toast.error("Telefon raqam to'liq emas")
+            return
+        }
+
         if (currentDriver?.id) {
             const { password, ...restValues } = values
 
