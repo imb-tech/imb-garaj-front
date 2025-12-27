@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 interface CashflowForm {
+    payment_type: any
     action: number
     amount: number
     category: number
@@ -32,7 +33,9 @@ const AddCashflow = () => {
     const { closeModal } = useModal("create-order-cashflow")
     const search = useSearch({ strict: false })
     const orderId = Number(search.order)
-    const {data:paymentTypes} = useGet<ListResponse<RolesType>>(SETTINTS_PAYMENT_TYPE)
+    const { data: paymentTypes } = useGet<ListResponse<RolesType>>(
+        SETTINTS_PAYMENT_TYPE,
+    )
     const { data: categoryData } = useGet<ExpenseCategory[]>(
         SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
     )
@@ -48,6 +51,7 @@ const AddCashflow = () => {
             comment: currentCashflow?.comment,
             currency: currentCashflow?.currency,
             currency_course: currentCashflow?.currency_course,
+            payment_type: currentCashflow?.payment_type,
         },
     })
 
@@ -82,6 +86,7 @@ const AddCashflow = () => {
             comment: data.comment,
             currency: data.currency,
             currency_course: data.currency_course,
+            payment_type: data.payment_type,
         }
 
         if (currentCashflow?.id) {
@@ -127,15 +132,15 @@ const AddCashflow = () => {
             />
             <FormCombobox
                 required
-                label="Valyuta"
-                name="currency"
+                label="To'lov turi"
+                name="payment_type"
                 control={control}
                 options={paymentTypes?.results}
                 valueKey="id"
                 labelKey="name"
                 placeholder="To'lov turini tanlang"
             />
-         
+
             <FormNumberInput
                 required
                 name="amount"
@@ -144,13 +149,7 @@ const AddCashflow = () => {
                 control={control}
                 placeholder="0 UZS"
             />
-            <FormInput
-            required
-            name="comment"
-            label="Izoh"
-            methods={form}
-            />
-           
+            <FormInput required name="comment" label="Izoh" methods={form} />
 
             <div className="col-span-2 flex justify-end pt-4">
                 <Button
