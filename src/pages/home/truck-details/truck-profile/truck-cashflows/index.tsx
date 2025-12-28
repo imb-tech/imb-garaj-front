@@ -68,6 +68,7 @@ const VehicleCashflows = () => {
                 path={VEHICLES_CASHFLOWS}
                 refetchKeys={[VEHICLES_CASHFLOWS]}
                 id={item?.id}
+                modalKey="delete-vehicle-cashflow"
             />
             <Modal
                 size="max-w-2xl"

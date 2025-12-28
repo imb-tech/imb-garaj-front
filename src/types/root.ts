@@ -59,5 +59,7 @@ type SearchParams = {
     to_date?:string
     driver_name?:string
     cashflow_search?:string
+    driver?:string
+    vehicle?:string
 }
 
