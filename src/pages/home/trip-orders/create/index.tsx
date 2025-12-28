@@ -225,6 +225,7 @@ const AddTripOrders = () => {
             />
             {selectedCurrency === 2 && (
                 <FormNumberInput
+                    required
                     thousandSeparator=" "
                     name="currency_course"
                     label="Valyuta kursi"

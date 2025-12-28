@@ -111,6 +111,7 @@ const AddPayment = () => {
             />
             {selectedCurrency === 2 && (
                 <FormNumberInput
+                    required
                     thousandSeparator=" "
                     name="currency_course"
                     label="Valyuta kursi"
@@ -134,7 +135,6 @@ const AddPayment = () => {
                 label="Valyuta miqdori"
                 thousandSeparator=" "
                 control={control}
-                 
             />
 
             <FormCombobox
