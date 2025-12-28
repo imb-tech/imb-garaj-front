@@ -31,22 +31,9 @@ const AddTrip = () => {
 
     const { handleSubmit, control, reset, watch, setValue } = form
 
-    const selectedVehicleId = watch("vehicle")
+  
 
-    useEffect(() => {
-        if (!selectedVehicleId || !vehicleData?.results) return
-
-        const selectedVehicle = vehicleData.results.find(
-            (v) => v.id === selectedVehicleId,
-        )
-
-        if (selectedVehicle?.driver) {
-            setValue("driver", selectedVehicle.driver, {
-                shouldValidate: true,
-                shouldDirty: true,
-            })
-        }
-    }, [selectedVehicleId, vehicleData, setValue])
+    
 
     const onSuccess = () => {
         toast.success(
