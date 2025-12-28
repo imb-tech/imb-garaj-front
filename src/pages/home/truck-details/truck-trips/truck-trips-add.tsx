@@ -8,7 +8,6 @@ import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -30,10 +29,6 @@ const AddTrip = () => {
     })
 
     const { handleSubmit, control, reset, watch, setValue } = form
-
-  
-
-    
 
     const onSuccess = () => {
         toast.success(
