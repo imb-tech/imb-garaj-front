@@ -13,7 +13,7 @@ import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
-import { useSearch } from "@tanstack/react-router"
+import { useParams, useSearch } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -32,7 +32,8 @@ const AddCashflow = () => {
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create-order-cashflow")
     const search = useSearch({ strict: false })
-    const orderId = Number(search.order)
+   const { parentId, childId } = useParams({ strict: false })
+
     const { data: paymentTypes } = useGet<ListResponse<RolesType>>(
         SETTINTS_PAYMENT_TYPE,
     )
@@ -76,10 +77,10 @@ const AddCashflow = () => {
     const { mutate: update, isPending: updating } = usePatch({ onSuccess })
 
     const onSubmit = (data: CashflowForm) => {
-        if (!orderId) return
+        if (!childId) return
 
         const payload = {
-            order: orderId,
+            order:childId,
             action: data.action,
             amount: Number(data.amount),
             category: data.category,
@@ -96,7 +97,7 @@ const AddCashflow = () => {
         }
     }
 
-    if (!orderId) {
+    if (!childId) {
         return (
             <div className="text-sm text-muted-foreground">
                 Xarajatlar mavjud emas
