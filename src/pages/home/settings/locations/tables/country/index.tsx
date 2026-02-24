@@ -30,7 +30,7 @@ const CountriesTable = () => {
     const totalColumns = columns.length + 2
 
     return (
-        <div className="overflow-x-auto">
+        <div className="">
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -66,7 +66,7 @@ const CountriesTable = () => {
             </div>
 
             <div className="flex my-3 justify-center">
-                <ParamPagination totalPages={data?.total_pages}  />
+                <ParamPagination totalPages={data?.total_pages} />
             </div>
 
             <DeleteModal

@@ -81,15 +81,24 @@ const AddTrip = () => {
                     labelKey="first_name"
                     placeholder="Haydovchi tanlang"
                 />
-
-                <FormDatePicker
-                    required
-                    label="Reja qilingan yetkazib berish sanasi"
-                    control={control}
-                    name="start"
-                    placeholder="Sanani tanlang"
-                    className="w-full"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                    <FormDatePicker
+                        required
+                        label="Boshlangan sana"
+                        control={control}
+                        name="start"
+                        placeholder="Sanani tanlang"
+                        className="w-full"
+                    />
+                    <FormDatePicker
+                        required
+                        label="Tugash sana"
+                        control={control}
+                        name="end"
+                        placeholder="Sanani tanlang"
+                        className="w-full"
+                    />
+                </div>
             </div>
 
             <div className="col-span-2 flex justify-end gap-4 pt-4">
