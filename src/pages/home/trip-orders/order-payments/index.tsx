@@ -5,7 +5,7 @@ import { TRIPS_ORDERS_PAYMENT } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useSearch } from "@tanstack/react-router"
+import { useParams, useSearch } from "@tanstack/react-router"
 import TableHeaderTripsOrders from "../trip-table-header"
 import AddPayment from "./add-payments"
 import { useColumnsOrderPayment } from "./payments-cols"
@@ -16,12 +16,17 @@ const TripDetailPayment = () => {
 
     const currentPayment = getData<OrderPaymentType>(TRIPS_ORDERS_PAYMENT)
     const search = useSearch({ strict: false })
-    const orderId = Number(search.order)
+    const params = useParams({ strict: false })
+const { parentId, childId } = useParams({ strict: false })
+
+const tripId = Number(parentId)
+const orderId = Number(childId)
+
     const { data, isLoading } = useGet<ListResponse<OrderPaymentType>>(
         TRIPS_ORDERS_PAYMENT,
         {
             params: {
-                order: orderId,
+                order:orderId,
                 page: 1,
                 page_size: 1000,
             },
@@ -69,9 +74,8 @@ const TripDetailPayment = () => {
                 modalKey="create-order-payment"
                 size="max-w-2xl"
                 classNameTitle="font-medium text-xl"
-                title={`To'lov ${
-                    currentPayment?.id ? "tahrirlash" : "qo‘shish"
-                }`}
+                title={`To'lov ${currentPayment?.id ? "tahrirlash" : "qo‘shish"
+                    }`}
             >
                 <div className="max-h-[80vh] overflow-y-auto p-0.5">
                     <AddPayment />
