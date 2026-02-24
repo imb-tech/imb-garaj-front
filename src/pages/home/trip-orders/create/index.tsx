@@ -1,83 +1,97 @@
 import { FormCombobox } from "@/components/form/combobox"
 import { FormDatePicker } from "@/components/form/date-picker"
 import { Button } from "@/components/ui/button"
+import {
+    SETTINGS_SELECTABLE_CARGO_TYPE,
+    SETTINGS_SELECTABLE_CLIENT,
+    SETTINGS_SELECTABLE_DISTRICT,
+    SETTINGS_SELECTABLE_PAYMENT_TYPE,
+    TRIPS_ORDERS,
+} from "@/constants/api-endpoints"
+import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
+import { useQueryClient } from "@tanstack/react-query"
+import { useParams } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
-import { SETTINGS_SELECTABLE_CARGO_TYPE, SETTINGS_SELECTABLE_CLIENT, SETTINGS_SELECTABLE_DISTRICT, SETTINGS_SELECTABLE_PAYMENT_TYPE, TRIPS_ORDERS } from "@/constants/api-endpoints"
-import { useGet } from "@/hooks/useGet"
-import { useParams } from "@tanstack/react-router"
 
 import { FormNumberInput } from "@/components/form/number-input"
-
 
 type ClientType = {
     id: number | string
     name: string
 }
 
-
 const AddTripOrders = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal("create")
     const currentTripOrder = getData<TripOrdersRow>(TRIPS_ORDERS)
-    const params = useParams({ strict: false },)
+    const params = useParams({ strict: false })
     const tripId = params?.id
-    console.log(tripId);
-    
+    console.log(tripId)
 
-    const { data: districtsData } = useGet<DistrictType[]>(SETTINGS_SELECTABLE_DISTRICT, {
-        params: {
-            model_name: "district"
-        }
-    })
-    const { data: clientData } = useGet<ClientType[]>(SETTINGS_SELECTABLE_CLIENT, {
-        params: {
-            model_name: "client"
-        }
-    })
-    const { data: paymentType } = useGet<ClientType[]>(SETTINGS_SELECTABLE_PAYMENT_TYPE, {
-        params: {
-            model_name: "payment-type"
-        }
-    })
-    const { data: cargoType } = useGet<ClientType[]>(SETTINGS_SELECTABLE_CARGO_TYPE, {
-        params: {
-            model_name: "cargo-type"
-        }
-    })
+    const { data: districtsData } = useGet<DistrictType[]>(
+        SETTINGS_SELECTABLE_DISTRICT,
+        {
+            params: {
+                model_name: "district",
+            },
+        },
+    )
+    const { data: clientData } = useGet<ClientType[]>(
+        SETTINGS_SELECTABLE_CLIENT,
+        {
+            params: {
+                model_name: "client",
+            },
+        },
+    )
+    const { data: paymentType } = useGet<ClientType[]>(
+        SETTINGS_SELECTABLE_PAYMENT_TYPE,
+        {
+            params: {
+                model_name: "payment-type",
+            },
+        },
+    )
+    const { data: cargoType } = useGet<ClientType[]>(
+        SETTINGS_SELECTABLE_CARGO_TYPE,
+        {
+            params: {
+                model_name: "cargo-type",
+            },
+        },
+    )
 
     const form = useForm<TripOrdersRow>({
         defaultValues: {
             loading: currentTripOrder?.loading,
             unloading: currentTripOrder?.unloading,
             trip: currentTripOrder?.trip,
-            payment_type: currentTripOrder?.payment_type,
-            currency:currentTripOrder?.currency,
-            currency_course:currentTripOrder?.currency_course,
-            date:currentTripOrder?.date,
-            amount:currentTripOrder?.amount,
-            type:currentTripOrder?.type,
-            cargo_type:currentTripOrder?.cargo_type,
-            client:currentTripOrder?.client
+            date: currentTripOrder?.date,
+            type: currentTripOrder?.type,
+            cargo_type: currentTripOrder?.cargo_type,
+            client: currentTripOrder?.client,
+            payment_type: currentTripOrder?.payments?.[0]?.payment_type,
+            currency: currentTripOrder?.payments?.[0]?.currency,
+            currency_course: currentTripOrder?.payments?.[0]?.currency_course,
+            amount: currentTripOrder?.payments?.[0]?.amount,
         },
-    }) 
+    })
 
     const { handleSubmit, control, reset, watch } = form
 
     const selectedCurrency = watch("currency")
 
-
     const onSuccess = () => {
         toast.success(
-            currentTripOrder?.id
-                ? "Buyurtma tahrirlandi!"
-                : "Buyurtma qo'shildi!",
+            currentTripOrder?.id ?
+                "Buyurtma tahrirlandi!"
+            :   "Buyurtma qo'shildi!",
         )
         reset()
         clearKey(TRIPS_ORDERS)
@@ -90,40 +104,38 @@ const AddTripOrders = () => {
 
     const isPending = creating || updating
 
-   const onSubmit = (data: TripOrdersRow) => {
-    const {
-        currency,
-        currency_course,
-        amount,
-        payment_type,
-        ...rest
-    } = data
+    const onSubmit = (data: TripOrdersRow) => {
+        const { currency, currency_course, amount, payment_type, ...rest } =
+            data
 
-    const payment: any = {
-        currency,
-        amount: String(amount),
-        payment_type,
-    }
+        const payment: any = {
+            currency,
+            amount: String(amount),
+            payment_type,
+        }
 
-    if (currency === 2) {
-        payment.currency_course = String(currency_course)
-    }
+        if (currency === 2) {
+            payment.currency_course = String(currency_course)
+        }
 
-    const formattedData = {
-        ...rest,
-        trip: tripId,
-        payments: [payment],
-    }
+        const formattedData = {
+            ...rest,
+            trip: tripId,
+            payments: [payment],
+        }
 
-    if (currentTripOrder?.id) {
-        update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
-    } else {
-        create(TRIPS_ORDERS, formattedData)
+        if (currentTripOrder?.id) {
+            update(`${TRIPS_ORDERS}/${currentTripOrder.id}`, formattedData)
+        } else {
+            create(TRIPS_ORDERS, formattedData)
+        }
     }
-}
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid grid-cols-2 gap-4"
+        >
             <FormCombobox
                 required
                 label="Buyurtma turi"
@@ -136,6 +148,14 @@ const AddTripOrders = () => {
                 valueKey="id"
                 labelKey="name"
                 placeholder="Buyurtmani tanlang"
+            />
+               <FormDatePicker
+                required
+                label="Reja qilingan yetkazib berish sanasi"
+                control={control}
+                name="date"
+                placeholder="Sanani tanlang"
+                className="w-full"
             />
             <FormCombobox
                 required
@@ -157,14 +177,17 @@ const AddTripOrders = () => {
                 labelKey="name"
                 placeholder="Hududni tanlang"
             />
-            <FormDatePicker
+                <FormCombobox
                 required
-                label="Reja qilingan yetkazib berish sanasi"
+                label="Yuk egasi"
+                name="client"
                 control={control}
-                name="date"
-                placeholder="Sanani tanlang"
-                className="w-full"
+                options={clientData}
+                // valueKey="id"
+                // labelKey="name"
+                placeholder="Yuk egasini tanlang"
             />
+         
             <FormCombobox
                 required
                 label="Yuk turi"
@@ -186,16 +209,7 @@ const AddTripOrders = () => {
                 placeholder="To'lov turini tanlang"
             />
 
-            <FormCombobox
-                required
-                label="Yuk egasi"
-                name="client"
-                control={control}
-                options={clientData}
-                // valueKey="id"
-                // labelKey="name"
-                placeholder="Yuk egasini tanlang"
-            />
+        
             <FormCombobox
                 required
                 label="Valyuta"
@@ -208,10 +222,10 @@ const AddTripOrders = () => {
                 valueKey="value"
                 labelKey="label"
                 placeholder="Valyutani tanlang"
-
             />
             {selectedCurrency === 2 && (
                 <FormNumberInput
+                    required
                     thousandSeparator=" "
                     name="currency_course"
                     label="Valyuta kursi"
@@ -229,13 +243,7 @@ const AddTripOrders = () => {
                 control={form.control}
             />
             <div className="col-span-2 flex justify-end gap-4 pt-4">
-
-
-                <Button
-                    type="submit"
-                    loading={isPending}
-                    disabled={isPending}
-                >
+                <Button type="submit" loading={isPending} disabled={isPending}>
                     Saqlash
                 </Button>
             </div>

@@ -38,13 +38,12 @@ function TruckProfile({ data }: Props) {
                 </div>
 
                 {/* Truck ma’lumotlari  1*/}
-
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-2xl mb-2">
                         {vehicleDetail?.truck_number || "Mavjud emas"}
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <Truck size={18} />
                         <span className="font-medium">
                             {"Avtomobil raqami"}:
@@ -54,7 +53,7 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 ">
                         <Truck size={18} />
                         <span className="font-medium">
                             {"Avtomobil hujjati"}:
@@ -64,7 +63,7 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <User size={18} />
                         <span className="font-medium">{"Haydovchi"}:</span>
                         <span>
@@ -72,30 +71,20 @@ function TruckProfile({ data }: Props) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                         <CalendarDays size={18} />
                         <span className="font-medium">
                             {"Ro‘yxatdan o‘tgan sana"}:
                         </span>
                         <span>{data?.register_date || "Mavjud emas"}</span>
                     </div>
-                </div>
-            </div>
-
-            {/* Truck ma’lumotlari 2 */}
-            <div className="flex flex-col gap-2 mt-10">
-                <div className="flex items-center gap-2 flex-wrap">
-                    <Fuel size={18} />
-                    <span className="font-medium">{"Yoqilg'i turlari"}:</span>
-                    <span>{vehicleDetail?.fuel}</span>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                    <Fuel size={18} />
-                    <span className="font-medium">{"Yoqilg‘i sarfi"}:</span>
-                    <span>
-                        {vehicleDetail?.consumption || "100 km / 28 litr"}
-                    </span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <Fuel size={18} />
+                        <span className="font-medium">
+                            {"Yoqilg'i turlari"}:
+                        </span>
+                        <span>{vehicleDetail?.fuel}</span>
+                    </div>
                 </div>
             </div>
         </div>
