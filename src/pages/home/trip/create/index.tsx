@@ -49,7 +49,6 @@ const AddTrip = () => {
         const formattedData = {
             ...data,
         }
-
         if (currentShift?.id) {
             update(`${TRIPS}/${currentShift.id}`, formattedData)
         } else {

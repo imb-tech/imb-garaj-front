@@ -32,7 +32,7 @@ const AddTripOrders = () => {
     const currentTripOrder = getData<TripOrdersRow>(TRIPS_ORDERS)
     const params = useParams({ strict: false })
     const tripId = params?.id
-    console.log(tripId)
+  
 
     const { data: districtsData } = useGet<DistrictType[]>(
         SETTINGS_SELECTABLE_DISTRICT,
