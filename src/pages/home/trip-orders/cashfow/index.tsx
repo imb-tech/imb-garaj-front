@@ -5,7 +5,7 @@ import { ORDER_CASHFLOWS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useSearch } from "@tanstack/react-router"
+import { useParams, useSearch } from "@tanstack/react-router"
 import TableHeaderTripsOrders from "../trip-table-header"
 import AddCashflow from "./add-cashflow"
 import { useCostCols } from "./cols"
@@ -17,7 +17,9 @@ const TripOrderDetailRow = () => {
 
     const currentCashflow = getData<CashflowRow>(ORDER_CASHFLOWS)
     const search = useSearch({ strict: false })
-    const orderId = Number(search.order)
+    const { parentId, childId } = useParams({ strict: false })
+
+    const orderId = Number(childId)
     const { data, isLoading } = useGet<ListResponse<CashflowRow>>(
         ORDER_CASHFLOWS,
         {
@@ -73,9 +75,8 @@ const TripOrderDetailRow = () => {
                 modalKey="create-order-cashflow"
                 size="max-w-2xl"
                 classNameTitle="font-medium text-xl"
-                title={`Xarajat ${
-                    currentCashflow?.id ? "tahrirlash" : "qo‘shish"
-                }`}
+                title={`Xarajat ${currentCashflow?.id ? "tahrirlash" : "qo‘shish"
+                    }`}
             >
                 <div className="max-h-[80vh] overflow-y-auto p-0.5">
                     <AddCashflow />

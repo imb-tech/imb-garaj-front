@@ -51,8 +51,8 @@ const ShiftStatisticMain = () => {
         if (!id) return
 
         navigate({
-            to: "/trip-orders/$id",
-            params: { id: id.toString() },
+            to: "/trip/$parentId",
+            params: { parentId: id.toString() },
         })
     }
 

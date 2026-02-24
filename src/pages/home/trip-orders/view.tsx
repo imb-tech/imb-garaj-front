@@ -4,11 +4,13 @@ import ParamTabs from "@/components/as-params/tabs"
 
 function ViewPageCashFlows() {
 
+
+
         const options = [
         {
             value: "0",
             label: "Xarajatlar",
-            content: <TripOrderDetailRow/>,
+            content: <TripOrderDetailRow />,
         },
 
         {
@@ -17,8 +19,11 @@ function ViewPageCashFlows() {
             content: <TripDetailPayment/>
         },
     ]
+
+
+
     return (
-        <div className="py-3 px-2">
+        <div className=" px-2">
           <ParamTabs options={options} className="gap-1 mt-2" />
         </div>
     )
