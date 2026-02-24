@@ -20,11 +20,16 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
     const { data, isLoading } = useGet<ListResponse<SettingsDistrictType>>(
         SETTINGS_DISTRICTS,
         {
-            params: region_id ? {
-                region: region_id,
-                search: search.district_search,
-            } : {},
-            enabled: !!region_id, 
+            params:
+                region_id ?
+                    {
+                        region: region_id,
+                        search: search.district_search,
+                        page: 1,
+                        page_size: 1000,
+                    }
+                :   {},
+            enabled: !!region_id,
         },
     )
 
@@ -55,6 +60,10 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
                 onDelete={handleDelete}
                 onEdit={({ original }) => handleEdit(original)}
                 numeration={true}
+                viewAll={true}
+                paginationProps={{
+                    totalPages: 1,
+                }}
                 head={
                     <TableHeaderLocation
                         storeKey={SETTINGS_DISTRICTS}
@@ -66,7 +75,11 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
                     />
                 }
             />
-            <DeleteModal modalKey="delete-districts" path={SETTINGS_DISTRICTS} id={item?.id} />
+            <DeleteModal
+                modalKey="delete-districts"
+                path={SETTINGS_DISTRICTS}
+                id={item?.id}
+            />
             <Modal
                 size="max-w-2xl"
                 title={`Tuman ${item?.id ? "tahrirlash" : "qo'shish"}`}

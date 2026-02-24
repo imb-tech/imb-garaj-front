@@ -1,9 +1,9 @@
 import { FormCombobox } from "@/components/form/combobox"
-import FormInput from "@/components/form/input"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
 import {
     SETTINGS_SELECTABLE_EXPENSE_CATEGORY,
+    SETTINTS_PAYMENT_TYPE,
     TRIPS_ORDERS_PAYMENT,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -17,12 +17,12 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 interface CashflowForm {
-    action: number
-    amount: number
-    category: number
-    comment: string
-    currency: number | string
-    currency_course: number | string
+    currency: number
+    currency_course: string
+    amount: string
+    currency_amount: string
+    order: number
+    payment_type: number
 }
 
 const AddPayment = () => {
@@ -38,14 +38,14 @@ const AddPayment = () => {
         TRIPS_ORDERS_PAYMENT,
     )
 
+    const { data: expensetypes } = useGet<ListResponse<RolesType>>(
+        SETTINTS_PAYMENT_TYPE,
+    )
+
     const form = useForm<CashflowForm>({
         defaultValues: {
-            action: currentCashflow?.action,
-            amount: currentCashflow?.amount,
-            category: currentCashflow?.category,
-            comment: currentCashflow?.comment,
-            currency: currentCashflow?.currency,
-            currency_course: currentCashflow?.currency_course
+            ...currentCashflow,
+            order: orderId,
         },
     })
 
@@ -54,7 +54,7 @@ const AddPayment = () => {
 
     const onSuccess = () => {
         toast.success(
-            currentCashflow?.id ? "To'lov tahrirlandi!" : "To'lov qo‘shildi!",
+            currentCashflow?.id ? "To'lov tahrirlandi!" : "To'lov qo'shildi!",
         )
         reset()
         clearKey(TRIPS_ORDERS_PAYMENT)
@@ -71,13 +71,8 @@ const AddPayment = () => {
         if (!orderId) return
 
         const payload = {
+            ...data,
             order: orderId,
-            action: data.action,
-            amount: Number(data.amount),
-            category: data.category,
-            comment: data.comment,
-            currency: data.currency,
-            currency_course: data.currency_course
         }
 
         if (currentCashflow?.id) {
@@ -100,43 +95,23 @@ const AddPayment = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="grid grid-cols-2 gap-4"
         >
-            <FormCombobox
-                required
-                label="Amal turi"
-                name="action"
-                control={control}
-                options={[
-                    { id: 1, name: "Haydovchidan Menejerga" },
-                    { id: 2, name: "Menejerdan Haydovchiga" },
-                ]}
-                valueKey="id"
-                labelKey="name"
-            />
-            <FormCombobox
-                required
-                label="Xarajat turi"
-                name="category"
-                control={control}
-                options={categoryData}
-                valueKey="id"
-                labelKey="name"
-            />
+            {/* Row 2 */}
             <FormCombobox
                 required
                 label="Valyuta"
                 name="currency"
                 control={control}
                 options={[
-                    { value: 1, label: "UZS - So‘m" },
+                    { value: 1, label: "UZS - So'm" },
                     { value: 2, label: "USD - AQSh dollari" },
                 ]}
                 valueKey="value"
                 labelKey="label"
                 placeholder="Valyutani tanlang"
-
             />
             {selectedCurrency === 2 && (
                 <FormNumberInput
+                    required
                     thousandSeparator=" "
                     name="currency_course"
                     label="Valyuta kursi"
@@ -145,24 +120,34 @@ const AddPayment = () => {
                 />
             )}
 
-            <div>
-                <FormNumberInput
-                    required
-                    name="amount"
-                    label="Miqdor"
-                    thousandSeparator=" "
-                    control={control}
-                    placeholder="0 UZS"
-                />
-                <FormInput
-                    required
-                    name="comment"
-                    label="To'ov uchun izoh"
-                    methods={form}
-                    placeholder="Misol: Yoqilg'i uchun"
-                />
-            </div>
+            {/* Row 3 - These stay fixed in position */}
+            <FormNumberInput
+                required
+                name="amount"
+                label="Miqdor"
+                thousandSeparator=" "
+                control={control}
+                placeholder="0 UZS"
+            />
+            <FormNumberInput
+                required
+                name="currency_amount"
+                label="Valyuta miqdori"
+                thousandSeparator=" "
+                control={control}
+            />
 
+            <FormCombobox
+                required
+                label="To'lov turi"
+                name="payment_type"
+                control={control}
+                options={expensetypes?.results}
+                labelKey="name"
+                valueKey="id"
+            />
+
+            {/* Submit button */}
             <div className="col-span-2 flex justify-end pt-4">
                 <Button
                     type="submit"

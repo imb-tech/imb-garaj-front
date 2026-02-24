@@ -36,7 +36,7 @@ const TableHeaderLocation = ({
             <ParamInput name={name} fullWidth searchKey={searchKey} pageKey={pageKey} />
             <div className="flex items-center gap-3">
                 <Button
-                    className="text-white bg-primary hover:bg-primary/90"
+                    className="flex items-center gap-2"
                     onClick={handleAdd}
                     disabled={disabled}
                     icon={<CirclePlus size={18} />}

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { Plus } from "lucide-react"
+import { CirclePlus, Plus, PlusCircle } from "lucide-react"
 import CountriesTable from "./tables/country"
 import AddCountriesModal from "./tables/country/add-country"
 
@@ -39,7 +39,7 @@ const Locations = () => {
                                 className="flex items-center gap-2"
                                 onClick={handleCountyModalOpen}
                             >
-                                <Plus size={14} />
+                                <CirclePlus size={18} />
                                 Qo'shish
                             </Button>
                         </div>

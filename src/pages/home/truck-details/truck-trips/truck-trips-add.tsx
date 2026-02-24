@@ -14,7 +14,7 @@ import { toast } from "sonner"
 const AddTrip = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
-    const { closeModal } = useModal("create")
+    const { closeModal } = useModal("post-trips")
     const { data: vehicleData } = useGet<ListResponse<Truck>>(VEHICLES)
     const { data: driversData } = useGet<ListResponse<any>>(SETTINGS_DRIVERS)
 
@@ -28,7 +28,7 @@ const AddTrip = () => {
         },
     })
 
-    const { handleSubmit, control, reset } = form
+    const { handleSubmit, control, reset, watch, setValue } = form
 
     const onSuccess = () => {
         toast.success(

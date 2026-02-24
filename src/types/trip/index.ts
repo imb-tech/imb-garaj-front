@@ -32,6 +32,7 @@ type TripRow = {
 }
 
 type Truck = {
+    truck_type_name: string
     status: number
     driver_name: string
     id: number
@@ -44,6 +45,7 @@ type Truck = {
     truck_type: number
     trailer_type: number | null
     driver: number
+    page:string
 }
 
 type CargoItem = {
@@ -91,6 +93,7 @@ type TripOrdersRow = {
             currency: number
             currency_course: string
             amount: string
+            payment_type:number
         },
     ]
 }
@@ -122,3 +125,13 @@ type OrderPaymentType = {
     order: number
     payment_type: number
 }
+
+
+
+//   "currency": 1,
+//   "currency_course": "-7354.24",
+//   "amount": "-284127952717280608.1",
+//   "currency_amount": "1844",
+//   "order": 0,
+//   "payment_type": 0
+// }

@@ -20,7 +20,11 @@ const TripDetailPayment = () => {
     const { data, isLoading } = useGet<ListResponse<OrderPaymentType>>(
         TRIPS_ORDERS_PAYMENT,
         {
-            params: { order: orderId },
+            params: {
+                order: orderId,
+                page: 1,
+                page_size: 1000,
+            },
         },
     )
 
@@ -38,24 +42,28 @@ const TripDetailPayment = () => {
 
     return (
         <div>
-            <DataTable
-                loading={isLoading}
-                columns={columns}
-                data={data?.results}
-                numeration
-                onEdit={({ original }) => handleEdit(original)}
-                onDelete={handleDelete}
-                paginationProps={{
-                    totalPages: data?.total_pages ?? 1,
-                }}
-                head={
-                    <TableHeaderTripsOrders
-                        modalKey="create-order-cashflow"
-                        storeKey={TRIPS_ORDERS_PAYMENT}
-                        heading="To'lovlar ro'yxati"
-                    />
-                }
-            />
+            <div className="overflow-x-auto">
+                <DataTable
+                    loading={isLoading}
+                    columns={columns}
+                    data={data?.results}
+                    numeration
+                    onEdit={({ original }) => handleEdit(original)}
+                    onDelete={handleDelete}
+                    paginationProps={{
+                        totalPages: 1,
+                    }}
+                    viewAll={true}
+                    tableWrapperClassName="max-h-[400px] overflow-auto"
+                    head={
+                        <TableHeaderTripsOrders
+                            modalKey="create-order-payment"
+                            storeKey={TRIPS_ORDERS_PAYMENT}
+                            heading="To'lovlar ro'yxati"
+                        />
+                    }
+                />
+            </div>
 
             <Modal
                 modalKey="create-order-payment"
