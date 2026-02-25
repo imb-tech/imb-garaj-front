@@ -57,11 +57,12 @@ const AddTripOrders = () => {
             date: currentTripOrder?.date,
             type: currentTripOrder?.type,
             client: currentTripOrder?.client,
+            cargo_type: currentTripOrder?.cargo_type,
             payments: currentTripOrder?.payments?.length
                 ? currentTripOrder.payments
                 : [
                     {
-                        cargo_type: null,
+
                         payment_type: null,
                         currency: null,
                         currency_course: null,
@@ -98,7 +99,6 @@ const AddTripOrders = () => {
                 currency: p.currency,
                 amount: String(p.amount),
                 payment_type: p.payment_type,
-                cargo_type: p.cargo_type,
             }
             if (p.currency === 2) {
                 payment.currency_course = String(p.currency_course)
@@ -113,6 +113,7 @@ const AddTripOrders = () => {
             type: data.type,
             client: data.client,
             trip: parentId,
+            cargo_type:data?.cargo_type,
             payments: formattedPayments,
         }
 
