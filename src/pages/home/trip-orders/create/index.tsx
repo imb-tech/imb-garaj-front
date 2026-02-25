@@ -152,6 +152,8 @@ const AddTripOrders = () => {
                 name="client"
                 control={control}
                 options={clientData}
+                labelKey="name"
+valueKey="id"
                 placeholder="Yuk egasini tanlang"
             />
             <FormCombobox

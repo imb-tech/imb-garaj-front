@@ -5,11 +5,12 @@ import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
+import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { ArrowLeft, CirclePlus } from "lucide-react"
 import AddTripOrders from "./create"
 import { DataTable } from "@/components/ui/datatable"
 import { useTripOrdersCols } from "./new-cols"
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 
 const TripOrderMain = () => {
     const params = useParams({ strict: false })
@@ -47,20 +48,20 @@ const TripOrderMain = () => {
         openDeleteModal()
     }
 
-  const handleRowClick = (order: TripOrdersRow) => {
-  const childId = order.id
-  const parentId = params.parentId // from current page
+    const handleRowClick = (order: TripOrdersRow) => {
+        const childId = order.id
+        const parentId = params.parentId // from current page
 
-  if (!childId || !parentId) return
+        if (!childId || !parentId) return
 
-  navigate({
-    to: "/trip/$parentId/$childId",
-    params: {
-      parentId: parentId.toString(),
-      childId: childId.toString(),
-    },
-  })
-}
+        navigate({
+            to: "/trip/$parentId/$childId",
+            params: {
+                parentId: parentId.toString(),
+                childId: childId.toString(),
+            },
+        })
+    }
     const handleToBack = () => {
         window.history.back()
     }
