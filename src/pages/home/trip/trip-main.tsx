@@ -11,6 +11,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CirclePlus } from "lucide-react"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 const ShiftStatisticMain = () => {
     const search = useSearch({ strict: false })
@@ -23,7 +24,7 @@ const ShiftStatisticMain = () => {
 
     const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS, {
         params: {
-            search:search.driver_name,
+            search: search.driver_name,
             page: search.page,
             page_size: search.page_size,
         },
@@ -58,6 +59,7 @@ const ShiftStatisticMain = () => {
 
     return (
         <div className="space-y-3">
+      
             <div className="flex justify-between items-center mb-3 gap-4">
                 <ParamInput
                     name="driver_name"
