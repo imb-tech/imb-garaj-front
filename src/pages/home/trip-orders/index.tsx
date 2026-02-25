@@ -21,13 +21,14 @@ const TripOrderMain = () => {
     const { openModal: openDeleteModal } = useModal("delete")
     const navigate = useNavigate()
 
+  const parentId = params.parentId
     const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
     const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(
         TRIPS_ORDERS,
         {
             params: {
-                trip: params.id,
+                trip:parentId,
                 page,
             },
         },

@@ -3,6 +3,7 @@ interface TripFormData {
     vehicle: number | string
     start: Date
     type: number | string
+    end:Date
 }
 
 type CardMain = {
