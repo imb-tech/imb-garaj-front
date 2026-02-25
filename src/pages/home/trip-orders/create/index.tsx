@@ -153,7 +153,7 @@ const AddTripOrders = () => {
                 control={control}
                 options={clientData}
                 labelKey="name"
-valueKey="id"
+                valueKey="id"
                 placeholder="Yuk egasini tanlang"
             />
             <FormCombobox
@@ -176,7 +176,16 @@ valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
             />
-
+            <FormCombobox
+                required
+                label="Yuk turi"
+                name={`cargo_type`}
+                control={control}
+                options={cargoType}
+                valueKey="id"
+                labelKey="name"
+                placeholder="Yuk turini tanlang"
+            />
             <div className="col-span-2 flex flex-col gap-4">
                 {fields.map((field, index) => {
                     const selectedCurrency = watch(`payments.${index}.currency`)
@@ -190,16 +199,7 @@ valueKey="id"
                                 To'lov #{index + 1}
                             </span>
 
-                            <FormCombobox
-                                required
-                                label="Yuk turi"
-                                name={`payments.${index}.cargo_type`}
-                                control={control}
-                                options={cargoType}
-                                valueKey="id"
-                                labelKey="name"
-                                placeholder="Yuk turini tanlang"
-                            />
+
                             <FormCombobox
                                 required
                                 label="To'lov turi"
