@@ -91,10 +91,10 @@ type TripOrdersRow = {
     type: number | string
     payments: [
         {
-            currency: number
-            currency_course: string
-            amount: string
-            payment_type:number
+            currency: number|null
+            currency_course: string|null
+            amount: string|null
+            payment_type:number|null
         },
     ]
 }
