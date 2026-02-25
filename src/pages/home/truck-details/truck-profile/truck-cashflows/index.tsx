@@ -21,6 +21,7 @@ const VehicleCashflows = () => {
                 search: search.cashflow_search,
                 page: search.page,
                 page_size: search.page_size,
+                vehicle:id
             },
         },
     )
