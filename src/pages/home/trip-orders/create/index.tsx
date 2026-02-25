@@ -141,7 +141,7 @@ const AddTripOrders = () => {
             />
             <FormDatePicker
                 required
-                label="Reja qilingan yetkazib berish sanasi"
+                label="Sana"
                 control={control}
                 name="date"
                 placeholder="Sanani tanlang"
