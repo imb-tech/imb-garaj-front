@@ -11,7 +11,6 @@ import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CirclePlus } from "lucide-react"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 
 const ShiftStatisticMain = () => {
     const search = useSearch({ strict: false })
@@ -59,7 +58,7 @@ const ShiftStatisticMain = () => {
 
     return (
         <div className="space-y-3">
-      
+
             <div className="flex justify-between items-center mb-3 gap-4">
                 <ParamInput
                     name="driver_name"
@@ -94,7 +93,7 @@ const ShiftStatisticMain = () => {
                 // }}
                 head={
                     <div className="flex items-center gap-3 mb-3">
-                        <h1 className="text-xl">Reyslar ro'yxati</h1>
+                        <h1 className="text-xl">Aylanmalar ro'yxati</h1>
                     </div>
                 }
                 paginationProps={{

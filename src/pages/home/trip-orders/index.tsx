@@ -5,12 +5,13 @@ import { TRIPS_ORDERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router"
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { ArrowLeft, CirclePlus } from "lucide-react"
 import AddTripOrders from "./create"
 import { DataTable } from "@/components/ui/datatable"
 import { useTripOrdersCols } from "./new-cols"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import AddExpenses from "./create/expense"
+import AddCashflow from "./cashfow/add-cashflow"
 
 const TripOrderMain = () => {
     const params = useParams({ strict: false })
@@ -18,17 +19,19 @@ const TripOrderMain = () => {
     const page = Number(search.page ?? 1)
     const { getData, setData, clearKey } = useGlobalStore()
     const { openModal: openCreateModal } = useModal("create")
+    const { openModal: AddExpenseModal } = useModal("add-expenses")
+
     const { openModal: openDeleteModal } = useModal("delete")
     const navigate = useNavigate()
 
-  const parentId = params.parentId
+    const parentId = params.parentId
     const currentTripsOrder = getData<TripsOrders>(TRIPS_ORDERS)
 
     const { data, isLoading } = useGet<ListResponse<TripOrdersRow>>(
         TRIPS_ORDERS,
         {
             params: {
-                trip:parentId,
+                trip: parentId,
                 page,
             },
         },
@@ -49,20 +52,26 @@ const TripOrderMain = () => {
         openDeleteModal()
     }
 
-    const handleRowClick = (order: TripOrdersRow) => {
-        const childId = order.id
-        const parentId = params.parentId // from current page
+    // const handleRowClick = (order: TripOrdersRow) => {
+    //     const childId = order.id
+    //     const parentId = params.parentId
 
-        if (!childId || !parentId) return
+    //     if (!childId || !parentId) return
 
-        navigate({
-            to: "/trip/$parentId/$childId",
-            params: {
-                parentId: parentId.toString(),
-                childId: childId.toString(),
-            },
-        })
+    //     navigate({
+    //         to: "/trip/$parentId/$childId",
+    //         params: {
+    //             parentId: parentId.toString(),
+    //             childId: childId.toString(),
+    //         },
+    //     })
+    // }
+
+    const handleAdd = (order: TripOrdersRow) => {
+        setData(TRIPS_ORDERS, order)
+        AddExpenseModal()
     }
+
     const handleToBack = () => {
         window.history.back()
     }
@@ -80,7 +89,7 @@ const TripOrderMain = () => {
                     <Button>
                         <ArrowLeft size={16} />
                     </Button>
-                    <h1 className="font-bold">Buyurtmalar ro‘yxati</h1>
+                    <h1 className="font-bold">Reyslar ro‘yxati</h1>
                 </div>
                 <div className="flex justify-end">
                     <Button onClick={handleCreate}>
@@ -101,7 +110,7 @@ const TripOrderMain = () => {
                     paginationProps={{
                         totalPages: 1,
                     }}
-                    onRowClick={handleRowClick}
+                    onView={({ original }) => handleAdd(original)}
                 />
             </div>
 
@@ -115,6 +124,8 @@ const TripOrderMain = () => {
             </Modal>
 
             <DeleteModal path={TRIPS_ORDERS} id={currentTripsOrder?.id} />
+            <Modal modalKey="add-expenses">
+                <AddCashflow/> </Modal>
         </div>
     )
 }
