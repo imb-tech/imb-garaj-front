@@ -25,6 +25,8 @@ import { Route as MainTripTripParentIdChildIdImport } from './routes/_main/_trip
 
 const MainDashboardLazyImport = createFileRoute('/_main/dashboard')()
 const AuthAuthLazyImport = createFileRoute('/_auth/auth')()
+const MainTexnikCheckIndexLazyImport = createFileRoute('/_main/texnik-check/')()
+const MainKassaIndexLazyImport = createFileRoute('/_main/kassa/')()
 const MainTrucksTruckIndexLazyImport = createFileRoute(
   '/_main/_trucks/truck/',
 )()
@@ -85,6 +87,20 @@ const AuthAuthLazyRoute = AuthAuthLazyImport.update({
   path: '/auth',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/auth.lazy').then((d) => d.Route))
+
+const MainTexnikCheckIndexLazyRoute = MainTexnikCheckIndexLazyImport.update({
+  path: '/texnik-check/',
+  getParentRoute: () => MainRoute,
+} as any).lazy(() =>
+  import('./routes/_main/texnik-check/index.lazy').then((d) => d.Route),
+)
+
+const MainKassaIndexLazyRoute = MainKassaIndexLazyImport.update({
+  path: '/kassa/',
+  getParentRoute: () => MainRoute,
+} as any).lazy(() =>
+  import('./routes/_main/kassa/index.lazy').then((d) => d.Route),
+)
 
 const MainTrucksTruckIndexLazyRoute = MainTrucksTruckIndexLazyImport.update({
   path: '/truck/',
@@ -246,6 +262,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexImport
       parentRoute: typeof MainImport
     }
+    '/_main/kassa/': {
+      id: '/_main/kassa/'
+      path: '/kassa'
+      fullPath: '/kassa'
+      preLoaderRoute: typeof MainKassaIndexLazyImport
+      parentRoute: typeof MainImport
+    }
+    '/_main/texnik-check/': {
+      id: '/_main/texnik-check/'
+      path: '/texnik-check'
+      fullPath: '/texnik-check'
+      preLoaderRoute: typeof MainTexnikCheckIndexLazyImport
+      parentRoute: typeof MainImport
+    }
     '/_main/_trucks/orders/$id': {
       id: '/_main/_trucks/orders/$id'
       path: '/orders/$id'
@@ -369,6 +399,8 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainIndexRoute: typeof MainIndexRoute
+  MainKassaIndexLazyRoute: typeof MainKassaIndexLazyRoute
+  MainTexnikCheckIndexLazyRoute: typeof MainTexnikCheckIndexLazyRoute
   MainTrucksOrdersIdRoute: typeof MainTrucksOrdersIdRoute
   MainTrucksTruckDetailIdRoute: typeof MainTrucksTruckDetailIdRoute
   MainSettingsCargoTypesIndexLazyRoute: typeof MainSettingsCargoTypesIndexLazyRoute
@@ -389,6 +421,8 @@ interface MainRouteChildren {
 const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainIndexRoute: MainIndexRoute,
+  MainKassaIndexLazyRoute: MainKassaIndexLazyRoute,
+  MainTexnikCheckIndexLazyRoute: MainTexnikCheckIndexLazyRoute,
   MainTrucksOrdersIdRoute: MainTrucksOrdersIdRoute,
   MainTrucksTruckDetailIdRoute: MainTrucksTruckDetailIdRoute,
   MainSettingsCargoTypesIndexLazyRoute: MainSettingsCargoTypesIndexLazyRoute,
@@ -416,6 +450,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
   '/': typeof MainIndexRoute
+  '/kassa': typeof MainKassaIndexLazyRoute
+  '/texnik-check': typeof MainTexnikCheckIndexLazyRoute
   '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
@@ -438,6 +474,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
   '/': typeof MainIndexRoute
+  '/kassa': typeof MainKassaIndexLazyRoute
+  '/texnik-check': typeof MainTexnikCheckIndexLazyRoute
   '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/cargo-types': typeof MainSettingsCargoTypesIndexLazyRoute
@@ -462,6 +500,8 @@ export interface FileRoutesById {
   '/_auth/auth': typeof AuthAuthLazyRoute
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/': typeof MainIndexRoute
+  '/_main/kassa/': typeof MainKassaIndexLazyRoute
+  '/_main/texnik-check/': typeof MainTexnikCheckIndexLazyRoute
   '/_main/_trucks/orders/$id': typeof MainTrucksOrdersIdRoute
   '/_main/_trucks/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/_main/_settings/cargo-types/': typeof MainSettingsCargoTypesIndexLazyRoute
@@ -486,6 +526,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/'
+    | '/kassa'
+    | '/texnik-check'
     | '/orders/$id'
     | '/truck-detail/$id'
     | '/cargo-types'
@@ -507,6 +549,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/'
+    | '/kassa'
+    | '/texnik-check'
     | '/orders/$id'
     | '/truck-detail/$id'
     | '/cargo-types'
@@ -529,6 +573,8 @@ export interface FileRouteTypes {
     | '/_auth/auth'
     | '/_main/dashboard'
     | '/_main/'
+    | '/_main/kassa/'
+    | '/_main/texnik-check/'
     | '/_main/_trucks/orders/$id'
     | '/_main/_trucks/truck-detail/$id'
     | '/_main/_settings/cargo-types/'
@@ -584,6 +630,8 @@ export const routeTree = rootRoute
       "children": [
         "/_main/dashboard",
         "/_main/",
+        "/_main/kassa/",
+        "/_main/texnik-check/",
         "/_main/_trucks/orders/$id",
         "/_main/_trucks/truck-detail/$id",
         "/_main/_settings/cargo-types/",
@@ -611,6 +659,14 @@ export const routeTree = rootRoute
     },
     "/_main/": {
       "filePath": "_main/index.tsx",
+      "parent": "/_main"
+    },
+    "/_main/kassa/": {
+      "filePath": "_main/kassa/index.lazy.tsx",
+      "parent": "/_main"
+    },
+    "/_main/texnik-check/": {
+      "filePath": "_main/texnik-check/index.lazy.tsx",
       "parent": "/_main"
     },
     "/_main/_trucks/orders/$id": {

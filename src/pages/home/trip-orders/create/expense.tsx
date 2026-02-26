@@ -25,10 +25,10 @@ type ClientType = {
     name: string
 }
 
-const AddTripOrders = () => {
+const AddExpenses = () => {
     const queryClient = useQueryClient()
     const { getData, clearKey } = useGlobalStore()
-    const { closeModal } = useModal("create")
+    const { closeModal } = useModal("add-expenses")
     const currentTripOrder = getData<TripOrdersRow>(TRIPS_ORDERS)
     const { parentId } = useParams({ strict: false })
 
@@ -286,4 +286,4 @@ const AddTripOrders = () => {
     )
 }
 
-export default AddTripOrders
+export default AddExpenses

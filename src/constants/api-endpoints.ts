@@ -42,3 +42,4 @@ export const COMMON_SELECTABLE_VEHICLE_TYPE = "common/vehicle-types"
 /** ===== VEHICLES ===== */
 export const VEHICLES = "vehicles"
 export const VEHICLES_CASHFLOWS = "checkout/vehicle-cashflows"
+export const CASHFLOW_STATISTICS = "checkout/cashflow-statistic"

@@ -100,15 +100,18 @@ type TripOrdersRow = {
 }
 
 type CashflowRow = {
-    amount: number
-    id: number
-    created: string
+    amount?: number|string
+    id?: number
+    created?: string
     updated: string
-    comment: string | null
-    executor: number
-    transaction: number
-    order: number
-    category: number
+    comment?: string | null
+    executor?: number
+    transaction?: number
+    order?: number
+    category?: number
+    technic?:string|number
+     end_time?:string|number
+
 }
 
 type ExpenseCategory = {
