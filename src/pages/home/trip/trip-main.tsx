@@ -8,7 +8,7 @@ import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useSearch } from "@tanstack/react-router"
-import { CirclePlus } from "lucide-react"
+import { CirclePlus, TrendingDown, CreditCard } from "lucide-react"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
 
@@ -58,6 +58,49 @@ const ShiftStatisticMain = () => {
 
     return (
         <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4 mb-2">
+                <div
+                    className="relative rounded-xl p-5 overflow-hidden"
+                    style={{ background: "linear-gradient(135deg, #3d1a0a 0%, #5c2a10 100%)" }}
+                >
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+                        <TrendingDown size={72} className="text-orange-300" />
+                    </div>
+
+                    <div className="flex items-start justify-between relative z-10">
+                        <span className="text-orange-200 text-sm font-medium">Jami Xarajatlar</span>
+                        <div className="w-8 h-8 rounded-full bg-orange-700/60 flex items-center justify-center">
+                            <TrendingDown size={16} className="text-orange-300" />
+                        </div>
+                    </div>
+                    <div className="mt-4 relative z-10">
+                        <span className="text-orange-400 text-2xl font-bold">
+                            3 000 000 so'm
+                        </span>
+                    </div>
+                </div>
+
+                <div
+                    className="relative rounded-xl p-5 overflow-hidden"
+                    style={{ background: "linear-gradient(135deg, #0f1a3d 0%, #1a2a5c 100%)" }}
+                >
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+                        <CreditCard size={72} className="text-blue-300" />
+                    </div>
+
+                    <div className="flex items-start justify-between relative z-10">
+                        <span className="text-blue-200 text-sm font-medium">Hisob Balansi</span>
+                        <div className="w-8 h-8 rounded-full bg-blue-700/60 flex items-center justify-center">
+                            <CreditCard size={16} className="text-blue-300" />
+                        </div>
+                    </div>
+                    <div className="mt-4 relative z-10">
+                        <span className="text-blue-300 text-2xl font-bold">
+                            250 000 000 so'm
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <div className="flex justify-between items-center mb-3 gap-4">
                 <ParamInput
@@ -83,14 +126,6 @@ const ShiftStatisticMain = () => {
                 onEdit={({ original }) => handleEdit(original)}
                 onDelete={handleDelete}
                 onRowClick={handleRowClick}
-                // onView={(row) => {
-                //     navigate({
-                //         to: "/trip-orders/$id",
-                //         params: {
-                //             id: String(row.original.id),
-                //         },
-                //     })
-                // }}
                 head={
                     <div className="flex items-center gap-3 mb-3">
                         <h1 className="text-xl">Aylanmalar ro'yxati</h1>
