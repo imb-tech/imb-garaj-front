@@ -3,7 +3,7 @@ import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
-import { TRIPS } from "@/constants/api-endpoints"
+import { CASHFLOW_STATISTICS, TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
@@ -11,6 +11,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CirclePlus, TrendingDown, CreditCard } from "lucide-react"
 import { useCostCols } from "./cols"
 import AddTrip from "./create"
+import { formatMoney } from "@/lib/format-money"
 
 const ShiftStatisticMain = () => {
     const search = useSearch({ strict: false })
@@ -24,6 +25,12 @@ const ShiftStatisticMain = () => {
     const { data, isLoading } = useGet<ListResponse<TripRow>>(TRIPS, {
         params: {
             search: search.driver_name,
+            page: search.page,
+            page_size: search.page_size,
+        },
+    })
+    const { data: cashflowData } = useGet<any>(CASHFLOW_STATISTICS, {
+        params: {
             page: search.page,
             page_size: search.page_size,
         },
@@ -68,14 +75,14 @@ const ShiftStatisticMain = () => {
                     </div>
 
                     <div className="flex items-start justify-between relative z-10">
-                        <span className="text-orange-200 text-sm font-medium">Jami Xarajatlar</span>
+                                             <span className="text-orange-200 text-sm font-medium">Jami Xarajatlar</span>
                         <div className="w-8 h-8 rounded-full bg-orange-700/60 flex items-center justify-center">
                             <TrendingDown size={16} className="text-orange-300" />
                         </div>
                     </div>
                     <div className="mt-4 relative z-10">
                         <span className="text-orange-400 text-2xl font-bold">
-                            3 000 000 so'm
+                            {formatMoney(cashflowData?.total_cashflow)}
                         </span>
                     </div>
                 </div>
@@ -96,7 +103,9 @@ const ShiftStatisticMain = () => {
                     </div>
                     <div className="mt-4 relative z-10">
                         <span className="text-blue-300 text-2xl font-bold">
-                            250 000 000 so'm
+                             <span className="text-orange-400 text-2xl font-bold">
+                            {formatMoney(cashflowData?.checkout_balance)}
+                        </span>
                         </span>
                     </div>
                 </div>
