@@ -43,3 +43,5 @@ export const COMMON_SELECTABLE_VEHICLE_TYPE = "common/vehicle-types"
 export const VEHICLES = "vehicles"
 export const VEHICLES_CASHFLOWS = "checkout/vehicle-cashflows"
 export const CASHFLOW_STATISTICS = "checkout/cashflow-statistic"
+
+export const TECHNICAL_INSPECT ="vehicles/technical-inspection"
