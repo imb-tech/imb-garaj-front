@@ -28,29 +28,6 @@ export const useTripOrdersCols = () => {
       header: "Yuk turi",
       cell: ({ row }) => row.original.cargo_type_name ?? "—",
     },
-
-    {
-      header: "To‘lov miqdori",
-      cell: ({ row }) => {
-        const amount = row.original.payments?.[0]?.amount
-        if (!amount) return "—"
-
-        return Number(amount)
-          .toLocaleString("uz-UZ")
-          .replace(/,/g, " ")
-      },
-    },
-
-    {
-      header: "Valyuta",
-      cell: ({ row }) => {
-        const c = row.original.payments?.[0]?.currency
-        if (c === 1) return "UZS"
-        if (c === 2) return "USD"
-        return "—"
-      },
-    },
-
     {
       header: "Yaratilgan sana",
       accessorKey: "created",
@@ -61,6 +38,6 @@ export const useTripOrdersCols = () => {
     },
 
 
-
+    
   ],)
 }
