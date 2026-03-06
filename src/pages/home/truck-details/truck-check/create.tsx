@@ -45,9 +45,7 @@ export default function CreateTechnicInspect() {
 
     const { data: expenses } =
         useGet<ListResponse<ExpenseCategory>>(SETTINGS_EXPENSES)
-
-    console.log("ex", expenses)
-
+        
     function onSubmit(value: TechnicInspect) {
         if (currentTech?.id) {
             editMutate(`${TECHNICAL_INSPECT}/${currentTech?.id}`, value)

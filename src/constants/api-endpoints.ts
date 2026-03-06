@@ -45,3 +45,8 @@ export const VEHICLES_CASHFLOWS = "checkout/vehicle-cashflows"
 export const CASHFLOW_STATISTICS = "checkout/cashflow-statistic"
 
 export const TECHNICAL_INSPECT ="vehicles/technical-inspection"
+
+export const MANAGERS_VEHICLES = "manager/vehicles"
+export const MANAGERS_TRIPS= "manager/trips"
+export const MANAGERS_ORDERS = "manager/orders"
+// export const 
