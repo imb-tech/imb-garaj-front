@@ -89,6 +89,7 @@ export const useItems = () =>
                 path: "/managers",
                 items: [
                     { label: "Transportlar", path: "/managers" },
+                    { label: "Kassa", path: "/kassa" },
                     {
                         label: "Texnik ko'rik",
                         path: "/technic-check",
@@ -96,7 +97,7 @@ export const useItems = () =>
                 ],
             },
             {
-                label: "Biznes egasi",
+                label: "Investor",
                 icon: <Truck width={18} />,
                 path: "/truck",
             },
@@ -115,7 +116,7 @@ export const useItems = () =>
             {
                 label: "Buxgalteriya",
                 icon: <Wallet width={18} />,
-                path: "/kassa",
+                path: "/buxgalteriya",
                 pending: true,
             },
             {

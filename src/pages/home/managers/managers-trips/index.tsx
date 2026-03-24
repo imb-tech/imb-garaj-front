@@ -3,6 +3,7 @@ import Modal from "@/components/custom/modal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
@@ -10,10 +11,12 @@ import { formatMoney } from "@/lib/format-money"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { ArrowLeft, Plus } from "lucide-react"
+import { useState } from "react"
 import { useColumnsManagersTrips } from "./cols"
 import CreateManagerTrips from "./create"
 import ExpensesModal from "./create-expenses"
 import FinishedManagerTrips from "./finished"
+import KirimXarajatContent from "./kirim-xarajat-modal"
 
 export default function ManagersTrips() {
     const search = useSearch({ strict: false })
@@ -22,6 +25,7 @@ export default function ManagersTrips() {
     const { openModal: editTripModal } = useModal(`${MANAGERS_TRIPS}-finished`)
     const { openModal: createExpenses } = useModal(MANAGERS_EXPENSES)
     const { openModal: deleteTrip } = useModal(`${MANAGERS_TRIPS}-delete`)
+    const [moliyaOpen, setMoliyaOpen] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams({ strict: false })
     const { name } = useSearch({ strict: false }) as any
@@ -58,7 +62,6 @@ export default function ManagersTrips() {
             } as any,
         })
     }
-    const cols = useColumnsManagersTrips()
     const handleEdit = (item: ManagerTrips) => {
         setData(MANAGERS_TRIPS, item)
         createTripModal()
@@ -80,6 +83,15 @@ export default function ManagersTrips() {
         setData("finished", item)
         editTripModal()
     }
+    const handleMoliya = (item: ManagerTrips) => {
+        setData(`${MANAGERS_TRIPS}-moliya`, item)
+        setMoliyaOpen(true)
+    }
+    const cols = useColumnsManagersTrips({
+        onMoliya: handleMoliya,
+        onEdit: handleEdit,
+        onDelete: handleDelete,
+    })
     return (
         <>
             <DataTable
@@ -93,9 +105,6 @@ export default function ManagersTrips() {
                     pageSizeParamName: "page_size",
                 }}
                 onRowClick={handleRowClick}
-                onEdit={(row) => handleEdit(row.original)}
-                onDelete={(row) => handleDelete(row.original)}
-                onRedo={(row) => handleUndo(row.original)}
                 head={
                     <div className=" mb-4 space-y-3">
                         <div className="flex items-center justify-between">
@@ -137,6 +146,17 @@ export default function ManagersTrips() {
                 id={item?.id}
                 modalKey={`${MANAGERS_TRIPS}-delete`}
             ></DeleteModal>
+
+            <Sheet open={moliyaOpen} onOpenChange={setMoliyaOpen}>
+                <SheetContent side="bottom" className="h-[95vh] rounded-t-2xl overflow-hidden">
+                    <SheetHeader className="sr-only">
+                        <SheetTitle>Kirim va Xarajatlar</SheetTitle>
+                    </SheetHeader>
+                    <div className="h-[calc(95vh-60px)] flex flex-col overflow-hidden">
+                        <KirimXarajatContent />
+                    </div>
+                </SheetContent>
+            </Sheet>
         </>
     )
 }
