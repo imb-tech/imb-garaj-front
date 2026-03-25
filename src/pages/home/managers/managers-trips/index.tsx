@@ -1,5 +1,6 @@
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
+import { InlineBreadcrumb } from "@/components/header/breadcrumbs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
@@ -10,8 +11,8 @@ import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
 import { useGlobalStore } from "@/store/global-store"
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router"
-import { ArrowLeft, Plus } from "lucide-react"
-import { useState } from "react"
+import { Plus } from "lucide-react"
+import { useMemo, useState } from "react"
 import { useColumnsManagersTrips } from "./cols"
 import CreateManagerTrips from "./create"
 import ExpensesModal from "./create-expenses"
@@ -29,11 +30,12 @@ export default function ManagersTrips() {
     const navigate = useNavigate()
     const { id } = useParams({ strict: false })
     const { name } = useSearch({ strict: false }) as any
+    const { driver_id } = useSearch({ strict: false }) as any
     const { data, isLoading } = useGet<ListResponse<ManagerTrips>>(
         MANAGERS_TRIPS,
         {
             params: {
-                vehicle: id,
+                ...(driver_id ? { driver_id } : { vehicle: id }),
             },
         },
     )
@@ -47,16 +49,14 @@ export default function ManagersTrips() {
     })
 
     const item = getData(MANAGERS_TRIPS)
-    const handleBack = () => {
-        navigate({ to: "/managers" })
-    }
     const handleRowClick = (item: ManagerTrips) => {
         setData("manager-trips", item)
-        const id = item?.id
-        if (!id) return
+        setData("manager-trips-vehicle-id", id)
+        const tripId = item?.id
+        if (!tripId) return
         navigate({
             to: "/manager-trips/manager-reys/$id",
-            params: { id: id.toString() },
+            params: { id: tripId.toString() },
             search: {
                 name: item?.driver_name,
             } as any,
@@ -70,6 +70,11 @@ export default function ManagersTrips() {
         setData(MANAGERS_TRIPS, item)
         deleteTrip()
     }
+
+    const hasOngoingTrip = useMemo(
+        () => data?.results?.some((t: ManagerTrips) => !t.end),
+        [data?.results],
+    )
 
     const handleAdd = () => {
         clearKey(MANAGERS_TRIPS)
@@ -106,20 +111,20 @@ export default function ManagersTrips() {
                 }}
                 onRowClick={handleRowClick}
                 head={
-                    <div className=" mb-4 space-y-3">
+                    <div className="mb-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Button onClick={handleBack}>
-                                    <ArrowLeft size={14} />
-                                </Button>
-                                <h1 className="text-xl">Aylanmalar</h1>
-                                <Badge>{formatMoney(data?.count)}</Badge>
-                                <span>/</span>
-                                <h1 className="text-[14px] text-primary">
-                                    {name || "nimadir"}
-                                </h1>
+                                <InlineBreadcrumb
+                                    trailing={
+                                        <>
+                                            <Badge>{formatMoney(data?.count)}</Badge>
+                                            <span className="text-muted-foreground">/</span>
+                                            <span>{name || "nimadir"}</span>
+                                        </>
+                                    }
+                                />
                             </div>
-                            <Button onClick={handleAdd}>
+                            <Button onClick={handleAdd} disabled={hasOngoingTrip}>
                                 <Plus size={16} />
                                 Boshlash
                             </Button>
@@ -130,7 +135,7 @@ export default function ManagersTrips() {
 
             <Modal
                 modalKey={MANAGERS_TRIPS}
-                title={item?.id ? "Aylanmani tahrirlash" : "Aylanma qo'shish"}
+                title={item?.id ? "Aylanmani tahrirlash" : "Aylanma boshlash"}
             >
                 <CreateManagerTrips />
             </Modal>

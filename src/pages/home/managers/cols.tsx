@@ -10,13 +10,6 @@ const STATUS_COLORS: Record<number, string> = {
     3: "bg-orange-500/10 text-orange-600 border-transparent",  // Ta'mirda
 }
 
-// Hardcoded location data for demo
-const LOCATION_DATA: Record<number, { from?: string; to?: string; location?: string }> = {
-    1: { from: "Toshkent", to: "Samarqand" },
-    2: { location: "Toshkent" },
-    3: { location: "Garaj" },
-}
-
 export const useColumnsManagersVehicles = () => {
     return useMemo<ColumnDef<ManagerVehicles>[]>(
         () => [
@@ -25,7 +18,7 @@ export const useColumnsManagersVehicles = () => {
                 header: "Avto raqami",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <div className="">{row.original.truck_number || "-"}</div>
+                    <div>{row.original.truck_number || "-"}</div>
                 ),
             },
             {
@@ -33,7 +26,15 @@ export const useColumnsManagersVehicles = () => {
                 header: "Transpost turi",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <div className="">{row.original.type || "-"}</div>
+                    <div>{row.original.type || "-"}</div>
+                ),
+            },
+            {
+                accessorKey: "driver_name",
+                header: "Haydovchi",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <div>{row.original.driver_name || "-"}</div>
                 ),
             },
             {
@@ -51,31 +52,29 @@ export const useColumnsManagersVehicles = () => {
                 },
             },
             {
-                accessorKey: "location",
+                accessorKey: "loading_name",
                 header: "Joylashuv",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const status = row.original?.status
-                    const loc = LOCATION_DATA[status]
-                    if (!loc) return <span className="text-muted-foreground">-</span>
+                    const { loading_name, unloading_name, status } = row.original
 
-                    // Bo'sh (2) or Ta'mirda (3) → single location
+                    // Bo'sh (2) or Ta'mirda (3) → no active route
                     if (status === 2 || status === 3) {
-                        return <span className="text-muted-foreground">{loc.location}</span>
+                        return <span className="text-muted-foreground">-</span>
                     }
 
                     // Band (1) → from → to
-                    if (loc.from && loc.to) {
+                    if (loading_name && unloading_name) {
                         return (
                             <div className="flex items-center gap-1.5">
-                                <span>{loc.from}</span>
+                                <span>{loading_name}</span>
                                 <ArrowRight size={14} className="text-muted-foreground" />
-                                <span>{loc.to}</span>
+                                <span>{unloading_name}</span>
                             </div>
                         )
                     }
 
-                    return <span className="text-muted-foreground">-</span>
+                    return <span className="text-muted-foreground">{loading_name || unloading_name || "-"}</span>
                 },
             },
             {

@@ -1,112 +1,53 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
+import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import ParamTabs from "@/components/as-params/tabs"
 import { formatMoney } from "@/lib/format-money"
 import { cn } from "@/lib/utils"
 import { ColumnDef } from "@tanstack/react-table"
-import { Plus } from "lucide-react"
-import { useMemo, useState } from "react"
+import { ArrowLeftRight, Plus, SquarePen, Trash2, Truck, User } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { FormCombobox } from "@/components/form/combobox"
 import { FormNumberInput } from "@/components/form/number-input"
 import { FormDatePicker } from "@/components/form/date-picker"
 import FormTextarea from "@/components/form/textarea"
+import FileUpload from "@/components/form/file-upload"
 import { useModal } from "@/hooks/useModal"
 import { toast } from "sonner"
+import { useGet } from "@/hooks/useGet"
+import { usePost } from "@/hooks/usePost"
+import { useGlobalStore } from "@/store/global-store"
+import { MANAGERS_EXPENSE_CATEGORIES, MANAGERS_EXPENSES, MANAGERS_TRIPS, SETTINGS_EXPENSES } from "@/constants/api-endpoints"
+import { useQueryClient } from "@tanstack/react-query"
+import FormInput from "@/components/form/input"
 
 // ──── Types ────
 
 type FinanceRow = {
     id: number
-    author_name: string
+    trip: number | null
     amount: number
-    date: string
-    body: string
-    created_at: string
+    executor: number
+    executor_name: string
+    category: number
     category_name: string
-    category_id: number
+    comment: string | null
+    payment_type: number | null
+    payment_type_name: string
+    receipt: string | null
+    quantity: string | null
+    created: string
+    updated: string
 }
 
 type Category = {
     id: number
     name: string
-    amount: number
+    amount?: number
 }
-
-// ──── Hardcoded categories ────
-
-const incomeCategories: Category[] = [
-    { id: 1, name: "Reys tushumi", amount: 87500000 },
-    { id: 2, name: "Qo'shimcha tushum", amount: 18200000 },
-    { id: 3, name: "Boshqa tushum", amount: 5100000 },
-]
-
-const expenseCategories: Category[] = [
-    { id: 4, name: "Yoqilg'i", amount: 42300000 },
-    { id: 5, name: "Ta'mirlash", amount: 18500000 },
-    { id: 6, name: "Oylik", amount: 15200000 },
-    { id: 7, name: "Boshqa xarajat", amount: 6850000 },
-]
-
-// ──── Hardcoded data (25 each) ────
-
-const incomeData: FinanceRow[] = [
-    { id: 1, author_name: "Ahmad Abdurahimov", amount: 5000000, date: "2025-11-25", body: "Yuk tashish to'lovi", created_at: "2025-11-25 10:30", category_name: "Reys tushumi", category_id: 1 },
-    { id: 2, author_name: "Sardor Karimov", amount: 3200000, date: "2025-11-26", body: "Qo'shimcha xizmat", created_at: "2025-11-26 14:00", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 3, author_name: "Ahmad Abdurahimov", amount: 7800000, date: "2025-11-27", body: "Samarqand reysi", created_at: "2025-11-27 09:15", category_name: "Reys tushumi", category_id: 1 },
-    { id: 4, author_name: "Jasur Mirzaev", amount: 1500000, date: "2025-11-28", body: "Yukni saqlash xizmati", created_at: "2025-11-28 16:45", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 5, author_name: "Sardor Karimov", amount: 4200000, date: "2025-11-29", body: "Buxoro reysi", created_at: "2025-11-29 11:20", category_name: "Reys tushumi", category_id: 1 },
-    { id: 6, author_name: "Bobur Xasanov", amount: 6100000, date: "2025-11-30", body: "Toshkent-Namangan", created_at: "2025-11-30 08:00", category_name: "Reys tushumi", category_id: 1 },
-    { id: 7, author_name: "Jasur Mirzaev", amount: 2800000, date: "2025-12-01", body: "Qo'shimcha transport", created_at: "2025-12-01 12:30", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 8, author_name: "Ahmad Abdurahimov", amount: 9500000, date: "2025-12-02", body: "Navoiy reysi", created_at: "2025-12-02 07:45", category_name: "Reys tushumi", category_id: 1 },
-    { id: 9, author_name: "Nodira Karimova", amount: 1800000, date: "2025-12-03", body: "Ijaraga berish", created_at: "2025-12-03 15:20", category_name: "Boshqa tushum", category_id: 3 },
-    { id: 10, author_name: "Sardor Karimov", amount: 5500000, date: "2025-12-04", body: "Farg'ona reysi", created_at: "2025-12-04 09:00", category_name: "Reys tushumi", category_id: 1 },
-    { id: 11, author_name: "Bobur Xasanov", amount: 3400000, date: "2025-12-05", body: "Xorazm reysi", created_at: "2025-12-05 11:15", category_name: "Reys tushumi", category_id: 1 },
-    { id: 12, author_name: "Ahmad Abdurahimov", amount: 2200000, date: "2025-12-06", body: "Yukni tushirish xizmati", created_at: "2025-12-06 14:30", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 13, author_name: "Jasur Mirzaev", amount: 8200000, date: "2025-12-07", body: "Andijon reysi", created_at: "2025-12-07 06:50", category_name: "Reys tushumi", category_id: 1 },
-    { id: 14, author_name: "Nodira Karimova", amount: 1200000, date: "2025-12-08", body: "Qo'shimcha tushum", created_at: "2025-12-08 17:00", category_name: "Boshqa tushum", category_id: 3 },
-    { id: 15, author_name: "Sardor Karimov", amount: 4800000, date: "2025-12-09", body: "Jizzax reysi", created_at: "2025-12-09 08:20", category_name: "Reys tushumi", category_id: 1 },
-    { id: 16, author_name: "Ahmad Abdurahimov", amount: 6700000, date: "2025-12-10", body: "Termiz reysi", created_at: "2025-12-10 10:10", category_name: "Reys tushumi", category_id: 1 },
-    { id: 17, author_name: "Bobur Xasanov", amount: 2900000, date: "2025-12-11", body: "Qashqadaryo reysi", created_at: "2025-12-11 13:40", category_name: "Reys tushumi", category_id: 1 },
-    { id: 18, author_name: "Jasur Mirzaev", amount: 1600000, date: "2025-12-12", body: "Yuklarni saqlash", created_at: "2025-12-12 16:15", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 19, author_name: "Sardor Karimov", amount: 7300000, date: "2025-12-13", body: "Sirdaryo reysi", created_at: "2025-12-13 07:30", category_name: "Reys tushumi", category_id: 1 },
-    { id: 20, author_name: "Nodira Karimova", amount: 950000, date: "2025-12-14", body: "Boshqa xizmat", created_at: "2025-12-14 11:50", category_name: "Boshqa tushum", category_id: 3 },
-    { id: 21, author_name: "Ahmad Abdurahimov", amount: 5400000, date: "2025-12-15", body: "Nukus reysi", created_at: "2025-12-15 09:25", category_name: "Reys tushumi", category_id: 1 },
-    { id: 22, author_name: "Bobur Xasanov", amount: 3100000, date: "2025-12-16", body: "Guliston reysi", created_at: "2025-12-16 14:00", category_name: "Reys tushumi", category_id: 1 },
-    { id: 23, author_name: "Jasur Mirzaev", amount: 4600000, date: "2025-12-17", body: "Qarshi reysi", created_at: "2025-12-17 08:40", category_name: "Reys tushumi", category_id: 1 },
-    { id: 24, author_name: "Sardor Karimov", amount: 2100000, date: "2025-12-18", body: "Transport xizmati", created_at: "2025-12-18 12:00", category_name: "Qo'shimcha tushum", category_id: 2 },
-    { id: 25, author_name: "Ahmad Abdurahimov", amount: 8800000, date: "2025-12-19", body: "Samarqand-Buxoro", created_at: "2025-12-19 06:30", category_name: "Reys tushumi", category_id: 1 },
-]
-
-const expenseData: FinanceRow[] = [
-    { id: 1, author_name: "Ahmad Abdurahimov", amount: 2500000, date: "2025-11-25", body: "Yoqilg'i xarajati", created_at: "2025-11-25 08:30", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 2, author_name: "Sardor Karimov", amount: 800000, date: "2025-11-26", body: "Shina almashtirish", created_at: "2025-11-26 13:00", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 3, author_name: "Ahmad Abdurahimov", amount: 1200000, date: "2025-11-27", body: "Moy almashtirish", created_at: "2025-11-27 10:45", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 4, author_name: "Jasur Mirzaev", amount: 350000, date: "2025-11-28", body: "Yo'l to'lovi", created_at: "2025-11-28 15:30", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 5, author_name: "Ahmad Abdurahimov", amount: 3000000, date: "2025-11-29", body: "Dizel yoqilg'i", created_at: "2025-11-29 07:00", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 6, author_name: "Sardor Karimov", amount: 450000, date: "2025-11-30", body: "Kunlik xarajat", created_at: "2025-11-30 18:00", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 7, author_name: "Bobur Xasanov", amount: 1800000, date: "2025-12-01", body: "Tormoz ta'mirlash", created_at: "2025-12-01 09:20", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 8, author_name: "Ahmad Abdurahimov", amount: 4200000, date: "2025-12-02", body: "Dizel Navoiy reysi", created_at: "2025-12-02 06:15", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 9, author_name: "Jasur Mirzaev", amount: 600000, date: "2025-12-03", body: "Yo'l jarima", created_at: "2025-12-03 14:50", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 10, author_name: "Nodira Karimova", amount: 5000000, date: "2025-12-04", body: "Haydovchi oyligi", created_at: "2025-12-04 17:00", category_name: "Oylik", category_id: 6 },
-    { id: 11, author_name: "Sardor Karimov", amount: 2200000, date: "2025-12-05", body: "Akkumulyator almashtirish", created_at: "2025-12-05 10:30", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 12, author_name: "Ahmad Abdurahimov", amount: 3500000, date: "2025-12-06", body: "Metan yoqilg'i", created_at: "2025-12-06 07:45", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 13, author_name: "Bobur Xasanov", amount: 750000, date: "2025-12-07", body: "Avtomoyka", created_at: "2025-12-07 16:20", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 14, author_name: "Jasur Mirzaev", amount: 1500000, date: "2025-12-08", body: "Filtr almashtirish", created_at: "2025-12-08 11:00", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 15, author_name: "Sardor Karimov", amount: 2800000, date: "2025-12-09", body: "Dizel Jizzax reysi", created_at: "2025-12-09 06:30", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 16, author_name: "Nodira Karimova", amount: 5200000, date: "2025-12-10", body: "Haydovchi oyligi", created_at: "2025-12-10 17:30", category_name: "Oylik", category_id: 6 },
-    { id: 17, author_name: "Ahmad Abdurahimov", amount: 900000, date: "2025-12-11", body: "Parkovka to'lovi", created_at: "2025-12-11 13:15", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 18, author_name: "Bobur Xasanov", amount: 3800000, date: "2025-12-12", body: "Dvigatel ta'mirlash", created_at: "2025-12-12 08:50", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 19, author_name: "Sardor Karimov", amount: 2100000, date: "2025-12-13", body: "Dizel Sirdaryo", created_at: "2025-12-13 07:00", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 20, author_name: "Jasur Mirzaev", amount: 400000, date: "2025-12-14", body: "Kunlik ovqat", created_at: "2025-12-14 12:30", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 21, author_name: "Ahmad Abdurahimov", amount: 4500000, date: "2025-12-15", body: "Dizel Nukus reysi", created_at: "2025-12-15 06:00", category_name: "Yoqilg'i", category_id: 4 },
-    { id: 22, author_name: "Nodira Karimova", amount: 5000000, date: "2025-12-16", body: "Haydovchi oyligi", created_at: "2025-12-16 18:00", category_name: "Oylik", category_id: 6 },
-    { id: 23, author_name: "Bobur Xasanov", amount: 1300000, date: "2025-12-17", body: "Elektr ta'mirlash", created_at: "2025-12-17 10:40", category_name: "Ta'mirlash", category_id: 5 },
-    { id: 24, author_name: "Sardor Karimov", amount: 550000, date: "2025-12-18", body: "Yo'l to'lovi", created_at: "2025-12-18 15:00", category_name: "Boshqa xarajat", category_id: 7 },
-    { id: 25, author_name: "Ahmad Abdurahimov", amount: 3200000, date: "2025-12-19", body: "Metan yoqilg'i", created_at: "2025-12-19 07:20", category_name: "Yoqilg'i", category_id: 4 },
-]
 
 // ──── Category tabs component ────
 
@@ -115,27 +56,34 @@ function CategoryTabs({
     selectedId,
     onSelect,
     onAdd,
+    prefix = "cat",
 }: {
     categories: Category[]
     selectedId: number | null
     onSelect: (id: number) => void
     onAdd: () => void
+    prefix?: string
 }) {
     return (
         <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar">
-            {categories.map((cat) => (
-                <div
-                    key={cat.id}
-                    onClick={() => onSelect(cat.id)}
-                    className={cn(
-                        "px-4 py-3 min-w-36 border rounded-md text-center cursor-pointer hover:border-primary transition-colors shrink-0",
-                        selectedId === cat.id && "border-primary bg-primary/5",
-                    )}
-                >
-                    <p className="text-sm">{cat.name}</p>
-                    <p className="font-semibold">{formatMoney(cat.amount)}</p>
-                </div>
-            ))}
+            {categories.map((cat, idx) => {
+                const isActive = selectedId != null && selectedId === cat.id
+                return (
+                    <div
+                        key={`${prefix}-${cat.id ?? idx}`}
+                        onClick={() => onSelect(cat.id)}
+                        className={cn(
+                            "px-4 py-3 min-w-36 rounded-md text-center cursor-pointer transition-colors shrink-0",
+                            isActive
+                                ? "border-2 border-primary bg-primary/5"
+                                : "border border-border hover:border-primary",
+                        )}
+                    >
+                        <p className="text-sm">{cat.name}</p>
+                        <p className="font-semibold">{formatMoney(cat.amount ?? 0)}</p>
+                    </div>
+                )
+            })}
             <div
                 onClick={onAdd}
                 className={cn(
@@ -148,14 +96,56 @@ function CategoryTabs({
     )
 }
 
-// ──── Add form (hardcoded, mirrors IMB-CRM create.tsx) ────
+// ──── Add category form ────
+
+function AddCategoryForm({ flowType, modalKey = "add-category" }: { flowType: 1 | 2; modalKey?: string }) {
+    const { closeModal } = useModal(modalKey)
+    const form = useForm<{ name: string }>()
+    const { handleSubmit, control, reset } = form
+    const { mutate, isPending } = usePost()
+    const queryClient = useQueryClient()
+
+    const onSubmit = (data: { name: string }) => {
+        mutate(SETTINGS_EXPENSES, {
+            name: data.name,
+            type: 3, // TRIP
+            flow_type: flowType,
+        }, {
+            onSuccess: () => {
+                toast.success("Kategoriya muvaffaqiyatli qo'shildi")
+                queryClient.invalidateQueries({ queryKey: [MANAGERS_EXPENSE_CATEGORIES] })
+                reset()
+                closeModal()
+            },
+        })
+    }
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+            <FormInput
+                required
+                methods={form}
+                label="Nomi"
+                name="name"
+                placeholder="Kategoriya nomi"
+            />
+            <Button className="w-full" type="submit" disabled={isPending}>
+                Saqlash
+            </Button>
+        </form>
+    )
+}
+
+// ──── Add finance form ────
 
 function AddFinanceForm({
     type,
-    categories,
+    categoryId,
+    isFuel,
 }: {
     type: "tushum" | "xarajat"
-    categories: Category[]
+    categoryId: number | null
+    isFuel: boolean
 }) {
     const { closeModal } = useModal("kirim-xarajat-add")
     const form = useForm()
@@ -173,15 +163,6 @@ function AddFinanceForm({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-            <FormCombobox
-                control={control}
-                required
-                labelKey="name"
-                valueKey="id"
-                name="category"
-                options={categories}
-                label={type === "tushum" ? "Tushum turi" : "Chiqim turi"}
-            />
             <FormNumberInput
                 required
                 control={control}
@@ -191,13 +172,25 @@ function AddFinanceForm({
                 thousandSeparator=" "
                 decimalScale={0}
             />
-            <FormDatePicker
-                required
-                label="Sana"
-                control={control}
-                name="date"
-            />
+            {isFuel && (
+                <FormNumberInput
+                    required
+                    control={control}
+                    label="Miqdori (litr)"
+                    name="quantity"
+                    placeholder="Ex: 120.5"
+                    decimalScale={2}
+                />
+            )}
             <FormTextarea required label="Izoh" methods={form} name="body" />
+            <FileUpload
+                control={control}
+                name="cheque"
+                multiple={false}
+                isPaste={false}
+                hideClearable={true}
+                label="Chek (ixtiyoriy)"
+            />
             <Button className="w-full" type="submit">
                 Saqlash
             </Button>
@@ -207,10 +200,10 @@ function AddFinanceForm({
 
 // ──── Columns ────
 
-const useIncomeCols = () => {
+const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: (item: FinanceRow) => void }) => {
     return useMemo<ColumnDef<FinanceRow>[]>(
         () => [
-            { header: "Mas'ul shaxs", accessorKey: "author_name", enableSorting: true },
+            { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
                 header: "Summa",
                 accessorKey: "amount",
@@ -221,18 +214,39 @@ const useIncomeCols = () => {
                     </span>
                 ),
             },
-            { header: "Sana", accessorKey: "date", enableSorting: true },
-            { header: "Izoh", accessorKey: "body", enableSorting: true },
-            { header: "Yaratilgan sana", accessorKey: "created_at", enableSorting: true },
+            { header: "Kategoriya", accessorKey: "category_name", enableSorting: true },
+            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
+            {
+                id: "actions",
+                header: " ",
+                cell: ({ row }) => (
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                        <Button
+                            icon={<SquarePen className="text-primary" size={14} />}
+                            size="sm"
+                            variant="ghost"
+                            className="p-0 h-6 w-6"
+                            onClick={(e) => { e.stopPropagation(); opts?.onEdit?.(row.original) }}
+                        />
+                        <Button
+                            icon={<Trash2 className="text-red-500" size={14} />}
+                            size="sm"
+                            variant="ghost"
+                            className="p-0 h-6 w-6"
+                            onClick={(e) => { e.stopPropagation(); opts?.onDelete?.(row.original) }}
+                        />
+                    </div>
+                ),
+            },
         ],
-        [],
+        [opts?.onEdit, opts?.onDelete],
     )
 }
 
-const useExpenseCols = () => {
+const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: (item: FinanceRow) => void }) => {
     return useMemo<ColumnDef<FinanceRow>[]>(
         () => [
-            { header: "Mas'ul shaxs", accessorKey: "author_name", enableSorting: true },
+            { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
                 header: "Summa",
                 accessorKey: "amount",
@@ -243,24 +257,80 @@ const useExpenseCols = () => {
                     </span>
                 ),
             },
-            { header: "Sana", accessorKey: "date", enableSorting: true },
-            { header: "Izoh", accessorKey: "body", enableSorting: true },
-            { header: "Yaratilgan sana", accessorKey: "created_at", enableSorting: true },
+            { header: "Kategoriya", accessorKey: "category_name", enableSorting: true },
+            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
+            {
+                id: "actions",
+                header: " ",
+                cell: ({ row }) => (
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                        <Button
+                            icon={<SquarePen className="text-primary" size={14} />}
+                            size="sm"
+                            variant="ghost"
+                            className="p-0 h-6 w-6"
+                            onClick={(e) => { e.stopPropagation(); opts?.onEdit?.(row.original) }}
+                        />
+                        <Button
+                            icon={<Trash2 className="text-red-500" size={14} />}
+                            size="sm"
+                            variant="ghost"
+                            className="p-0 h-6 w-6"
+                            onClick={(e) => { e.stopPropagation(); opts?.onDelete?.(row.original) }}
+                        />
+                    </div>
+                ),
+            },
         ],
-        [],
+        [opts?.onEdit, opts?.onDelete],
     )
 }
 
 // ──── Tab content components ────
 
-function IncomeTab() {
-    const columns = useIncomeCols()
-    const [selectedCat, setSelectedCat] = useState<number | null>(incomeCategories[0].id)
+function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (id: number | null, name?: string) => void }) {
+    const { setData } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
+    const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-delete`)
+    const { openModal: openAddCategory } = useModal("add-category")
 
-    const filtered = selectedCat
-        ? incomeData.filter((r) => r.category_id === selectedCat)
-        : incomeData
+    const { data: categoriesData } = useGet<ListResponse<Category>>(
+        MANAGERS_EXPENSE_CATEGORIES,
+        { params: { page_size: 100, action: 1, trip_id: tripId } },
+    )
+    const categories = categoriesData?.results ?? []
+    const [selectedCat, setSelectedCat] = useState<number | null>(null)
+
+    useEffect(() => {
+        if (categories.length > 0 && !categories.some((c) => c.id === selectedCat)) {
+            const first = categories[0]
+            setSelectedCat(first.id)
+            onCategoryChange(first.id, first.name)
+        }
+    }, [categoriesData])
+
+    const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
+        MANAGERS_EXPENSES,
+        { params: { trip: tripId, category: selectedCat, action: 1, page_size: 100 } },
+    )
+    const rows = expensesData?.results ?? []
+
+    const handleEdit = (item: FinanceRow) => {
+        setData(MANAGERS_EXPENSES, item)
+        openModal()
+    }
+    const handleDelete = (item: FinanceRow) => {
+        setData(MANAGERS_EXPENSES, item)
+        openDeleteModal()
+    }
+
+    const columns = useIncomeCols({ onEdit: handleEdit, onDelete: handleDelete })
+
+    const handleSelect = (id: number) => {
+        setSelectedCat(id)
+        const cat = categories.find((c) => c.id === id)
+        onCategoryChange(id, cat?.name)
+    }
 
     const handleAdd = () => {
         openModal()
@@ -270,22 +340,23 @@ function IncomeTab() {
         <div className="flex flex-col h-full overflow-hidden">
             <div className="shrink-0">
                 <CategoryTabs
-                    categories={incomeCategories}
+                    prefix="income"
+                    categories={categories}
                     selectedId={selectedCat}
-                    onSelect={setSelectedCat}
-                    onAdd={handleAdd}
+                    onSelect={handleSelect}
+                    onAdd={openAddCategory}
                 />
             </div>
             <div className="mt-4 flex-1 overflow-y-auto min-h-0">
                 <DataTable
                     columns={columns}
-                    data={filtered}
+                    data={rows}
                     numeration
                     head={
                         <div className="flex mb-3 justify-between items-center gap-3">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-xl">Tushum tarixi</h1>
-                                <Badge className="text-sm">{filtered.length}</Badge>
+                                <Badge className="text-sm">{rows.length}</Badge>
                             </div>
                             <Button onClick={handleAdd}>
                                 <Plus size={18} />
@@ -293,21 +364,65 @@ function IncomeTab() {
                             </Button>
                         </div>
                     }
-                    paginationProps={{ totalPages: 1 }}
+                    paginationProps={{ totalPages: expensesData?.total_pages }}
                 />
             </div>
+            <DeleteModal
+                path={MANAGERS_EXPENSES}
+                id={useGlobalStore.getState().getData(MANAGERS_EXPENSES)?.id}
+                modalKey={`${MANAGERS_EXPENSES}-delete`}
+                refetchKeys={[MANAGERS_EXPENSES]}
+            />
+            <Modal modalKey="add-category" title="Kategoriya qo'shish" size="max-w-sm">
+                <AddCategoryForm flowType={1} />
+            </Modal>
         </div>
     )
 }
 
-function ExpenseTab() {
-    const columns = useExpenseCols()
-    const [selectedCat, setSelectedCat] = useState<number | null>(expenseCategories[0].id)
+function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (id: number | null, name?: string) => void }) {
+    const { setData } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
+    const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-xarajat-delete`)
+    const { openModal: openAddCategory } = useModal("add-category-expense")
 
-    const filtered = selectedCat
-        ? expenseData.filter((r) => r.category_id === selectedCat)
-        : expenseData
+    const { data: categoriesData } = useGet<ListResponse<Category>>(
+        MANAGERS_EXPENSE_CATEGORIES,
+        { params: { page_size: 100, action: -1, trip_id: tripId } },
+    )
+    const categories = categoriesData?.results ?? []
+    const [selectedCat, setSelectedCat] = useState<number | null>(null)
+
+    useEffect(() => {
+        if (categories.length > 0 && !categories.some((c) => c.id === selectedCat)) {
+            const first = categories[0]
+            setSelectedCat(first.id)
+            onCategoryChange(first.id, first.name)
+        }
+    }, [categoriesData])
+
+    const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
+        MANAGERS_EXPENSES,
+        { params: { trip: tripId, category: selectedCat, action: -1, page_size: 100 } },
+    )
+    const rows = expensesData?.results ?? []
+
+    const handleEdit = (item: FinanceRow) => {
+        setData(MANAGERS_EXPENSES, item)
+        openModal()
+    }
+    const handleDelete = (item: FinanceRow) => {
+        setData(MANAGERS_EXPENSES, item)
+        openDeleteModal()
+    }
+
+    const columns = useExpenseCols({ onEdit: handleEdit, onDelete: handleDelete })
+
+    const handleSelect = (id: number) => {
+        setSelectedCat(id)
+        const cat = categories.find((c) => c.id === id)
+        onCategoryChange(id, cat?.name)
+    }
 
     const handleAdd = () => {
         openModal()
@@ -317,22 +432,23 @@ function ExpenseTab() {
         <div className="flex flex-col h-full overflow-hidden">
             <div className="shrink-0">
                 <CategoryTabs
-                    categories={expenseCategories}
+                    prefix="expense"
+                    categories={categories}
                     selectedId={selectedCat}
-                    onSelect={setSelectedCat}
-                    onAdd={handleAdd}
+                    onSelect={handleSelect}
+                    onAdd={openAddCategory}
                 />
             </div>
             <div className="mt-4 flex-1 overflow-y-auto min-h-0">
                 <DataTable
                     columns={columns}
-                    data={filtered}
+                    data={rows}
                     numeration
                     head={
                         <div className="flex mb-3 justify-between items-center gap-3">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-xl">Xarajatlar tarixi</h1>
-                                <Badge className="text-sm">{filtered.length}</Badge>
+                                <Badge className="text-sm">{rows.length}</Badge>
                             </div>
                             <Button onClick={handleAdd}>
                                 <Plus size={18} />
@@ -340,9 +456,405 @@ function ExpenseTab() {
                             </Button>
                         </div>
                     }
-                    paginationProps={{ totalPages: 1 }}
+                    paginationProps={{ totalPages: expensesData?.total_pages }}
                 />
             </div>
+            <DeleteModal
+                path={MANAGERS_EXPENSES}
+                id={useGlobalStore.getState().getData(MANAGERS_EXPENSES)?.id}
+                modalKey={`${MANAGERS_EXPENSES}-xarajat-delete`}
+                refetchKeys={[MANAGERS_EXPENSES]}
+            />
+            <Modal modalKey="add-category-expense" title="Kategoriya qo'shish" size="max-w-sm">
+                <AddCategoryForm flowType={2} modalKey="add-category-expense" />
+            </Modal>
+        </div>
+    )
+}
+
+// ──── T hisob (T accounting) types & data ────
+
+type TAccountRow = {
+    id: number
+    description: string
+    amount: number
+    type: "kirim" | "chiqim"
+    payment_method: "naqd" | "plastik" | "perechisleniya" | "solyarka"
+    date: string
+    visible_to_driver: boolean
+    visible_to_company: boolean
+}
+
+// Hardcoded T account data for the aylanma
+const tAccountData: TAccountRow[] = [
+    // Driver income (avans from company - visible to driver only, not company income)
+    { id: 1, description: "Avans berildi", amount: 5000000, type: "kirim", payment_method: "naqd", date: "2025-12-01", visible_to_driver: true, visible_to_company: false },
+    // Cash payment from client - visible to both
+    { id: 2, description: "Samarqand reysi - naqd to'lov", amount: 7800000, type: "kirim", payment_method: "naqd", date: "2025-12-02", visible_to_driver: true, visible_to_company: true },
+    // Bank transfer from client - company only
+    { id: 3, description: "Buxoro reysi - perechisleniya", amount: 12000000, type: "kirim", payment_method: "perechisleniya", date: "2025-12-03", visible_to_driver: false, visible_to_company: true },
+    // Cash from another client - both
+    { id: 4, description: "Navoiy reysi - naqd", amount: 4200000, type: "kirim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
+    // Bank transfer - company only
+    { id: 5, description: "Jizzax reysi - perechisleniya", amount: 8500000, type: "kirim", payment_method: "perechisleniya", date: "2025-12-05", visible_to_driver: false, visible_to_company: true },
+    // Fuel in tank at start of aylanma - driver income (he uses it)
+    { id: 6, description: "Bakdagi yoqilg'i (chiqishda)", amount: 1500000, type: "kirim", payment_method: "solyarka", date: "2025-12-01", visible_to_driver: true, visible_to_company: false },
+    // Cash from client
+    { id: 7, description: "Farg'ona reysi - naqd", amount: 3500000, type: "kirim", payment_method: "naqd", date: "2025-12-06", visible_to_driver: true, visible_to_company: true },
+
+    // Expenses
+    // Driver fuels up with his cash - both driver and company expense
+    { id: 8, description: "Yoqilg'i - haydovchi to'ladi", amount: 2000000, type: "chiqim", payment_method: "naqd", date: "2025-12-02", visible_to_driver: true, visible_to_company: true },
+    // Company pays fuel directly (card/transfer) - company expense only
+    { id: 9, description: "Yoqilg'i - kompaniya to'ladi", amount: 3500000, type: "chiqim", payment_method: "plastik", date: "2025-12-03", visible_to_driver: false, visible_to_company: true },
+    // Driver pays parking - both
+    { id: 10, description: "Parkovka to'lovi", amount: 350000, type: "chiqim", payment_method: "naqd", date: "2025-12-03", visible_to_driver: true, visible_to_company: true },
+    // Driver pays road toll - both
+    { id: 11, description: "Yo'l to'lovi", amount: 500000, type: "chiqim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
+    // Driver fuels again - both
+    { id: 12, description: "Yoqilg'i - haydovchi to'ladi", amount: 1800000, type: "chiqim", payment_method: "naqd", date: "2025-12-05", visible_to_driver: true, visible_to_company: true },
+    // Driver salary - company expense only
+    { id: 13, description: "Haydovchi oyligi", amount: 5000000, type: "chiqim", payment_method: "perechisleniya", date: "2025-12-06", visible_to_driver: false, visible_to_company: true },
+    // Driver food etc - both
+    { id: 14, description: "Kunlik xarajat (ovqat)", amount: 400000, type: "chiqim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
+    // Fuel in tank at return - returnable to company as solyarka
+    { id: 15, description: "Bakdagi yoqilg'i (qaytishda)", amount: 800000, type: "chiqim", payment_method: "solyarka", date: "2025-12-06", visible_to_driver: true, visible_to_company: false },
+]
+
+const paymentMethodLabels: Record<TAccountRow["payment_method"], string> = {
+    naqd: "Naqd",
+    plastik: "Plastik",
+    perechisleniya: "Perechisleniya",
+    solyarka: "Solyarka",
+}
+
+// ──── Avans form ────
+
+function AvansForm() {
+    const { closeModal } = useModal("avans-berish")
+    const form = useForm()
+    const { handleSubmit, control, reset } = form
+
+    const paymentOptions = [
+        { id: "naqd", name: "Naqd" },
+        { id: "plastik", name: "Plastik" },
+        { id: "perechisleniya", name: "Perechisleniya" },
+    ]
+
+    const onSubmit = () => {
+        toast.success("Avans muvaffaqiyatli berildi")
+        reset()
+        closeModal()
+    }
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+            <FormNumberInput
+                required
+                control={control}
+                label="Summa"
+                name="amount"
+                placeholder="Ex: 5 000 000"
+                thousandSeparator=" "
+                decimalScale={0}
+            />
+            <FormCombobox
+                control={control}
+                required
+                labelKey="name"
+                valueKey="id"
+                name="payment_type"
+                options={paymentOptions}
+                label="To'lov turi"
+            />
+            <FormDatePicker
+                required
+                label="Sana"
+                control={control}
+                name="date"
+            />
+            <FormTextarea label="Izoh" methods={form} name="comment" />
+            <Button className="w-full" type="submit">
+                Saqlash
+            </Button>
+        </form>
+    )
+}
+
+// ──── T hisob mode toggle ────
+
+function ModeToggle({
+    mode,
+    onToggle,
+}: {
+    mode: "aylanma" | "haydovchi"
+    onToggle: (mode: "aylanma" | "haydovchi") => void
+}) {
+    const isHaydovchi = mode === "haydovchi"
+    return (
+        <div className="w-full max-w-sm mx-auto">
+            <div className="flex items-center rounded-lg bg-muted p-1 relative">
+                <div
+                    className={cn(
+                        "absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-md bg-background shadow-sm transition-all duration-300 ease-in-out pointer-events-none",
+                        isHaydovchi ? "left-[calc(50%+2px)]" : "left-1",
+                    )}
+                />
+                <button
+                    onClick={() => onToggle("aylanma")}
+                    className={cn(
+                        "relative z-10 flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200",
+                        !isHaydovchi
+                            ? "text-primary"
+                            : "text-muted-foreground",
+                    )}
+                >
+                    <Truck size={16} />
+                    Aylanmalar
+                </button>
+                <button
+                    onClick={() => onToggle("haydovchi")}
+                    className={cn(
+                        "relative z-10 flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200",
+                        isHaydovchi
+                            ? "text-primary"
+                            : "text-muted-foreground",
+                    )}
+                >
+                    <User size={16} />
+                    Haydovchilar
+                </button>
+            </div>
+        </div>
+    )
+}
+
+// ──── Summary card ────
+
+function SummaryCard({
+    label,
+    amount,
+    variant,
+}: {
+    label: string
+    amount: number
+    variant: "income" | "expense" | "balance"
+}) {
+    return (
+        <div
+            className={cn(
+                "px-4 py-3 rounded-md border min-w-36 text-center",
+                variant === "income" && "bg-green-500/10 border-transparent",
+                variant === "expense" && "bg-red-600/10 border-transparent",
+                variant === "balance" && "bg-primary/10 border-transparent",
+            )}
+        >
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <p
+                className={cn(
+                    "font-semibold text-lg",
+                    variant === "income" && "text-green-600",
+                    variant === "expense" && "text-red-600",
+                    variant === "balance" && "text-primary",
+                )}
+            >
+                {formatMoney(amount)}
+            </p>
+        </div>
+    )
+}
+
+// ──── Returnable breakdown ────
+
+function ReturnableBreakdown({
+    data,
+}: {
+    data: { label: string; amount: number }[]
+}) {
+    return (
+        <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar">
+            {data.map((item) => (
+                <div
+                    key={item.label}
+                    className="px-4 py-2 rounded-md bg-orange-100 dark:bg-orange-900/40 border-transparent min-w-32 text-center shrink-0"
+                >
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className="font-semibold text-orange-600 dark:text-orange-400">
+                        {formatMoney(item.amount)}
+                    </p>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+// ──── T hisob tab ────
+
+function TAccountTab({ mode, onToggle }: { mode: "aylanma" | "haydovchi"; onToggle: (m: "aylanma" | "haydovchi") => void }) {
+    const { openModal: openAvansModal } = useModal("avans-berish")
+
+    const filtered = tAccountData.filter((row) =>
+        mode === "aylanma" ? row.visible_to_company : row.visible_to_driver,
+    )
+
+    const income = filtered.filter((r) => r.type === "kirim")
+    const expense = filtered.filter((r) => r.type === "chiqim")
+
+    const totalIncome = income.reduce((s, r) => s + r.amount, 0)
+    const totalExpense = expense.reduce((s, r) => s + r.amount, 0)
+    const balance = totalIncome - totalExpense
+
+    // For driver mode: breakdown of returnable by payment method
+    const returnableBreakdown = useMemo(() => {
+        if (mode !== "haydovchi") return []
+        const byMethod: Record<string, number> = {}
+        for (const row of income) {
+            const key = row.payment_method
+            byMethod[key] = (byMethod[key] || 0) + row.amount
+        }
+        // Subtract expenses by method
+        for (const row of expense) {
+            const key = row.payment_method
+            byMethod[key] = (byMethod[key] || 0) - row.amount
+        }
+        return Object.entries(byMethod)
+            .filter(([, amount]) => amount !== 0)
+            .map(([method, amount]) => ({
+                label: paymentMethodLabels[method as TAccountRow["payment_method"]] || method,
+                amount,
+            }))
+    }, [mode, income, expense])
+
+    return (
+        <div className="flex flex-col h-full overflow-hidden gap-4">
+            <div className="shrink-0 flex flex-col gap-3">
+                {/* Mode switch */}
+                <ModeToggle mode={mode} onToggle={onToggle} />
+
+                {/* Summary row */}
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar">
+                        <SummaryCard label="Jami kirim" amount={totalIncome} variant="income" />
+                        <SummaryCard label="Jami chiqim" amount={totalExpense} variant="expense" />
+                        <div className="px-4 py-3 rounded-md bg-primary/10 min-w-36 shrink-0">
+                            <p className="text-sm text-muted-foreground">
+                                {mode === "haydovchi" ? "Balans" : "Foyda"}
+                            </p>
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                                <p className="font-semibold text-lg text-primary">
+                                    {formatMoney(balance)}
+                                </p>
+                                {mode === "haydovchi" && returnableBreakdown.map((item) => (
+                                    <span
+                                        key={item.label}
+                                        className="text-[11px] text-primary/70 font-medium"
+                                    >
+                                        {item.label}: {formatMoney(item.amount)}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    {mode === "haydovchi" && (
+                        <Button
+                            onClick={() => openAvansModal()}
+                            variant="outline"
+                            className="gap-1.5 shrink-0"
+                        >
+                            <Plus size={16} />
+                            Avans berish
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {/* Single card, two columns inside */}
+            <div className="flex-1 overflow-hidden border rounded-lg">
+                {/* Shared header row */}
+                <div className="grid grid-cols-2 border-b items-center">
+                    <div className="px-4 py-3 flex items-center justify-center gap-2 border-r bg-green-500/10">
+                        <span className="size-2 rounded-full bg-green-500" />
+                        <h2 className="font-semibold text-sm text-green-600">Kirim</h2>
+                        <span className="text-[10px] font-semibold text-green-600 bg-green-500/15 rounded-full px-1.5 py-0.5 leading-none">{income.length}</span>
+                    </div>
+                    <div className="px-4 py-3 flex items-center justify-center gap-2 bg-red-600/10">
+                        <span className="size-2 rounded-full bg-red-500" />
+                        <h2 className="font-semibold text-sm text-red-600">Chiqim</h2>
+                        <span className="text-[10px] font-semibold text-red-600 bg-red-500/15 rounded-full px-1.5 py-0.5 leading-none">{expense.length}</span>
+                    </div>
+                </div>
+
+                {/* Two columns of items */}
+                <div className="grid grid-cols-2 h-[calc(100%-45px)]">
+                    {/* Left: Kirim */}
+                    <div className="border-r overflow-y-auto divide-y">
+                        {income.map((row, i) => (
+                            <div key={row.id} className="px-4 py-3 hover:bg-muted/30 transition-colors">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex gap-2 min-w-0">
+                                        <span className="text-xs text-muted-foreground mt-0.5 shrink-0 w-4 text-right">
+                                            {i + 1}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium truncate">{row.description}</p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-xs text-muted-foreground">{row.date}</span>
+                                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted">
+                                                    {paymentMethodLabels[row.payment_method]}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span className="text-sm font-semibold text-green-500 shrink-0">
+                                        + {formatMoney(row.amount)}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                        {income.length === 0 && (
+                            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                                Kirim yo'q
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right: Chiqim */}
+                    <div className="overflow-y-auto divide-y">
+                        {expense.map((row, i) => (
+                            <div key={row.id} className="px-4 py-3 hover:bg-muted/30 transition-colors">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex gap-2 min-w-0">
+                                        <span className="text-xs text-muted-foreground mt-0.5 shrink-0 w-4 text-right">
+                                            {i + 1}
+                                        </span>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium truncate">{row.description}</p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-xs text-muted-foreground">{row.date}</span>
+                                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted">
+                                                    {paymentMethodLabels[row.payment_method]}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span className="text-sm font-semibold text-red-500 shrink-0">
+                                        - {formatMoney(row.amount)}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                        {expense.length === 0 && (
+                            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                                Chiqim yo'q
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <Modal modalKey="avans-berish" title="Avans berish" size="max-w-md">
+                <AvansForm />
+            </Modal>
         </div>
     )
 }
@@ -350,24 +862,47 @@ function ExpenseTab() {
 // ──── Main export ────
 
 export default function KirimXarajatContent() {
-    const [currentType, setCurrentType] = useState<"tushum" | "xarajat">("tushum")
+    const { getData } = useGlobalStore()
+    const tripItem = getData(`${MANAGERS_TRIPS}-moliya`)
+    const tripId = tripItem?.id
+
+    const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">("tushum")
+    const [tAccountMode, setTAccountMode] = useState<"aylanma" | "haydovchi">("aylanma")
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+    const [selectedCategoryName, setSelectedCategoryName] = useState<string>("")
+
+    const isFuel = currentType === "xarajat" && /yoqilg['ʻ']i|fuel|solyarka|metan|dizel|benzin/i.test(selectedCategoryName)
+
+    const handleCategoryChange = (id: number | null, name?: string) => {
+        setSelectedCategoryId(id)
+        if (name) setSelectedCategoryName(name)
+    }
 
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <ParamTabs
                 paramName="moliya_tab"
                 className="shrink-0"
-                onValueChange={(val) => setCurrentType(val as "tushum" | "xarajat")}
+                onValueChange={(val) => {
+                    setCurrentType(val as "tushum" | "xarajat" | "t_hisob")
+                    setSelectedCategoryId(null)
+                    setSelectedCategoryName("")
+                }}
                 options={[
                     {
                         value: "tushum",
                         label: "Tushum",
-                        content: <IncomeTab />,
+                        content: <IncomeTab tripId={tripId} onCategoryChange={handleCategoryChange} />,
                     },
                     {
                         value: "xarajat",
                         label: "Xarajat",
-                        content: <ExpenseTab />,
+                        content: <ExpenseTab tripId={tripId} onCategoryChange={handleCategoryChange} />,
+                    },
+                    {
+                        value: "t_hisob",
+                        label: "T hisob",
+                        content: <TAccountTab mode={tAccountMode} onToggle={setTAccountMode} />,
                     },
                 ]}
             />
@@ -378,8 +913,9 @@ export default function KirimXarajatContent() {
                 size="max-w-md"
             >
                 <AddFinanceForm
-                    type={currentType}
-                    categories={currentType === "tushum" ? incomeCategories : expenseCategories}
+                    type={currentType as "tushum" | "xarajat"}
+                    categoryId={selectedCategoryId}
+                    isFuel={isFuel}
                 />
             </Modal>
         </div>

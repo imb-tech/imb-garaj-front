@@ -52,4 +52,9 @@ export const MANAGERS_VEHICLES = "manager/vehicles"
 export const MANAGERS_TRIPS= "manager/trips"
 export const MANAGERS_ORDERS = "manager/orders"
 export const MANAGERS_EXPENSES = "manager/expense"
-// export const 
+export const MANAGERS_EXPENSE_CATEGORIES = "manager/expense/category"
+
+/** ===== CHECKOUT ===== */
+export const CHECKOUT_MAIN = "checkout/main"
+export const DRIVERS_BALANCE = "users/drivers/balance"
+// export const

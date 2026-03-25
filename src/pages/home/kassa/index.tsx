@@ -2,45 +2,28 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from "@/components/ui/datatable"
+import { CHECKOUT_MAIN, DRIVERS_BALANCE } from "@/constants/api-endpoints"
+const TRANSACTIONS = "transaction"
+import { useGet } from "@/hooks/useGet"
 import { formatMoney } from "@/lib/format-money"
 import { ColumnDef } from "@tanstack/react-table"
+import { useNavigate, useSearch } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
 import { useMemo } from "react"
 
 type Transaction = {
-    id: number
     amount: string
-    full_name: string
-    created_at: string
-    comment: string
-    type: number // 0 = Chiqim, 1 = Tushum
+    comment: string | null
+    executor_name: string
+    created: string
+    type: number // 1 = Income, -1 = Outcome
 }
 
-const fakeTransactions: Transaction[] = [
-    { id: 1, amount: "50000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-23 09:33", comment: "kartaga", type: 0 },
-    { id: 2, amount: "500000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-23 08:28", comment: "kotta kassadan", type: 1 },
-    { id: 3, amount: "50000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-21 16:56", comment: "Javohir K Bugun", type: 0 },
-    { id: 4, amount: "100000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-21 16:55", comment: "Bugun kotta kassa", type: 1 },
-    { id: 5, amount: "300000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-21 16:40", comment: "Kotta kassa + Samarqand", type: 1 },
-    { id: 6, amount: "200000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-18 20:30", comment: "Namangan", type: 1 },
-    { id: 7, amount: "300000000", full_name: "Husanboy Abdubannobov", created_at: "2026-03-18 08:22", comment: "Kotta kassadan", type: 1 },
-    { id: 8, amount: "75000000", full_name: "Sardor Karimov", created_at: "2026-03-17 14:10", comment: "Yoqilg'i uchun", type: 0 },
-    { id: 9, amount: "150000000", full_name: "Jasur Mirzaev", created_at: "2026-03-16 11:45", comment: "Buxoro reysi", type: 1 },
-    { id: 10, amount: "40000000", full_name: "Sardor Karimov", created_at: "2026-03-15 09:00", comment: "Ta'mirlash", type: 0 },
-]
-
-type AgentRow = {
-    id: number
+type DriverRow = {
+    id?: number
     full_name: string
     balance: string
 }
-
-const fakeAgents: AgentRow[] = [
-    { id: 1, full_name: "Moliya", balance: "45 200 000" },
-    { id: 2, full_name: "Agentlar", balance: "12 800 000" },
-    { id: 3, full_name: "Plastik", balance: "8 500 000" },
-    { id: 4, full_name: "Prastoy", balance: "3 200 000" },
-]
 
 const useTransactionCols = () => {
     return useMemo<ColumnDef<Transaction>[]>(
@@ -57,13 +40,24 @@ const useTransactionCols = () => {
             },
             {
                 header: "Ma'sul",
-                accessorKey: "full_name",
+                accessorKey: "executor_name",
                 enableSorting: true,
             },
             {
                 header: "Sana",
-                accessorKey: "created_at",
+                accessorKey: "created",
                 enableSorting: true,
+                cell: ({ row }) => {
+                    const d = new Date(row.original.created)
+                    if (isNaN(d.getTime())) return "-"
+                    return d.toLocaleString("uz-UZ", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })
+                },
             },
             {
                 header: "Izoh",
@@ -77,12 +71,12 @@ const useTransactionCols = () => {
                 cell: ({ row }) => (
                     <Badge
                         variant={
-                            Number(row.original.type) === 0
+                            row.original.type === -1
                                 ? "destructive"
                                 : "default"
                         }
                     >
-                        {Number(row.original.type) === 0 ? "Chiqim" : "Tushum"}
+                        {row.original.type === -1 ? "Chiqim" : "Tushum"}
                     </Badge>
                 ),
             },
@@ -91,32 +85,44 @@ const useTransactionCols = () => {
     )
 }
 
-const useAgentCols = () => {
-    return useMemo<ColumnDef<AgentRow>[]>(
-        () => [
-            {
-                header: "Agent",
-                accessorKey: "full_name",
-                enableSorting: true,
-            },
-            {
-                header: "Balans",
-                accessorKey: "balance",
-                enableSorting: true,
-            },
-        ],
-        [],
-    )
-}
 
 const Kassa = () => {
     const transactionCols = useTransactionCols()
-    const agentCols = useAgentCols()
+    const navigate = useNavigate()
+    const search = useSearch({ strict: false }) as any
+    const { data: checkout } = useGet<{ id: number; name: string; balance: string }>(CHECKOUT_MAIN)
+    const { data: driversData } = useGet<DriverRow[]>(DRIVERS_BALANCE)
+    const { data: transactionsData, isLoading: transactionsLoading } = useGet<ListResponse<Transaction>>(
+        TRANSACTIONS,
+        { params: { page: search.page, page_size: search.page_size } },
+    )
+    const drivers = driversData ?? []
+
+    const driversTotal = useMemo(
+        () =>
+            drivers.reduce(
+                (sum, d) => sum + Number(d.balance || 0),
+                0,
+            ),
+        [drivers],
+    )
+
+    const handleDriverClick = (driver: DriverRow) => {
+        if (!driver.id) return
+        navigate({
+            to: "/manager-trips/$id",
+            params: { id: driver.id.toString() },
+            search: {
+                driver_id: driver.id,
+                name: driver.full_name,
+            } as any,
+        })
+    }
 
     return (
-        <div className="flex md:flex-row flex-col w-full gap-3">
+        <div className="flex md:flex-row flex-col w-full gap-3 md:items-start">
             {/* Left sidebar */}
-            <div className="space-y-3 md:max-w-sm w-full">
+            <div className="md:max-w-sm md:min-w-sm w-full md:sticky md:top-0 shrink-0">
                 <Card className="bg-muted/60">
                     <CardHeader className="space-y-0">
                         <CardTitle className="font-medium text-lg">
@@ -124,13 +130,13 @@ const Kassa = () => {
                         </CardTitle>
                         <span>
                             <span className="text-xl font-semibold">
-                                {formatMoney(172987400)}
+                                {formatMoney(Number(checkout?.balance ?? 0))}
                             </span>{" "}
                             <span className="text-base">so'm</span>
                         </span>
                     </CardHeader>
-                    <CardContent className="pt-0 gap-3 w-full">
-                        <div className="gap-3 mb-2 flex items-center justify-between">
+                    <CardContent className="pt-0 space-y-3">
+                        <div className="gap-3 flex items-center justify-between">
                             <Button
                                 variant="destructive"
                                 type="button"
@@ -144,49 +150,61 @@ const Kassa = () => {
                                 Balans To'ldirish
                             </Button>
                         </div>
-                    </CardContent>
-                </Card>
 
-                <DataTable
-                    numeration
-                    data={fakeAgents}
-                    columns={agentCols}
-                    paginationProps={{ totalPages: 1 }}
-                />
-
-                <Card className="overflow-hidden relative bg-muted/60">
-                    <CardHeader className="text-base sm:text-lg font-medium pb-0">
-                        Balans ma'lumotlari
-                    </CardHeader>
-                    <CardContent className="space-y-2 pt-1">
-                        <div className="flex items-center justify-between">
-                            <p className="max-w-[50%] text-muted-foreground">
-                                Reyslar
+                        <div className="border-t pt-3">
+                            <p className="text-sm text-muted-foreground">
+                                Haydovchilar balansi
                             </p>
-                            <span>0 so'm</span>
+                            <p className="text-xl font-semibold mt-0.5">
+                                {formatMoney(driversTotal)} so'm
+                            </p>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <p className="max-w-[50%] text-muted-foreground">
-                                Agentlar:
+
+                        <div className="border-t pt-3">
+                            <p className="text-sm font-medium text-muted-foreground mb-2">
+                                Batafsil
                             </p>
-                            <span>0 so'm</span>
+                            <div className="space-y-1">
+                                {drivers.map((driver, i) => (
+                                    <div
+                                        key={driver.id}
+                                        onClick={() => handleDriverClick(driver)}
+                                        className="flex items-center justify-between py-1.5 px-2 rounded-md hover:bg-muted/80 transition-colors cursor-pointer"
+                                    >
+                                        <span className="text-sm flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground w-4 text-right">
+                                                {i + 1}
+                                            </span>
+                                            {driver.full_name}
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            {driver.balance} so'm
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Right table */}
-            <div className="w-full">
+            <div className="w-full min-w-0 overflow-x-auto">
                 <DataTable
                     numeration
+                    loading={transactionsLoading}
                     columns={transactionCols}
-                    data={fakeTransactions}
-                    paginationProps={{ totalPages: 1 }}
+                    data={transactionsData?.results}
+                    paginationProps={{
+                        totalPages: transactionsData?.total_pages,
+                        paramName: "page",
+                        pageSizeParamName: "page_size",
+                    }}
                     head={
                         <div className="flex justify-between items-center gap-3 mb-3">
                             <div className="flex items-center gap-2">
                                 <h1 className="text-lg">Kiritilgan summa</h1>
-                                <Badge>{fakeTransactions.length}</Badge>
+                                <Badge>{formatMoney(transactionsData?.count)}</Badge>
                             </div>
                         </div>
                     }

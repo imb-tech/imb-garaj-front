@@ -137,7 +137,20 @@ export const useColumnsManagersTrips = (opts?: {
                 id: "actions",
                 header: " ",
                 cell: ({ row }) => (
-                    <div className="flex items-center justify-center gap-3 py-2">
+                    <div className="flex items-center justify-end gap-2 py-2">
+                        {!row.original.end && (
+                            <Button
+                                size="sm"
+                                className="bg-green-500/10 text-green-600 hover:bg-green-500/15"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleFinished(row.original)
+                                }}
+                            >
+                                <CheckCircle size={14} />
+                                Tugatish
+                            </Button>
+                        )}
                         <Button
                             icon={<HandCoins className="text-blue-500" size={16} />}
                             size="sm"
@@ -168,19 +181,6 @@ export const useColumnsManagersTrips = (opts?: {
                                 onDelete?.(row.original)
                             }}
                         />
-                        {!row.original.end && (
-                            <Button
-                                variant="outline"
-                                className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100 hover:text-green-700 h-8 px-3"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleFinished(row.original)
-                                }}
-                            >
-                                <CheckCircle size={14} />
-                                Tugatish
-                            </Button>
-                        )}
                     </div>
                 ),
             },
