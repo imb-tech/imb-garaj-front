@@ -44,9 +44,11 @@ type FinanceRow = {
 }
 
 type Category = {
-    id: number
+    id?: number
     name: string
     amount?: number
+    total_amount?: number
+    code?: string | null
 }
 
 // ──── Category tabs component ────
@@ -60,7 +62,7 @@ function CategoryTabs({
 }: {
     categories: Category[]
     selectedId: number | null
-    onSelect: (id: number) => void
+    onSelect: (cat: Category) => void
     onAdd: () => void
     prefix?: string
 }) {
@@ -71,7 +73,7 @@ function CategoryTabs({
                 return (
                     <div
                         key={`${prefix}-${cat.id ?? idx}`}
-                        onClick={() => onSelect(cat.id)}
+                        onClick={() => onSelect(cat)}
                         className={cn(
                             "px-4 py-3 min-w-36 rounded-md text-center cursor-pointer transition-colors shrink-0",
                             isActive
@@ -80,7 +82,7 @@ function CategoryTabs({
                         )}
                     >
                         <p className="text-sm">{cat.name}</p>
-                        <p className="font-semibold">{formatMoney(cat.amount ?? 0)}</p>
+                        <p className="font-semibold">{formatMoney(cat.total_amount ?? cat.amount ?? 0)}</p>
                     </div>
                 )
             })}
@@ -140,11 +142,11 @@ function AddCategoryForm({ flowType, modalKey = "add-category" }: { flowType: 1 
 
 function AddFinanceForm({
     type,
-    categoryId,
+    categoryName,
     isFuel,
 }: {
     type: "tushum" | "xarajat"
-    categoryId: number | null
+    categoryName: string
     isFuel: boolean
 }) {
     const { closeModal } = useModal("kirim-xarajat-add")
@@ -288,7 +290,7 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
 
 // ──── Tab content components ────
 
-function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (id: number | null, name?: string) => void }) {
+function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (name: string | null) => void }) {
     const { setData } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
     const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-delete`)
@@ -299,19 +301,19 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
         { params: { page_size: 100, action: 1, trip_id: tripId } },
     )
     const categories = categoriesData?.results ?? []
-    const [selectedCat, setSelectedCat] = useState<number | null>(null)
+    const [selectedCatId, setSelectedCatId] = useState<number | null>(null)
 
     useEffect(() => {
-        if (categories.length > 0 && !categories.some((c) => c.id === selectedCat)) {
+        if (categories.length > 0 && !categories.some((c) => c.id === selectedCatId)) {
             const first = categories[0]
-            setSelectedCat(first.id)
-            onCategoryChange(first.id, first.name)
+            setSelectedCatId(first.id ?? null)
+            onCategoryChange(first.name)
         }
     }, [categoriesData])
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_EXPENSES,
-        { params: { trip: tripId, category: selectedCat, action: 1, page_size: 100 } },
+        { params: { trip: tripId, category: selectedCatId, action: 1, page_size: 100 } },
     )
     const rows = expensesData?.results ?? []
 
@@ -326,10 +328,9 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
 
     const columns = useIncomeCols({ onEdit: handleEdit, onDelete: handleDelete })
 
-    const handleSelect = (id: number) => {
-        setSelectedCat(id)
-        const cat = categories.find((c) => c.id === id)
-        onCategoryChange(id, cat?.name)
+    const handleSelect = (cat: Category) => {
+        setSelectedCatId(cat.id ?? null)
+        onCategoryChange(cat.name)
     }
 
     const handleAdd = () => {
@@ -342,7 +343,7 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
                 <CategoryTabs
                     prefix="income"
                     categories={categories}
-                    selectedId={selectedCat}
+                    selectedId={selectedCatId}
                     onSelect={handleSelect}
                     onAdd={openAddCategory}
                 />
@@ -380,7 +381,7 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
     )
 }
 
-function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (id: number | null, name?: string) => void }) {
+function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (name: string | null) => void }) {
     const { setData } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
     const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-xarajat-delete`)
@@ -391,19 +392,19 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
         { params: { page_size: 100, action: -1, trip_id: tripId } },
     )
     const categories = categoriesData?.results ?? []
-    const [selectedCat, setSelectedCat] = useState<number | null>(null)
+    const [selectedCatId, setSelectedCatId] = useState<number | null>(null)
 
     useEffect(() => {
-        if (categories.length > 0 && !categories.some((c) => c.id === selectedCat)) {
+        if (categories.length > 0 && !categories.some((c) => c.id === selectedCatId)) {
             const first = categories[0]
-            setSelectedCat(first.id)
-            onCategoryChange(first.id, first.name)
+            setSelectedCatId(first.id ?? null)
+            onCategoryChange(first.name)
         }
     }, [categoriesData])
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_EXPENSES,
-        { params: { trip: tripId, category: selectedCat, action: -1, page_size: 100 } },
+        { params: { trip: tripId, category: selectedCatId, action: -1, page_size: 100 } },
     )
     const rows = expensesData?.results ?? []
 
@@ -418,10 +419,9 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
 
     const columns = useExpenseCols({ onEdit: handleEdit, onDelete: handleDelete })
 
-    const handleSelect = (id: number) => {
-        setSelectedCat(id)
-        const cat = categories.find((c) => c.id === id)
-        onCategoryChange(id, cat?.name)
+    const handleSelect = (cat: Category) => {
+        setSelectedCatId(cat.id ?? null)
+        onCategoryChange(cat.name)
     }
 
     const handleAdd = () => {
@@ -434,7 +434,7 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
                 <CategoryTabs
                     prefix="expense"
                     categories={categories}
-                    selectedId={selectedCat}
+                    selectedId={selectedCatId}
                     onSelect={handleSelect}
                     onAdd={openAddCategory}
                 />
@@ -868,14 +868,12 @@ export default function KirimXarajatContent() {
 
     const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">("tushum")
     const [tAccountMode, setTAccountMode] = useState<"aylanma" | "haydovchi">("aylanma")
-    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
     const [selectedCategoryName, setSelectedCategoryName] = useState<string>("")
 
     const isFuel = currentType === "xarajat" && /yoqilg['ʻ']i|fuel|solyarka|metan|dizel|benzin/i.test(selectedCategoryName)
 
-    const handleCategoryChange = (id: number | null, name?: string) => {
-        setSelectedCategoryId(id)
-        if (name) setSelectedCategoryName(name)
+    const handleCategoryChange = (name: string | null) => {
+        setSelectedCategoryName(name ?? "")
     }
 
     return (
@@ -885,7 +883,6 @@ export default function KirimXarajatContent() {
                 className="shrink-0"
                 onValueChange={(val) => {
                     setCurrentType(val as "tushum" | "xarajat" | "t_hisob")
-                    setSelectedCategoryId(null)
                     setSelectedCategoryName("")
                 }}
                 options={[
@@ -914,7 +911,7 @@ export default function KirimXarajatContent() {
             >
                 <AddFinanceForm
                     type={currentType as "tushum" | "xarajat"}
-                    categoryId={selectedCategoryId}
+                    categoryName={selectedCategoryName}
                     isFuel={isFuel}
                 />
             </Modal>
