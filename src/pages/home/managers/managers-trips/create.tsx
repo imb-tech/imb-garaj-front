@@ -70,31 +70,29 @@ export default function CreateManagerTrips() {
 
     function onSubmit(values: any) {
         const formData = new FormData()
-        formData.append("start_mileage", String(values.start_mileage))
         formData.append("start", values.start)
         formData.append("driver", String(values.driver))
         formData.append("vehicle", String(values.vehicle))
 
+        if (values.start_mileage != null) {
+            formData.append("start_mileage", String(values.start_mileage))
+        }
         if (values.start_fuel != null) {
             formData.append("start_fuel", String(values.start_fuel))
-        }
-        if (values.advance != null) {
-            formData.append("advance", String(values.advance))
         }
         if (values.end_mileage != null) {
             formData.append("end_mileage", String(values.end_mileage))
         }
+        if (values.end_fuel != null) {
+            formData.append("end_fuel", String(values.end_fuel))
+        }
         if (values.end != null) {
             formData.append("end", values.end)
-        }
-        if (values.fuel_consume != null) {
-            formData.append("fuel_consume", String(values.fuel_consume))
         }
 
         if (values.start_mileage_image instanceof File) {
             formData.append("start_mileage_image", values.start_mileage_image)
         }
-
         if (values.end_mileage_image instanceof File) {
             formData.append("end_mileage_image", values.end_mileage_image)
         }
@@ -157,22 +155,12 @@ export default function CreateManagerTrips() {
                 :   null}
 
                 {!item?.id && (
-                    <>
-                        <FormNumberInput
-                            name="start_fuel"
-                            label="Bakdagi yoqilg'i (litr)"
-                            control={control}
-                            decimalScale={2}
-                        />
-                        <FormNumberInput
-                            name="advance"
-                            label="Avans"
-                            control={control}
-                            thousandSeparator=" "
-                            decimalScale={0}
-                            placeholder="Ex: 5 000 000"
-                        />
-                    </>
+                    <FormNumberInput
+                        name="start_fuel"
+                        label="Bakdagi yoqilg'i (litr)"
+                        control={control}
+                        decimalScale={2}
+                    />
                 )}
 
                 {item?.id && (
@@ -215,10 +203,10 @@ export default function CreateManagerTrips() {
                         :   null}
 
                         <FormNumberInput
-                            name="fuel_consume"
-                            label="Yoqilg'i"
-                            required
+                            name="end_fuel"
+                            label="Bakdagi yoqilg'i (litr)"
                             control={control}
+                            decimalScale={2}
                         />
 
                         <FormDatePicker

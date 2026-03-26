@@ -19,8 +19,9 @@ import { useModal } from "@/hooks/useModal"
 import { toast } from "sonner"
 import { useGet } from "@/hooks/useGet"
 import { usePost } from "@/hooks/usePost"
+import { usePatch } from "@/hooks/usePatch"
 import { useGlobalStore } from "@/store/global-store"
-import { MANAGERS_EXPENSE_CATEGORIES, MANAGERS_EXPENSES, MANAGERS_TRIPS, SETTINGS_EXPENSES } from "@/constants/api-endpoints"
+import { MANAGERS_CASHFLOW, MANAGERS_EXPENSE_CATEGORIES, MANAGERS_EXPENSES, MANAGERS_TRIPS, SETTINGS_EXPENSES, SETTINTS_PAYMENT_TYPE } from "@/constants/api-endpoints"
 import { useQueryClient } from "@tanstack/react-query"
 import FormInput from "@/components/form/input"
 
@@ -100,7 +101,7 @@ function CategoryTabs({
 
 // ──── Add category form ────
 
-function AddCategoryForm({ flowType, modalKey = "add-category" }: { flowType: 1 | 2; modalKey?: string }) {
+function AddCategoryForm({ flowType, modalKey = "add-category" }: { flowType: 1 | -1; modalKey?: string }) {
     const { closeModal } = useModal(modalKey)
     const form = useForm<{ name: string }>()
     const { handleSubmit, control, reset } = form
@@ -144,23 +145,95 @@ function AddFinanceForm({
     type,
     categoryName,
     isFuel,
+    tripId,
+    selectedCategoryId,
+    action,
 }: {
     type: "tushum" | "xarajat"
     categoryName: string
     isFuel: boolean
+    tripId?: number
+    selectedCategoryId: number | null
+    action: 1 | -1
 }) {
     const { closeModal } = useModal("kirim-xarajat-add")
-    const form = useForm()
+    const { getData, clearKey } = useGlobalStore()
+    const queryClient = useQueryClient()
+    const editItem = getData(MANAGERS_EXPENSES) as FinanceRow | undefined
+    const isEdit = !!editItem?.id
+
+    const form = useForm({
+        defaultValues: {
+            amount: editItem?.amount ?? "",
+            quantity: editItem?.quantity ?? "",
+            payment_type: editItem?.payment_type ?? "",
+            comment: editItem?.comment ?? "",
+            receipt: null as any,
+        },
+    })
     const { handleSubmit, control, reset } = form
 
-    const onSubmit = () => {
-        toast.success(
-            type === "tushum"
+    const { data: paymentTypes } = useGet(SETTINTS_PAYMENT_TYPE, {
+        params: { page_size: 100000 },
+    })
+
+    const { mutate: postMutate, isPending: isPosting } = usePost()
+    const { mutate: patchMutate, isPending: isPatching } = usePatch()
+    const isPending = isPosting || isPatching
+
+    useEffect(() => {
+        if (editItem?.id) {
+            reset({
+                amount: editItem.amount ?? "",
+                quantity: editItem.quantity ?? "",
+                payment_type: editItem.payment_type ?? "",
+                comment: editItem.comment ?? "",
+                receipt: null,
+            })
+        } else {
+            reset({
+                amount: "",
+                quantity: "",
+                payment_type: "",
+                comment: "",
+                receipt: null,
+            })
+        }
+    }, [editItem?.id, reset])
+
+    const handleSuccess = () => {
+        const msg = isEdit
+            ? "Muvaffaqiyatli yangilandi"
+            : type === "tushum"
                 ? "Tushum muvaffaqiyatli qo'shildi"
-                : "Xarajat muvaffaqiyatli qo'shildi",
-        )
+                : "Xarajat muvaffaqiyatli qo'shildi"
+        toast.success(msg)
+        queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW] })
+        queryClient.invalidateQueries({ queryKey: [MANAGERS_EXPENSE_CATEGORIES] })
+        clearKey(MANAGERS_EXPENSES)
         reset()
         closeModal()
+    }
+
+    const onSubmit = (data: any) => {
+        const payload = {
+            trip: tripId ?? null,
+            amount: Number(data.amount),
+            category: selectedCategoryId,
+            comment: data.comment || null,
+            payment_type: data.payment_type || null,
+            quantity: data.quantity ? String(data.quantity) : null,
+        }
+
+        if (isEdit) {
+            patchMutate(`${MANAGERS_EXPENSES}/${editItem.id}`, payload, {
+                onSuccess: handleSuccess,
+            })
+        } else {
+            postMutate(MANAGERS_CASHFLOW, payload, {
+                onSuccess: handleSuccess,
+            })
+        }
     }
 
     return (
@@ -184,17 +257,25 @@ function AddFinanceForm({
                     decimalScale={2}
                 />
             )}
-            <FormTextarea required label="Izoh" methods={form} name="body" />
+            <FormCombobox
+                control={control}
+                label="To'lov turi"
+                name="payment_type"
+                options={paymentTypes?.results ?? []}
+                valueKey="id"
+                labelKey="name"
+            />
+            <FormTextarea required label="Izoh" methods={form} name="comment" />
             <FileUpload
                 control={control}
-                name="cheque"
+                name="receipt"
                 multiple={false}
                 isPaste={false}
                 hideClearable={true}
                 label="Chek (ixtiyoriy)"
             />
-            <Button className="w-full" type="submit">
-                Saqlash
+            <Button className="w-full" type="submit" disabled={isPending}>
+                {isPending ? "Saqlanmoqda..." : "Saqlash"}
             </Button>
         </form>
     )
@@ -245,7 +326,7 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
     )
 }
 
-const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: (item: FinanceRow) => void }) => {
+const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: (item: FinanceRow) => void; isFuel?: boolean }) => {
     return useMemo<ColumnDef<FinanceRow>[]>(
         () => [
             { header: "Izoh", accessorKey: "comment", enableSorting: true },
@@ -259,6 +340,15 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
                     </span>
                 ),
             },
+            ...(opts?.isFuel ? [{
+                header: "Miqdori (litr)",
+                accessorKey: "quantity",
+                enableSorting: true,
+                cell: ({ row }: { row: any }) => {
+                    const q = row.original.quantity
+                    return q ? <span className="font-medium">{q}</span> : <span className="text-muted-foreground">—</span>
+                },
+            }] : []),
             { header: "Kategoriya", accessorKey: "category_name", enableSorting: true },
             { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
             {
@@ -284,14 +374,14 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
                 ),
             },
         ],
-        [opts?.onEdit, opts?.onDelete],
+        [opts?.onEdit, opts?.onDelete, opts?.isFuel],
     )
 }
 
 // ──── Tab content components ────
 
-function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (name: string | null) => void }) {
-    const { setData } = useGlobalStore()
+function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: number; onCategoryChange: (name: string | null) => void; onCategoryIdChange: (id: number | null) => void }) {
+    const { setData, clearKey } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
     const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-delete`)
     const { openModal: openAddCategory } = useModal("add-category")
@@ -308,11 +398,12 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
             const first = categories[0]
             setSelectedCatId(first.id ?? null)
             onCategoryChange(first.name)
+            onCategoryIdChange(first.id ?? null)
         }
     }, [categoriesData])
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
-        MANAGERS_EXPENSES,
+        MANAGERS_CASHFLOW,
         { params: { trip: tripId, category: selectedCatId, action: 1, page_size: 100 } },
     )
     const rows = expensesData?.results ?? []
@@ -331,9 +422,11 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
     const handleSelect = (cat: Category) => {
         setSelectedCatId(cat.id ?? null)
         onCategoryChange(cat.name)
+        onCategoryIdChange(cat.id ?? null)
     }
 
     const handleAdd = () => {
+        clearKey(MANAGERS_EXPENSES)
         openModal()
     }
 
@@ -372,7 +465,7 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
                 path={MANAGERS_EXPENSES}
                 id={useGlobalStore.getState().getData(MANAGERS_EXPENSES)?.id}
                 modalKey={`${MANAGERS_EXPENSES}-delete`}
-                refetchKeys={[MANAGERS_EXPENSES]}
+                refetchKeys={[MANAGERS_CASHFLOW]}
             />
             <Modal modalKey="add-category" title="Kategoriya qo'shish" size="max-w-sm">
                 <AddCategoryForm flowType={1} />
@@ -381,8 +474,8 @@ function IncomeTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryCh
     )
 }
 
-function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryChange: (name: string | null) => void }) {
-    const { setData } = useGlobalStore()
+function ExpenseTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: number; onCategoryChange: (name: string | null) => void; onCategoryIdChange: (id: number | null) => void }) {
+    const { setData, clearKey } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
     const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-xarajat-delete`)
     const { openModal: openAddCategory } = useModal("add-category-expense")
@@ -399,11 +492,12 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
             const first = categories[0]
             setSelectedCatId(first.id ?? null)
             onCategoryChange(first.name)
+            onCategoryIdChange(first.id ?? null)
         }
     }, [categoriesData])
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
-        MANAGERS_EXPENSES,
+        MANAGERS_CASHFLOW,
         { params: { trip: tripId, category: selectedCatId, action: -1, page_size: 100 } },
     )
     const rows = expensesData?.results ?? []
@@ -417,14 +511,18 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
         openDeleteModal()
     }
 
-    const columns = useExpenseCols({ onEdit: handleEdit, onDelete: handleDelete })
+    const selectedCatName = categories.find((c) => c.id === selectedCatId)?.name ?? ""
+    const isFuel = /yoqilg['ʻ']i|fuel|solyarka|metan|dizel|benzin/i.test(selectedCatName)
+    const columns = useExpenseCols({ onEdit: handleEdit, onDelete: handleDelete, isFuel })
 
     const handleSelect = (cat: Category) => {
         setSelectedCatId(cat.id ?? null)
         onCategoryChange(cat.name)
+        onCategoryIdChange(cat.id ?? null)
     }
 
     const handleAdd = () => {
+        clearKey(MANAGERS_EXPENSES)
         openModal()
     }
 
@@ -463,10 +561,10 @@ function ExpenseTab({ tripId, onCategoryChange }: { tripId?: number; onCategoryC
                 path={MANAGERS_EXPENSES}
                 id={useGlobalStore.getState().getData(MANAGERS_EXPENSES)?.id}
                 modalKey={`${MANAGERS_EXPENSES}-xarajat-delete`}
-                refetchKeys={[MANAGERS_EXPENSES]}
+                refetchKeys={[MANAGERS_CASHFLOW]}
             />
             <Modal modalKey="add-category-expense" title="Kategoriya qo'shish" size="max-w-sm">
-                <AddCategoryForm flowType={2} modalKey="add-category-expense" />
+                <AddCategoryForm flowType={-1} modalKey="add-category-expense" />
             </Modal>
         </div>
     )
@@ -869,11 +967,17 @@ export default function KirimXarajatContent() {
     const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">("tushum")
     const [tAccountMode, setTAccountMode] = useState<"aylanma" | "haydovchi">("aylanma")
     const [selectedCategoryName, setSelectedCategoryName] = useState<string>("")
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
     const isFuel = currentType === "xarajat" && /yoqilg['ʻ']i|fuel|solyarka|metan|dizel|benzin/i.test(selectedCategoryName)
+    const action = currentType === "tushum" ? 1 : -1
 
     const handleCategoryChange = (name: string | null) => {
         setSelectedCategoryName(name ?? "")
+    }
+
+    const handleCategoryIdChange = (id: number | null) => {
+        setSelectedCategoryId(id)
     }
 
     return (
@@ -884,17 +988,18 @@ export default function KirimXarajatContent() {
                 onValueChange={(val) => {
                     setCurrentType(val as "tushum" | "xarajat" | "t_hisob")
                     setSelectedCategoryName("")
+                    setSelectedCategoryId(null)
                 }}
                 options={[
                     {
                         value: "tushum",
                         label: "Tushum",
-                        content: <IncomeTab tripId={tripId} onCategoryChange={handleCategoryChange} />,
+                        content: <IncomeTab tripId={tripId} onCategoryChange={handleCategoryChange} onCategoryIdChange={handleCategoryIdChange} />,
                     },
                     {
                         value: "xarajat",
                         label: "Xarajat",
-                        content: <ExpenseTab tripId={tripId} onCategoryChange={handleCategoryChange} />,
+                        content: <ExpenseTab tripId={tripId} onCategoryChange={handleCategoryChange} onCategoryIdChange={handleCategoryIdChange} />,
                     },
                     {
                         value: "t_hisob",
@@ -913,6 +1018,9 @@ export default function KirimXarajatContent() {
                     type={currentType as "tushum" | "xarajat"}
                     categoryName={selectedCategoryName}
                     isFuel={isFuel}
+                    tripId={tripId}
+                    selectedCategoryId={selectedCategoryId}
+                    action={action as 1 | -1}
                 />
             </Modal>
         </div>

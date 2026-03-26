@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
+import { MANAGERS_CASHFLOW, MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
@@ -40,7 +40,7 @@ export default function ManagersTrips() {
         },
     )
     const currentItem = getData("expense-id")
-    const { data: expenses } = useGet(MANAGERS_EXPENSES, {
+    const { data: expenses } = useGet(MANAGERS_CASHFLOW, {
         params: {
             trip: currentItem?.id,
             page_size: search.page_size,

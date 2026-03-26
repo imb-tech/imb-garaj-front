@@ -124,7 +124,6 @@ export const useItems = () =>
                 label: "Moliya",
                 icon: <Coins width={18} />,
                 path: "/moliya",
-                pending: true,
             },
             {
                 label: "Monitoring",
