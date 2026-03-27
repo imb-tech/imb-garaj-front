@@ -9,8 +9,6 @@ export interface MenuItem {
     path: string
     items?: MenuItem[]
     pending?: boolean
-    /** Additional path prefixes that should match this item's group */
-    extraPaths?: string[]
 }
 
 const filterMenuItems = (
