@@ -16,6 +16,7 @@ import { FormDatePicker } from "@/components/form/date-picker"
 import FormTextarea from "@/components/form/textarea"
 import FileUpload from "@/components/form/file-upload"
 import { useModal } from "@/hooks/useModal"
+import { useSearch } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useGet } from "@/hooks/useGet"
 import { usePost } from "@/hooks/usePost"
@@ -30,6 +31,9 @@ import FormInput from "@/components/form/input"
 type FinanceRow = {
     id: number
     trip: number | null
+    order: number | null
+    loading_name: string | null
+    unloading_name: string | null
     amount: number
     executor: number
     executor_name: string
@@ -289,6 +293,16 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
         () => [
             { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
+                header: "Yuklash",
+                accessorKey: "loading_name",
+                cell: ({ row }) => row.original.order ? <span>{row.original.loading_name || "-"}</span> : null,
+            },
+            {
+                header: "Tushirish",
+                accessorKey: "unloading_name",
+                cell: ({ row }) => row.original.order ? <span>{row.original.unloading_name || "-"}</span> : null,
+            },
+            {
                 header: "Summa",
                 accessorKey: "amount",
                 enableSorting: true,
@@ -298,7 +312,6 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
                     </span>
                 ),
             },
-            { header: "Kategoriya", accessorKey: "category_name", enableSorting: true },
             { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
             {
                 id: "actions",
@@ -332,6 +345,16 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
         () => [
             { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
+                header: "Yuklash",
+                accessorKey: "loading_name",
+                cell: ({ row }) => row.original.order ? <span>{row.original.loading_name || "-"}</span> : null,
+            },
+            {
+                header: "Tushirish",
+                accessorKey: "unloading_name",
+                cell: ({ row }) => row.original.order ? <span>{row.original.unloading_name || "-"}</span> : null,
+            },
+            {
                 header: "Summa",
                 accessorKey: "amount",
                 enableSorting: true,
@@ -350,7 +373,6 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
                     return q ? <span className="font-medium">{q}</span> : <span className="text-muted-foreground">—</span>
                 },
             }] : []),
-            { header: "Kategoriya", accessorKey: "category_name", enableSorting: true },
             { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
             {
                 id: "actions",
@@ -920,6 +942,11 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
                                         </span>
                                         <div className="min-w-0">
                                             <p className="text-sm font-medium truncate">{row.category_name}</p>
+                                            {row.order && (
+                                                <p className="text-xs text-muted-foreground truncate">
+                                                    {row.loading_name} → {row.unloading_name}
+                                                </p>
+                                            )}
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 {row.comment && <span className="text-xs text-muted-foreground">{row.comment}</span>}
                                                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted">
@@ -952,6 +979,11 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
                                         </span>
                                         <div className="min-w-0">
                                             <p className="text-sm font-medium truncate">{row.category_name}</p>
+                                            {row.order && (
+                                                <p className="text-xs text-muted-foreground truncate">
+                                                    {row.loading_name} → {row.unloading_name}
+                                                </p>
+                                            )}
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 {row.comment && <span className="text-xs text-muted-foreground">{row.comment}</span>}
                                                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted">
@@ -986,8 +1018,9 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
 
 export default function KirimXarajatContent() {
     const { getData } = useGlobalStore()
+    const search = useSearch({ strict: false }) as any
     const tripItem = getData(`${MANAGERS_TRIPS}-moliya`)
-    const tripId = tripItem?.id
+    const tripId = tripItem?.id ?? search.moliya_trip_id
 
     const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">("tushum")
     const [tAccountMode, setTAccountMode] = useState<"aylanma" | "haydovchi">("aylanma")

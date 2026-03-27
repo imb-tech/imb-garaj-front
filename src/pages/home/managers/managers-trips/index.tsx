@@ -29,13 +29,18 @@ export default function ManagersTrips() {
     const { openModal: editTripModal } = useModal(`${MANAGERS_TRIPS}-finished`)
     const { openModal: createExpenses } = useModal(MANAGERS_EXPENSES)
     const { openModal: deleteTrip } = useModal(`${MANAGERS_TRIPS}-delete`)
-    const [moliyaOpen, setMoliyaOpen] = useState(false)
     const [isArchive, setIsArchive] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams({ strict: false })
     const { name } = useSearch({ strict: false }) as any
     const { driver_id } = useSearch({ strict: false }) as any
-    const { from_date, to_date } = search as any
+    const { from_date, to_date, moliya_trip_id } = search as any
+    const moliyaOpen = !!moliya_trip_id
+    const setMoliyaOpen = (open: boolean) => {
+        if (!open) {
+            navigate({ search: (prev: any) => { const { moliya_trip_id, ...rest } = prev; return rest } } as any)
+        }
+    }
     const { data, isLoading } = useGet<ListResponse<ManagerTrips>>(
         MANAGERS_TRIPS,
         {
@@ -99,7 +104,7 @@ export default function ManagersTrips() {
     }
     const handleMoliya = (item: ManagerTrips) => {
         setData(`${MANAGERS_TRIPS}-moliya`, item)
-        setMoliyaOpen(true)
+        navigate({ search: (prev: any) => ({ ...prev, moliya_trip_id: item.id }) } as any)
     }
     const cols = useColumnsManagersTrips({
         onMoliya: handleMoliya,
@@ -113,6 +118,7 @@ export default function ManagersTrips() {
                 numeration
                 data={data?.results}
                 columns={cols}
+                viewAll={!isArchive}
                 {...(isArchive ? {
                     paginationProps: {
                         totalPages: data?.total_pages,
