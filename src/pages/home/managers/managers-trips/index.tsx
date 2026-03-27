@@ -1,9 +1,12 @@
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { InlineBreadcrumb } from "@/components/header/breadcrumbs"
+import ParamDateRange from "@/components/as-params/date-picker-range"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { MANAGERS_CASHFLOW, MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -27,15 +30,21 @@ export default function ManagersTrips() {
     const { openModal: createExpenses } = useModal(MANAGERS_EXPENSES)
     const { openModal: deleteTrip } = useModal(`${MANAGERS_TRIPS}-delete`)
     const [moliyaOpen, setMoliyaOpen] = useState(false)
+    const [isArchive, setIsArchive] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams({ strict: false })
     const { name } = useSearch({ strict: false }) as any
     const { driver_id } = useSearch({ strict: false }) as any
+    const { from_date, to_date } = search as any
     const { data, isLoading } = useGet<ListResponse<ManagerTrips>>(
         MANAGERS_TRIPS,
         {
             params: {
                 ...(driver_id ? { driver_id } : { vehicle: id }),
+                ...(!isArchive ? { page_size: 2 } : {}),
+                ...(isArchive && from_date ? { from_date } : {}),
+                ...(isArchive && to_date ? { to_date } : {}),
+                ...(isArchive ? { page_size: search.page_size, page: search.page } : {}),
             },
         },
     )
@@ -104,11 +113,13 @@ export default function ManagersTrips() {
                 numeration
                 data={data?.results}
                 columns={cols}
-                paginationProps={{
-                    totalPages: data?.total_pages,
-                    paramName: "page",
-                    pageSizeParamName: "page_size",
-                }}
+                {...(isArchive ? {
+                    paginationProps: {
+                        totalPages: data?.total_pages,
+                        paramName: "page",
+                        pageSizeParamName: "page_size",
+                    },
+                } : {})}
                 onRowClick={handleRowClick}
                 head={
                     <div className="mb-4">
@@ -124,10 +135,26 @@ export default function ManagersTrips() {
                                     }
                                 />
                             </div>
-                            <Button onClick={handleAdd} disabled={hasOngoingTrip}>
-                                <Plus size={16} />
-                                Boshlash
-                            </Button>
+                            <div className="flex items-center gap-3">
+                                {isArchive && (
+                                    <ParamDateRange
+                                        from="from_date"
+                                        to="to_date"
+                                    />
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="archive-switch" className="text-sm cursor-pointer">Arxiv</Label>
+                                    <Switch
+                                        id="archive-switch"
+                                        checked={isArchive}
+                                        onCheckedChange={setIsArchive}
+                                    />
+                                </div>
+                                <Button onClick={handleAdd} disabled={hasOngoingTrip}>
+                                    <Plus size={16} />
+                                    Boshlash
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 }

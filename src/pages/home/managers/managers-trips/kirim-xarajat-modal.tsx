@@ -223,6 +223,7 @@ function AddFinanceForm({
             comment: data.comment || null,
             payment_type: data.payment_type || null,
             quantity: data.quantity ? String(data.quantity) : null,
+            action,
         }
 
         if (isEdit) {
@@ -628,10 +629,12 @@ const paymentMethodLabels: Record<TAccountRow["payment_method"], string> = {
 
 // ──── Avans form ────
 
-function AvansForm() {
+function AvansForm({ tripId }: { tripId?: number }) {
     const { closeModal } = useModal("avans-berish")
     const form = useForm()
     const { handleSubmit, control, reset } = form
+    const { mutate, isPending } = usePost()
+    const queryClient = useQueryClient()
 
     const paymentOptions = [
         { id: "naqd", name: "Naqd" },
@@ -639,10 +642,24 @@ function AvansForm() {
         { id: "perechisleniya", name: "Perechisleniya" },
     ]
 
-    const onSubmit = () => {
-        toast.success("Avans muvaffaqiyatli berildi")
-        reset()
-        closeModal()
+    const onSubmit = (data: any) => {
+        mutate(MANAGERS_CASHFLOW, {
+            trip: tripId ?? null,
+            amount: Number(data.amount),
+            payment_type: data.payment_type || null,
+            comment: data.comment || null,
+            date: data.date || null,
+            action: 2,
+        }, {
+            onSuccess: () => {
+                toast.success("Avans muvaffaqiyatli berildi")
+                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW] })
+                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW_TRIP_STAT] })
+                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW_DRIVER_STAT] })
+                reset()
+                closeModal()
+            },
+        })
     }
 
     return (
@@ -672,8 +689,8 @@ function AvansForm() {
                 name="date"
             />
             <FormTextarea label="Izoh" methods={form} name="comment" />
-            <Button className="w-full" type="submit">
-                Saqlash
+            <Button className="w-full" type="submit" disabled={isPending}>
+                {isPending ? "Saqlanmoqda..." : "Saqlash"}
             </Button>
         </form>
     )
@@ -959,7 +976,7 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
             </div>
 
             <Modal modalKey="avans-berish" title="Avans berish" size="max-w-md">
-                <AvansForm />
+                <AvansForm tripId={tripId} />
             </Modal>
         </div>
     )

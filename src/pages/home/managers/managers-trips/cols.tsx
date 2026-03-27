@@ -125,11 +125,19 @@ export const useColumnsManagersTrips = (opts?: {
                 ),
             },
             {
-                accessorKey: "fuel_consume",
-                header: "Yoqilg'i sarfi",
+                accessorKey: "start_fuel",
+                header: "Boshlang'ich yoqilg'i",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <div>{formatMoney(row.original.fuel_consume)}</div>
+                    <div>{formatMoney((row.original as any).start_fuel)}</div>
+                ),
+            },
+            {
+                accessorKey: "end_fuel",
+                header: "Yakuniy yoqilg'i",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <div>{formatMoney((row.original as any).end_fuel)}</div>
                 ),
             },
 
