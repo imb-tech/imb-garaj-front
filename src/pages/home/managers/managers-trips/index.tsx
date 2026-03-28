@@ -60,6 +60,7 @@ export default function ManagersTrips() {
             page_size: search.page_size,
             page: search.page,
         },
+        enabled: !!currentItem?.id,
     })
 
     const item = getData(MANAGERS_TRIPS)

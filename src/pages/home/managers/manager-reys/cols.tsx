@@ -142,5 +142,11 @@ const formatDateSafe = (value?: string) => {
 
     if (isNaN(date.getTime())) return "-"
 
-    return format(date, "yyyy-MM-dd")
+    return (
+        <>
+            {format(date, "yyyy-MM-dd")}
+            <br />
+            {format(date, "HH:mm")}
+        </>
+    )
 }

@@ -157,24 +157,20 @@ export default function CreateManagerTrips() {
                     />
                 :   null}
 
-                {!item?.id && (
-                    <>
-                        <FormNumberInput
-                            name="start_fuel"
-                            label="Bakdagi yoqilg'i (litr)"
-                            control={control}
-                            decimalScale={2}
-                        />
-                        <FormNumberInput
-                            name="advance"
-                            label="Avans"
-                            control={control}
-                            thousandSeparator=" "
-                            decimalScale={0}
-                            placeholder="Ex: 5 000 000"
-                        />
-                    </>
-                )}
+                <FormNumberInput
+                    name="start_fuel"
+                    label="Bakdagi yoqilg'i (litr)"
+                    control={control}
+                    decimalScale={2}
+                />
+                <FormNumberInput
+                    name="advance"
+                    label="Avans"
+                    control={control}
+                    thousandSeparator=" "
+                    decimalScale={0}
+                    placeholder="Ex: 5 000 000"
+                />
 
                 {item?.id && (
                     <>
@@ -224,7 +220,6 @@ export default function CreateManagerTrips() {
 
                         <FormDatePicker
                             name="end"
-                            required
                             fullWidth
                             label="Tugallangan"
                             control={control}

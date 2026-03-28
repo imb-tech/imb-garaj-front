@@ -5,6 +5,7 @@ import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import ParamTabs from "@/components/as-params/tabs"
 import { formatMoney } from "@/lib/format-money"
+import { formatDateTime } from "@/lib/format-date"
 import { cn } from "@/lib/utils"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowLeftRight, Plus, SquarePen, Trash2, Truck, User } from "lucide-react"
@@ -22,7 +23,7 @@ import { useGet } from "@/hooks/useGet"
 import { usePost } from "@/hooks/usePost"
 import { usePatch } from "@/hooks/usePatch"
 import { useGlobalStore } from "@/store/global-store"
-import { MANAGERS_CASHFLOW, MANAGERS_CASHFLOW_DRIVER_STAT, MANAGERS_CASHFLOW_TRIP_STAT, MANAGERS_EXPENSE_CATEGORIES, MANAGERS_EXPENSES, MANAGERS_TRIPS, SETTINGS_EXPENSES, SETTINTS_PAYMENT_TYPE } from "@/constants/api-endpoints"
+import { MANAGERS_CASHFLOW, MANAGERS_CASHFLOW_DRIVER_STAT, MANAGERS_CASHFLOW_TRIP_STAT, MANAGERS_EXPENSE_CATEGORIES, MANAGERS_EXPENSES, MANAGERS_ORDERS, MANAGERS_TRIPS, SETTINGS_EXPENSES, SETTINTS_PAYMENT_TYPE } from "@/constants/api-endpoints"
 import { useQueryClient } from "@tanstack/react-query"
 import FormInput from "@/components/form/input"
 
@@ -151,6 +152,7 @@ function AddFinanceForm({
     isFuel,
     tripId,
     selectedCategoryId,
+    selectedCategoryCode,
     action,
 }: {
     type: "tushum" | "xarajat"
@@ -158,6 +160,7 @@ function AddFinanceForm({
     isFuel: boolean
     tripId?: number
     selectedCategoryId: number | null
+    selectedCategoryCode: string | null
     action: 1 | -1
 }) {
     const { closeModal } = useModal("kirim-xarajat-add")
@@ -166,6 +169,8 @@ function AddFinanceForm({
     const editItem = getData(MANAGERS_EXPENSES) as FinanceRow | undefined
     const isEdit = !!editItem?.id
 
+    const isOrderCategory = type === "tushum" && selectedCategoryCode === "order"
+
     const form = useForm({
         defaultValues: {
             amount: editItem?.amount ?? "",
@@ -173,6 +178,7 @@ function AddFinanceForm({
             payment_type: editItem?.payment_type ?? "",
             comment: editItem?.comment ?? "",
             receipt: null as any,
+            order: editItem?.order ?? "",
         },
     })
     const { handleSubmit, control, reset } = form
@@ -180,6 +186,18 @@ function AddFinanceForm({
     const { data: paymentTypes } = useGet(SETTINTS_PAYMENT_TYPE, {
         params: { page_size: 100000 },
     })
+
+    const { data: ordersData } = useGet<ListResponse<{ id: number; loading_name: string; unloading_name: string }>>(
+        MANAGERS_ORDERS,
+        { params: { trip: tripId, page_size: 100 }, enabled: isOrderCategory && !!tripId },
+    )
+    const orderOptions = useMemo(() =>
+        (ordersData?.results ?? []).map((o) => ({
+            ...o,
+            label: `${o.loading_name} → ${o.unloading_name}`,
+        })),
+        [ordersData],
+    )
 
     const { mutate: postMutate, isPending: isPosting } = usePost()
     const { mutate: patchMutate, isPending: isPatching } = usePatch()
@@ -193,6 +211,7 @@ function AddFinanceForm({
                 payment_type: editItem.payment_type ?? "",
                 comment: editItem.comment ?? "",
                 receipt: null,
+                order: editItem.order ?? "",
             })
         } else {
             reset({
@@ -201,6 +220,7 @@ function AddFinanceForm({
                 payment_type: "",
                 comment: "",
                 receipt: null,
+                order: "",
             })
         }
     }, [editItem?.id, reset])
@@ -212,7 +232,9 @@ function AddFinanceForm({
                 ? "Tushum muvaffaqiyatli qo'shildi"
                 : "Xarajat muvaffaqiyatli qo'shildi"
         toast.success(msg)
-        queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW] })
+        queryClient.invalidateQueries({
+            predicate: (q) => String(q.queryKey[0]).includes("cashflow"),
+        })
         queryClient.invalidateQueries({ queryKey: [MANAGERS_EXPENSE_CATEGORIES] })
         clearKey(MANAGERS_EXPENSES)
         reset()
@@ -220,7 +242,7 @@ function AddFinanceForm({
     }
 
     const onSubmit = (data: any) => {
-        const payload = {
+        const payload: Record<string, any> = {
             trip: tripId ?? null,
             amount: Number(data.amount),
             category: selectedCategoryId,
@@ -228,6 +250,9 @@ function AddFinanceForm({
             payment_type: data.payment_type || null,
             quantity: data.quantity ? String(data.quantity) : null,
             action,
+        }
+        if (isOrderCategory && data.order) {
+            payload.order = data.order
         }
 
         if (isEdit) {
@@ -252,6 +277,18 @@ function AddFinanceForm({
                 thousandSeparator=" "
                 decimalScale={0}
             />
+            {isOrderCategory && (
+                <FormCombobox
+                    required
+                    control={control}
+                    label="Buyurtma"
+                    name="order"
+                    options={orderOptions}
+                    valueKey="id"
+                    labelKey="label"
+                    placeholder="Buyurtmani tanlang"
+                />
+            )}
             {isFuel && (
                 <FormNumberInput
                     required
@@ -312,7 +349,7 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
                     </span>
                 ),
             },
-            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
+            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true, cell: ({ row }) => formatDateTime(row.original.created) },
             {
                 id: "actions",
                 header: " ",
@@ -345,16 +382,6 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
         () => [
             { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
-                header: "Yuklash",
-                accessorKey: "loading_name",
-                cell: ({ row }) => row.original.order ? <span>{row.original.loading_name || "-"}</span> : null,
-            },
-            {
-                header: "Tushirish",
-                accessorKey: "unloading_name",
-                cell: ({ row }) => row.original.order ? <span>{row.original.unloading_name || "-"}</span> : null,
-            },
-            {
                 header: "Summa",
                 accessorKey: "amount",
                 enableSorting: true,
@@ -373,7 +400,7 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
                     return q ? <span className="font-medium">{q}</span> : <span className="text-muted-foreground">—</span>
                 },
             }] : []),
-            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true },
+            { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true, cell: ({ row }) => formatDateTime(row.original.created) },
             {
                 id: "actions",
                 header: " ",
@@ -403,7 +430,7 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
 
 // ──── Tab content components ────
 
-function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: number; onCategoryChange: (name: string | null) => void; onCategoryIdChange: (id: number | null) => void }) {
+function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange, onCategoryCodeChange }: { tripId?: number; onCategoryChange: (name: string | null) => void; onCategoryIdChange: (id: number | null) => void; onCategoryCodeChange: (code: string | null) => void }) {
     const { setData, clearKey } = useGlobalStore()
     const { openModal } = useModal("kirim-xarajat-add")
     const { openModal: openDeleteModal } = useModal(`${MANAGERS_EXPENSES}-delete`)
@@ -411,7 +438,7 @@ function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: 
 
     const { data: categoriesData } = useGet<ListResponse<Category>>(
         MANAGERS_EXPENSE_CATEGORIES,
-        { params: { page_size: 100, action: 1, trip_id: tripId } },
+        { params: { page_size: 100, action: 1, trip_id: tripId }, enabled: !!tripId },
     )
     const categories = categoriesData?.results ?? []
     const [selectedCatId, setSelectedCatId] = useState<number | null>(null)
@@ -422,12 +449,17 @@ function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: 
             setSelectedCatId(first.id ?? null)
             onCategoryChange(first.name)
             onCategoryIdChange(first.id ?? null)
+            onCategoryCodeChange(first.code ?? null)
         }
     }, [categoriesData])
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_CASHFLOW,
-        { params: { trip: tripId, category: selectedCatId, action: 1, page_size: 100 } },
+        {
+            params: { trip: tripId, category: selectedCatId, action: 1, page_size: 100 },
+            enabled: selectedCatId != null,
+            options: { queryKey: [MANAGERS_CASHFLOW, "income", tripId, selectedCatId] },
+        },
     )
     const rows = expensesData?.results ?? []
 
@@ -446,6 +478,7 @@ function IncomeTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?: 
         setSelectedCatId(cat.id ?? null)
         onCategoryChange(cat.name)
         onCategoryIdChange(cat.id ?? null)
+        onCategoryCodeChange(cat.code ?? null)
     }
 
     const handleAdd = () => {
@@ -505,7 +538,7 @@ function ExpenseTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?:
 
     const { data: categoriesData } = useGet<ListResponse<Category>>(
         MANAGERS_EXPENSE_CATEGORIES,
-        { params: { page_size: 100, action: -1, trip_id: tripId } },
+        { params: { page_size: 100, action: -1, trip_id: tripId }, enabled: !!tripId },
     )
     const categories = categoriesData?.results ?? []
     const [selectedCatId, setSelectedCatId] = useState<number | null>(null)
@@ -521,7 +554,11 @@ function ExpenseTab({ tripId, onCategoryChange, onCategoryIdChange }: { tripId?:
 
     const { data: expensesData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_CASHFLOW,
-        { params: { trip: tripId, category: selectedCatId, action: -1, page_size: 100 } },
+        {
+            params: { trip: tripId, category: selectedCatId, action: -1, page_size: 100 },
+            enabled: selectedCatId != null,
+            options: { queryKey: [MANAGERS_CASHFLOW, "expense", tripId, selectedCatId] },
+        },
     )
     const rows = expensesData?.results ?? []
 
@@ -606,41 +643,7 @@ type TAccountRow = {
     visible_to_company: boolean
 }
 
-// Hardcoded T account data for the aylanma
-const tAccountData: TAccountRow[] = [
-    // Driver income (avans from company - visible to driver only, not company income)
-    { id: 1, description: "Avans berildi", amount: 5000000, type: "kirim", payment_method: "naqd", date: "2025-12-01", visible_to_driver: true, visible_to_company: false },
-    // Cash payment from client - visible to both
-    { id: 2, description: "Samarqand reysi - naqd to'lov", amount: 7800000, type: "kirim", payment_method: "naqd", date: "2025-12-02", visible_to_driver: true, visible_to_company: true },
-    // Bank transfer from client - company only
-    { id: 3, description: "Buxoro reysi - perechisleniya", amount: 12000000, type: "kirim", payment_method: "perechisleniya", date: "2025-12-03", visible_to_driver: false, visible_to_company: true },
-    // Cash from another client - both
-    { id: 4, description: "Navoiy reysi - naqd", amount: 4200000, type: "kirim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
-    // Bank transfer - company only
-    { id: 5, description: "Jizzax reysi - perechisleniya", amount: 8500000, type: "kirim", payment_method: "perechisleniya", date: "2025-12-05", visible_to_driver: false, visible_to_company: true },
-    // Fuel in tank at start of aylanma - driver income (he uses it)
-    { id: 6, description: "Bakdagi yoqilg'i (chiqishda)", amount: 1500000, type: "kirim", payment_method: "solyarka", date: "2025-12-01", visible_to_driver: true, visible_to_company: false },
-    // Cash from client
-    { id: 7, description: "Farg'ona reysi - naqd", amount: 3500000, type: "kirim", payment_method: "naqd", date: "2025-12-06", visible_to_driver: true, visible_to_company: true },
 
-    // Expenses
-    // Driver fuels up with his cash - both driver and company expense
-    { id: 8, description: "Yoqilg'i - haydovchi to'ladi", amount: 2000000, type: "chiqim", payment_method: "naqd", date: "2025-12-02", visible_to_driver: true, visible_to_company: true },
-    // Company pays fuel directly (card/transfer) - company expense only
-    { id: 9, description: "Yoqilg'i - kompaniya to'ladi", amount: 3500000, type: "chiqim", payment_method: "plastik", date: "2025-12-03", visible_to_driver: false, visible_to_company: true },
-    // Driver pays parking - both
-    { id: 10, description: "Parkovka to'lovi", amount: 350000, type: "chiqim", payment_method: "naqd", date: "2025-12-03", visible_to_driver: true, visible_to_company: true },
-    // Driver pays road toll - both
-    { id: 11, description: "Yo'l to'lovi", amount: 500000, type: "chiqim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
-    // Driver fuels again - both
-    { id: 12, description: "Yoqilg'i - haydovchi to'ladi", amount: 1800000, type: "chiqim", payment_method: "naqd", date: "2025-12-05", visible_to_driver: true, visible_to_company: true },
-    // Driver salary - company expense only
-    { id: 13, description: "Haydovchi oyligi", amount: 5000000, type: "chiqim", payment_method: "perechisleniya", date: "2025-12-06", visible_to_driver: false, visible_to_company: true },
-    // Driver food etc - both
-    { id: 14, description: "Kunlik xarajat (ovqat)", amount: 400000, type: "chiqim", payment_method: "naqd", date: "2025-12-04", visible_to_driver: true, visible_to_company: true },
-    // Fuel in tank at return - returnable to company as solyarka
-    { id: 15, description: "Bakdagi yoqilg'i (qaytishda)", amount: 800000, type: "chiqim", payment_method: "solyarka", date: "2025-12-06", visible_to_driver: true, visible_to_company: false },
-]
 
 const paymentMethodLabels: Record<TAccountRow["payment_method"], string> = {
     naqd: "Naqd",
@@ -658,11 +661,9 @@ function AvansForm({ tripId }: { tripId?: number }) {
     const { mutate, isPending } = usePost()
     const queryClient = useQueryClient()
 
-    const paymentOptions = [
-        { id: "naqd", name: "Naqd" },
-        { id: "plastik", name: "Plastik" },
-        { id: "perechisleniya", name: "Perechisleniya" },
-    ]
+    const { data: paymentTypes } = useGet(SETTINTS_PAYMENT_TYPE, {
+        params: { page_size: 100000 },
+    })
 
     const onSubmit = (data: any) => {
         mutate(MANAGERS_CASHFLOW, {
@@ -675,9 +676,9 @@ function AvansForm({ tripId }: { tripId?: number }) {
         }, {
             onSuccess: () => {
                 toast.success("Avans muvaffaqiyatli berildi")
-                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW] })
-                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW_TRIP_STAT] })
-                queryClient.invalidateQueries({ queryKey: [MANAGERS_CASHFLOW_DRIVER_STAT] })
+                queryClient.invalidateQueries({
+                    predicate: (q) => String(q.queryKey[0]).includes("cashflow"),
+                })
                 reset()
                 closeModal()
             },
@@ -701,7 +702,7 @@ function AvansForm({ tripId }: { tripId?: number }) {
                 labelKey="name"
                 valueKey="id"
                 name="payment_type"
-                options={paymentOptions}
+                options={paymentTypes?.results ?? []}
                 label="To'lov turi"
             />
             <FormDatePicker
@@ -827,7 +828,7 @@ function ReturnableBreakdown({
 
 // ──── T hisob tab ────
 
-function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "haydovchi"; onToggle: (m: "aylanma" | "haydovchi") => void; tripId?: number; driverId?: number }) {
+function TAccountTab({ mode, onToggle, tripId }: { mode: "aylanma" | "haydovchi"; onToggle: (m: "aylanma" | "haydovchi") => void; tripId?: number }) {
     const { openModal: openAvansModal } = useModal("avans-berish")
 
     // Trip statistic (aylanma mode)
@@ -838,18 +839,27 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
 
     // Driver statistic (haydovchi mode)
     const { data: driverStat } = useGet(
-        `${MANAGERS_CASHFLOW_DRIVER_STAT}/${driverId}/statistic`,
-        { enabled: mode === "haydovchi" && !!driverId },
+        `${MANAGERS_CASHFLOW_DRIVER_STAT}/${tripId}/statistic`,
+        { enabled: mode === "haydovchi" && !!tripId },
     )
 
     // Cashflow list for the two-column view
+    const isDriver = mode === "haydovchi"
     const { data: incomeData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_CASHFLOW,
-        { params: { trip: tripId, action: 1, page_size: 100 } },
+        {
+            params: { trip: tripId, action: isDriver ? "1,2" : 1, page_size: 100, ...(isDriver ? { driver: true } : {}) },
+            enabled: !!tripId,
+            options: { queryKey: [MANAGERS_CASHFLOW, "t-hisob-income", tripId, isDriver] },
+        },
     )
     const { data: expenseData } = useGet<ListResponse<FinanceRow>>(
         MANAGERS_CASHFLOW,
-        { params: { trip: tripId, action: -1, page_size: 100 } },
+        {
+            params: { trip: tripId, action: -1, page_size: 100, ...(isDriver ? { driver: true } : {}) },
+            enabled: !!tripId,
+            options: { queryKey: [MANAGERS_CASHFLOW, "t-hisob-expense", tripId, isDriver] },
+        },
     )
 
     const incomeRows = incomeData?.results ?? []
@@ -863,10 +873,10 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
     const returnableBreakdown = useMemo(() => {
         if (mode !== "haydovchi" || !driverStat) return []
         const items: { label: string; amount: number }[] = []
-        const returnCash = Number(driverStat.return_cash ?? 0)
+        const returnFuelAmount = Number(driverStat.return_fuel_amount ?? 0)
         const returnFuel = Number(driverStat.return_fuel ?? 0)
-        if (returnCash) items.push({ label: "Naqd", amount: returnCash })
-        if (returnFuel) items.push({ label: "Yoqilg'i", amount: returnFuel })
+        if (returnFuelAmount) items.push({ label: "Yoqilg'i summasi", amount: returnFuelAmount })
+        if (returnFuel) items.push({ label: "Yoqilg'i (litr)", amount: returnFuel })
         return items
     }, [mode, driverStat])
 
@@ -881,24 +891,10 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
                     <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar">
                         <SummaryCard label="Jami kirim" amount={totalIncome} variant="income" />
                         <SummaryCard label="Jami chiqim" amount={totalExpense} variant="expense" />
-                        <div className="px-4 py-3 rounded-md bg-primary/10 min-w-36 shrink-0">
-                            <p className="text-sm text-muted-foreground">
-                                {mode === "haydovchi" ? "Balans" : "Foyda"}
-                            </p>
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                                <p className="font-semibold text-lg text-primary">
-                                    {formatMoney(balance)}
-                                </p>
-                                {mode === "haydovchi" && returnableBreakdown.map((item) => (
-                                    <span
-                                        key={item.label}
-                                        className="text-[11px] text-primary/70 font-medium"
-                                    >
-                                        {item.label}: {formatMoney(item.amount)}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
+                        <SummaryCard label={mode === "haydovchi" ? "Balans" : "Foyda"} amount={balance} variant="balance" />
+                        {mode === "haydovchi" && returnableBreakdown.map((item) => (
+                            <SummaryCard key={item.label} label={item.label} amount={item.amount} variant="balance" />
+                        ))}
                     </div>
                     {mode === "haydovchi" && (
                         <Button
@@ -914,9 +910,9 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
             </div>
 
             {/* Single card, two columns inside */}
-            <div className="flex-1 overflow-hidden border rounded-lg">
+            <div className="flex-1 min-h-0 flex flex-col border rounded-lg">
                 {/* Shared header row */}
-                <div className="grid grid-cols-2 border-b items-center">
+                <div className="grid grid-cols-2 border-b items-center shrink-0">
                     <div className="px-4 py-3 flex items-center justify-center gap-2 border-r bg-green-500/10">
                         <span className="size-2 rounded-full bg-green-500" />
                         <h2 className="font-semibold text-sm text-green-600">Kirim</h2>
@@ -930,7 +926,7 @@ function TAccountTab({ mode, onToggle, tripId, driverId }: { mode: "aylanma" | "
                 </div>
 
                 {/* Two columns of items */}
-                <div className="grid grid-cols-2 h-[calc(100%-45px)]">
+                <div className="grid grid-cols-2 flex-1 min-h-0">
                     {/* Left: Kirim */}
                     <div className="border-r overflow-y-auto divide-y">
                         {incomeRows.map((row, i) => (
@@ -1022,13 +1018,15 @@ export default function KirimXarajatContent() {
     const tripItem = getData(`${MANAGERS_TRIPS}-moliya`)
     const tripId = tripItem?.id ?? search.moliya_trip_id
 
-    const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">("tushum")
+    const initialTab = (search.moliya_tab as string) || "tushum"
+    const [currentType, setCurrentType] = useState<"tushum" | "xarajat" | "t_hisob">(initialTab as any)
     const [tAccountMode, setTAccountMode] = useState<"aylanma" | "haydovchi">("aylanma")
     const [selectedCategoryName, setSelectedCategoryName] = useState<string>("")
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+    const [selectedCategoryCode, setSelectedCategoryCode] = useState<string | null>(null)
 
     const isFuel = currentType === "xarajat" && /yoqilg['ʻ']i|fuel|solyarka|metan|dizel|benzin/i.test(selectedCategoryName)
-    const action = currentType === "tushum" ? 1 : -1
+    const action: 1 | -1 = currentType === "xarajat" ? -1 : 1
 
     const handleCategoryChange = (name: string | null) => {
         setSelectedCategoryName(name ?? "")
@@ -1038,8 +1036,12 @@ export default function KirimXarajatContent() {
         setSelectedCategoryId(id)
     }
 
+    const handleCategoryCodeChange = (code: string | null) => {
+        setSelectedCategoryCode(code)
+    }
+
     return (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden [&>div]:flex [&>div]:flex-col [&>div]:flex-1 [&>div]:min-h-0 [&>div>div[role=tabpanel]]:flex-1 [&>div>div[role=tabpanel]]:min-h-0">
             <ParamTabs
                 paramName="moliya_tab"
                 className="shrink-0"
@@ -1047,12 +1049,13 @@ export default function KirimXarajatContent() {
                     setCurrentType(val as "tushum" | "xarajat" | "t_hisob")
                     setSelectedCategoryName("")
                     setSelectedCategoryId(null)
+                    setSelectedCategoryCode(null)
                 }}
                 options={[
                     {
                         value: "tushum",
                         label: "Tushum",
-                        content: <IncomeTab tripId={tripId} onCategoryChange={handleCategoryChange} onCategoryIdChange={handleCategoryIdChange} />,
+                        content: <IncomeTab tripId={tripId} onCategoryChange={handleCategoryChange} onCategoryIdChange={handleCategoryIdChange} onCategoryCodeChange={handleCategoryCodeChange} />,
                     },
                     {
                         value: "xarajat",
@@ -1062,7 +1065,7 @@ export default function KirimXarajatContent() {
                     {
                         value: "t_hisob",
                         label: "T hisob",
-                        content: <TAccountTab mode={tAccountMode} onToggle={setTAccountMode} tripId={tripId} driverId={tripItem?.driver} />,
+                        content: <TAccountTab mode={tAccountMode} onToggle={setTAccountMode} tripId={tripId} />,
                     },
                 ]}
             />
@@ -1078,6 +1081,7 @@ export default function KirimXarajatContent() {
                     isFuel={isFuel}
                     tripId={tripId}
                     selectedCategoryId={selectedCategoryId}
+                    selectedCategoryCode={selectedCategoryCode}
                     action={action as 1 | -1}
                 />
             </Modal>

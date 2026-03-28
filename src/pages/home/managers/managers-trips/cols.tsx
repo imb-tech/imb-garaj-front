@@ -12,11 +12,15 @@ export const STATUS_LABELS: any = {
     3: "Ta'mirda",
 }
 
-export const STATUS_TRIP: any = {
+export const STATUS_TRIP: Record<number, string> = {
     0: "Kutilmoqda",
     1: "Boshlandi",
+    5: "Yuklanmoqda",
+    6: "Yo'lda",
+    7: "Tushirilmoqda",
     2: "Tugallandi",
-    4: "Bekor qilindi",
+    3: "Bekor qilindi",
+    4: "Arxivlangan",
 }
 
 export const useColumnsManagersTrips = (opts?: {
