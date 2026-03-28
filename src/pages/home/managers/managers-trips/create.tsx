@@ -159,19 +159,20 @@ export default function CreateManagerTrips() {
 
                 <FormNumberInput
                     name="start_fuel"
-                    label="Bakdagi yoqilg'i (litr)"
+                    label="Boshlanish yoqilg'i (litr)"
                     control={control}
                     decimalScale={2}
                 />
-                <FormNumberInput
-                    name="advance"
-                    label="Avans"
-                    control={control}
-                    thousandSeparator=" "
-                    decimalScale={0}
-                    placeholder="Ex: 5 000 000"
-                />
-
+                {!item?.id && (
+                    <FormNumberInput
+                        name="advance"
+                        label="Avans"
+                        control={control}
+                        thousandSeparator=" "
+                        decimalScale={0}
+                        placeholder="Ex: 5 000 000"
+                    />
+                )}
                 {item?.id && (
                     <>
                         <FormNumberInput
@@ -213,7 +214,7 @@ export default function CreateManagerTrips() {
 
                         <FormNumberInput
                             name="end_fuel"
-                            label="Bakdagi yoqilg'i (litr)"
+                            label="Tugash yoqilg'i (litr)"
                             control={control}
                             decimalScale={2}
                         />
