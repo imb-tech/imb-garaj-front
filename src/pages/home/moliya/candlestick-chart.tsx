@@ -166,6 +166,7 @@ function CustomTooltip({ active, payload }: any) {
 export default function CandlestickChart() {
   const allData = useRef(generateHistoricalData());
   const [activeTimeframe, setActiveTimeframe] = useState<TimeframeKey>('1Y');
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Zoom/pan state: endIndex is always the right edge, visibleCount is how many bars visible
   const [visibleCount, setVisibleCount] = useState<number | null>(null); // null = use timeframe
@@ -307,32 +308,38 @@ export default function CandlestickChart() {
       </div>
 
       {/* OHLC info bar */}
-      <div className="flex items-center gap-3 px-4 py-1.5 text-xs font-mono text-muted-foreground border-b">
-        <span>
-          O{' '}
-          <span className={lastCandle?.isUp ? 'text-green-600' : 'text-red-500'}>
-            {formatSum(lastCandle?.open ?? 0)}
-          </span>
-        </span>
-        <span>
-          H{' '}
-          <span className={lastCandle?.isUp ? 'text-green-600' : 'text-red-500'}>
-            {formatSum(lastCandle?.high ?? 0)}
-          </span>
-        </span>
-        <span>
-          L{' '}
-          <span className={lastCandle?.isUp ? 'text-green-600' : 'text-red-500'}>
-            {formatSum(lastCandle?.low ?? 0)}
-          </span>
-        </span>
-        <span>
-          C{' '}
-          <span className={lastCandle?.isUp ? 'text-green-600' : 'text-red-500'}>
-            {formatSum(lastCandle?.close ?? 0)}
-          </span>
-        </span>
-      </div>
+      {(() => {
+        const ohlc = hoveredIndex != null ? chartData[hoveredIndex] : lastCandle;
+        const up = ohlc?.isUp;
+        return (
+          <div className="flex items-center gap-3 px-4 py-1.5 text-xs font-mono text-muted-foreground border-b">
+            <span>
+              O{' '}
+              <span className={up ? 'text-green-600' : 'text-red-500'}>
+                {formatSum(ohlc?.open ?? 0)}
+              </span>
+            </span>
+            <span>
+              H{' '}
+              <span className={up ? 'text-green-600' : 'text-red-500'}>
+                {formatSum(ohlc?.high ?? 0)}
+              </span>
+            </span>
+            <span>
+              L{' '}
+              <span className={up ? 'text-green-600' : 'text-red-500'}>
+                {formatSum(ohlc?.low ?? 0)}
+              </span>
+            </span>
+            <span>
+              C{' '}
+              <span className={up ? 'text-green-600' : 'text-red-500'}>
+                {formatSum(ohlc?.close ?? 0)}
+              </span>
+            </span>
+          </div>
+        );
+      })()}
 
       {/* Chart */}
       <div
@@ -349,6 +356,12 @@ export default function CandlestickChart() {
             data={chartData}
             margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
             barCategoryGap="20%"
+            onMouseMove={(state: any) => {
+              if (state?.activeTooltipIndex != null) {
+                setHoveredIndex(state.activeTooltipIndex);
+              }
+            }}
+            onMouseLeave={() => setHoveredIndex(null)}
           >
             <XAxis
               dataKey="date"
@@ -368,7 +381,7 @@ export default function CandlestickChart() {
               width={70}
               orientation="right"
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
             <Bar
               dataKey="base"
               stackId="candle"
@@ -381,9 +394,18 @@ export default function CandlestickChart() {
               isAnimationActive={false}
               radius={[1, 1, 0, 0]}
             >
-              {chartData.map((entry, index) => (
-                <Cell key={index} fill={entry.isUp ? '#26a69a' : '#ef5350'} />
-              ))}
+              {chartData.map((entry, index) => {
+                const isHovered = hoveredIndex === index;
+                const upColor = isHovered ? '#2edccc' : '#26a69a';
+                const downColor = isHovered ? '#ff7b78' : '#ef5350';
+                return (
+                  <Cell
+                    key={index}
+                    fill={entry.isUp ? upColor : downColor}
+                    style={isHovered ? { filter: 'brightness(1.3)' } : undefined}
+                  />
+                );
+              })}
             </Bar>
             <Customized component={WickLayer} />
           </BarChart>
