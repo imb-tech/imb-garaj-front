@@ -53,6 +53,7 @@ const DistrictsTable = ({ country_id, region_id }: DistrictsTableProps) => {
     return (
         <>
             <div className="h-[500px]  flex flex-col overflow-hidden bg-background">
+                <h3 className="text-lg font-semibold px-3 pt-3">Tumanlar</h3>
                 <div className="flex-1 overflow-y-auto no-scrollbar-0 no-scrollbar-x ">
                     <DataTable
                         loading={isLoading}

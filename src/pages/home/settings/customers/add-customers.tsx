@@ -17,7 +17,10 @@ const AddCustomerModal = () => {
 
     const currentForwarder = getData<CustomersType>(SETTINGS_CUSTOMERS)
     const form = useForm<CustomersType>({
-        defaultValues: currentForwarder,
+        defaultValues: {
+            ...currentForwarder,
+            phone_number: currentForwarder?.phone_number?.replace(/^\+?998/, "") || "",
+        },
     })
 
     const { handleSubmit, reset } = form
