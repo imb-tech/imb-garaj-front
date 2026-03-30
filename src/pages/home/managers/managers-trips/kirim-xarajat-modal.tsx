@@ -104,7 +104,9 @@ function CategoryTabs({
                         {cat.total_amount_uzs != null ? (
                             <div>
                                 <p className="font-semibold">{formatMoney(cat.total_amount_uzs)} <span className="text-xs text-muted-foreground">UZS</span></p>
-                                <p className="font-semibold text-sm">{formatMoney(cat.total_amount_usd)} <span className="text-xs text-muted-foreground">USD</span></p>
+                                {Number(cat.total_amount_usd) > 0 && (
+                                    <p className="font-semibold text-sm">{formatMoney(cat.total_amount_usd)} <span className="text-xs text-muted-foreground">USD</span></p>
+                                )}
                             </div>
                         ) : (
                             <p className="font-semibold">{formatMoney(cat.total_amount ?? cat.amount ?? 0)}</p>
@@ -849,11 +851,13 @@ function ModeToggle({
 
 function SummaryCard({
     label,
-    amount,
+    amountUzs,
+    amountUsd,
     variant,
 }: {
     label: string
-    amount: number
+    amountUzs: number
+    amountUsd?: number
     variant: "income" | "expense" | "balance"
 }) {
     return (
@@ -874,8 +878,20 @@ function SummaryCard({
                     variant === "balance" && "text-primary",
                 )}
             >
-                {formatMoney(amount)}
+                {formatMoney(amountUzs)} <span className="text-xs text-muted-foreground">UZS</span>
             </p>
+            {amountUsd != null && Number(amountUsd) > 0 && (
+                <p
+                    className={cn(
+                        "font-semibold text-sm",
+                        variant === "income" && "text-green-600",
+                        variant === "expense" && "text-red-600",
+                        variant === "balance" && "text-primary",
+                    )}
+                >
+                    {formatMoney(amountUsd)} <span className="text-xs text-muted-foreground">USD</span>
+                </p>
+            )}
         </div>
     )
 }
@@ -925,19 +941,12 @@ function TAccountTab({ mode, onToggle, tripId }: { mode: "aylanma" | "haydovchi"
     const expenseCols = useExpenseCols()
 
     const stat = mode === "aylanma" ? tripStat : driverStat
-    const totalIncome = Number(stat?.income ?? 0)
-    const totalExpense = Number(stat?.expense ?? 0)
-    const balance = totalIncome - totalExpense
-
-    const returnableBreakdown = useMemo(() => {
-        if (mode !== "haydovchi" || !driverStat) return []
-        const items: { label: string; amount: number }[] = []
-        const returnFuelAmount = Number(driverStat.return_fuel_amount ?? 0)
-        const returnFuel = Number(driverStat.return_fuel ?? 0)
-        if (returnFuelAmount) items.push({ label: "Yoqilg'i summasi", amount: returnFuelAmount })
-        if (returnFuel) items.push({ label: "Yoqilg'i (litr)", amount: returnFuel })
-        return items
-    }, [mode, driverStat])
+    const incomeUzs = Number(stat?.income_uzs ?? 0)
+    const incomeUsd = Number(stat?.income_usd ?? 0)
+    const expenseUzs = Number(stat?.expense_uzs ?? 0)
+    const expenseUsd = Number(stat?.expense_usd ?? 0)
+    const balanceUzs = incomeUzs - expenseUzs
+    const balanceUsd = incomeUsd - expenseUsd
 
     return (
         <div className="flex flex-col h-full overflow-hidden gap-4">
@@ -948,12 +957,17 @@ function TAccountTab({ mode, onToggle, tripId }: { mode: "aylanma" | "haydovchi"
                 {/* Summary row */}
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-stretch gap-3 overflow-x-auto no-scrollbar">
-                        <SummaryCard label="Jami kirim" amount={totalIncome} variant="income" />
-                        <SummaryCard label="Jami chiqim" amount={totalExpense} variant="expense" />
-                        <SummaryCard label={mode === "haydovchi" ? "Balans" : "Foyda"} amount={balance} variant="balance" />
-                        {mode === "haydovchi" && returnableBreakdown.map((item) => (
-                            <SummaryCard key={item.label} label={item.label} amount={item.amount} variant="balance" />
-                        ))}
+                        <SummaryCard label="Jami kirim" amountUzs={incomeUzs} amountUsd={incomeUsd} variant="income" />
+                        <SummaryCard label="Jami chiqim" amountUzs={expenseUzs} amountUsd={expenseUsd} variant="expense" />
+                        <SummaryCard label={mode === "haydovchi" ? "Balans" : "Foyda"} amountUzs={balanceUzs} amountUsd={balanceUsd} variant="balance" />
+                        {mode === "haydovchi" && driverStat && (
+                            <>
+                                <SummaryCard label="Yoqilg'i summasi" amountUzs={Number(driverStat.return_fuel_amount_uzs ?? 0)} amountUsd={Number(driverStat.return_fuel_amount_usd ?? 0)} variant="balance" />
+                                {Number(driverStat.return_fuel ?? 0) > 0 && (
+                                    <SummaryCard label="Yoqilg'i (litr)" amountUzs={Number(driverStat.return_fuel)} variant="balance" />
+                                )}
+                            </>
+                        )}
                     </div>
                     {mode === "haydovchi" && (
                         <Button
