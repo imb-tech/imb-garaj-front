@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 import { MANAGERS_CASHFLOW, MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
@@ -186,16 +187,28 @@ export default function ManagersTrips() {
                 modalKey={`${MANAGERS_TRIPS}-delete`}
             ></DeleteModal>
 
-            <Sheet open={moliyaOpen} onOpenChange={setMoliyaOpen}>
-                <SheetContent side="bottom" className="h-[95vh] rounded-t-2xl overflow-hidden">
-                    <SheetHeader className="sr-only">
-                        <SheetTitle>Kirim va Xarajatlar</SheetTitle>
-                    </SheetHeader>
-                    <div className="h-[calc(95vh-60px)] flex flex-col overflow-hidden">
-                        <KirimXarajatContent />
+            {moliyaOpen && (
+                <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setMoliyaOpen(false)} />
+            )}
+            <div
+                className={cn(
+                    "fixed bottom-0 right-0 z-50 transition-transform duration-300 ease-in-out",
+                    moliyaOpen ? "translate-y-0" : "translate-y-full",
+                )}
+                style={{ height: "100vh", left: "var(--sidebar-width, 14rem)" }}
+            >
+                <button
+                    onClick={() => setMoliyaOpen(false)}
+                    className="absolute -left-10 top-2 z-50 bg-gray-500/70 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm hover:bg-gray-500/90"
+                >
+                    <X size={16} />
+                </button>
+                <div className="bg-background shadow-2xl h-full flex flex-col overflow-hidden">
+                    <div className="h-full flex flex-col overflow-hidden p-4">
+                        {moliyaOpen && <KirimXarajatContent />}
                     </div>
-                </SheetContent>
-            </Sheet>
+                </div>
+            </div>
         </>
     )
 }
