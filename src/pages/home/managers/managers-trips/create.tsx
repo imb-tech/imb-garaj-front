@@ -36,6 +36,7 @@ export default function CreateManagerTrips() {
     const { data: startData } = useGet(MANAGERS_TRIPS_START_DATA, {
         params: { vehicle_id: id },
         enabled: !isEdit,
+        options: { staleTime: 0, gcTime: 0 },
     })
 
     useEffect(() => {
