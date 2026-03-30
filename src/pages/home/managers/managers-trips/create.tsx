@@ -1,9 +1,8 @@
 import { FormCombobox } from "@/components/form/combobox"
-import { FormDatePicker } from "@/components/form/date-picker"
 import FileUpload from "@/components/form/file-upload"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
-import { MANAGERS_TRIPS, SETTINGS_DRIVERS } from "@/constants/api-endpoints"
+import { MANAGERS_TRIPS, MANAGERS_TRIPS_START_DATA, SETTINGS_DRIVERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
@@ -12,6 +11,7 @@ import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
 import { X } from "lucide-react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -21,6 +21,7 @@ export default function CreateManagerTrips() {
     const queryClient = useQueryClient()
     const { getData } = useGlobalStore()
     const item = getData(MANAGERS_TRIPS)
+    const isEdit = !!item?.id
 
     const form = useForm<any>({
         defaultValues: {
@@ -32,6 +33,25 @@ export default function CreateManagerTrips() {
 
     const { handleSubmit, reset, control, watch, setValue } = form
 
+    const { data: startData } = useGet(MANAGERS_TRIPS_START_DATA, {
+        params: { vehicle_id: id },
+        enabled: !isEdit,
+    })
+
+    useEffect(() => {
+        if (startData && !isEdit) {
+            if (startData.end_mileage != null) {
+                setValue("start_mileage", startData.end_mileage)
+            }
+            if (startData.end_fuel != null) {
+                setValue("start_fuel", startData.end_fuel)
+            }
+            if (startData.end_mileage_image) {
+                setValue("start_mileage_image", startData.end_mileage_image)
+            }
+        }
+    }, [startData, isEdit, setValue])
+
     const { data: drivers } = useGet(SETTINGS_DRIVERS, {
         params: { page_size: 10000 },
     })
@@ -41,6 +61,10 @@ export default function CreateManagerTrips() {
 
     const startMileage = watch("start_mileage")
     const endMileage = watch("end_mileage")
+    const startFuel = watch("start_fuel")
+
+    const mileageDiffers = !isEdit && startData?.end_mileage != null && Number(startMileage) !== Number(startData.end_mileage)
+    const fuelDiffers = !isEdit && startData?.end_fuel != null && Number(startFuel) !== Number(startData.end_fuel)
 
     function removeImage(name: "start_mileage_image" | "end_mileage_image") {
         setValue(name, null)
@@ -121,7 +145,7 @@ export default function CreateManagerTrips() {
                 <FormNumberInput
                     name="start_mileage"
                     required
-                    label="Ketish probegi"
+                    label={`Ketish probegi${mileageDiffers ? ` (${startData.end_mileage})` : ""}`}
                     control={control}
                 />
 
@@ -155,7 +179,7 @@ export default function CreateManagerTrips() {
 
                 <FormNumberInput
                     name="start_fuel"
-                    label="Boshlanishdagi yoqilg'i (litr)"
+                    label={`Boshlanishdagi yoqilg'i (litr)${fuelDiffers ? ` (${startData.end_fuel})` : ""}`}
                     control={control}
                     decimalScale={2}
                 />

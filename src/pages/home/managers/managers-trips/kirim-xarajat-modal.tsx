@@ -47,6 +47,17 @@ type FinanceRow = {
     quantity: string | null
     created: string
     updated: string
+    currency: number
+    currency_course: string | null
+}
+
+function formatAmount(row: FinanceRow) {
+    if (row.currency === 2 && row.currency_course) {
+        const usd = Number(row.amount)
+        const uzs = usd * Number(row.currency_course)
+        return <>{formatMoney(usd)} USD (={formatMoney(uzs)} UZS)</>
+    }
+    return formatMoney(row.amount)
 }
 
 type Category = {
@@ -54,6 +65,8 @@ type Category = {
     name: string
     amount?: number
     total_amount?: number
+    total_amount_uzs?: string
+    total_amount_usd?: string
     code?: string | null
 }
 
@@ -88,7 +101,14 @@ function CategoryTabs({
                         )}
                     >
                         <p className="text-sm">{cat.name}</p>
-                        <p className="font-semibold">{formatMoney(cat.total_amount ?? cat.amount ?? 0)}</p>
+                        {cat.total_amount_uzs != null ? (
+                            <div>
+                                <p className="font-semibold">{formatMoney(cat.total_amount_uzs)} <span className="text-xs text-muted-foreground">UZS</span></p>
+                                <p className="font-semibold text-sm">{formatMoney(cat.total_amount_usd)} <span className="text-xs text-muted-foreground">USD</span></p>
+                            </div>
+                        ) : (
+                            <p className="font-semibold">{formatMoney(cat.total_amount ?? cat.amount ?? 0)}</p>
+                        )}
                     </div>
                 )
             })}
@@ -345,7 +365,7 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
                 enableSorting: true,
                 cell: ({ row }) => (
                     <span className="text-green-500 font-medium">
-                        {formatMoney(row.original.amount)}
+                        {formatAmount(row.original)}
                     </span>
                 ),
             },
@@ -389,7 +409,7 @@ const useExpenseCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?:
                 enableSorting: true,
                 cell: ({ row }) => (
                     <span className="text-red-500 font-medium">
-                        - {formatMoney(row.original.amount)}
+                        - {formatAmount(row.original)}
                     </span>
                 ),
             },
@@ -956,7 +976,7 @@ function TAccountTab({ mode, onToggle, tripId }: { mode: "aylanma" | "haydovchi"
                                         </div>
                                     </div>
                                     <span className="text-sm font-semibold text-green-500 shrink-0">
-                                        + {formatMoney(row.amount)}
+                                        + {formatAmount(row)}
                                     </span>
                                 </div>
                             </div>
@@ -993,7 +1013,7 @@ function TAccountTab({ mode, onToggle, tripId }: { mode: "aylanma" | "haydovchi"
                                         </div>
                                     </div>
                                     <span className="text-sm font-semibold text-red-500 shrink-0">
-                                        - {formatMoney(row.amount)}
+                                        - {formatAmount(row)}
                                     </span>
                                 </div>
                             </div>

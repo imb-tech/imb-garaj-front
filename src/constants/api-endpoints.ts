@@ -50,6 +50,7 @@ export const OWNER_TRIP_DAILY_STATISTIC = "owner/trip-daily-statistic"
 
 export const MANAGERS_VEHICLES = "manager/vehicles"
 export const MANAGERS_TRIPS= "manager/trips"
+export const MANAGERS_TRIPS_START_DATA = "manager/trips/start-data"
 export const MANAGERS_ORDERS = "manager/orders"
 export const MANAGERS_EXPENSES = "manager/expense"
 export const MANAGERS_CASHFLOW = "manager/cashflow"
