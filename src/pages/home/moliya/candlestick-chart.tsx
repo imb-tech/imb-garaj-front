@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
   Cell,
   Customized,
 } from 'recharts';
@@ -35,6 +36,8 @@ const TIMEFRAMES: { key: TimeframeKey; label: string; days: number }[] = [
 
 const MIN_VISIBLE = 20;
 const MAX_VISIBLE = 500;
+const MOMENTUM_FRICTION = 0.92;
+const MOMENTUM_MIN = 0.3;
 
 // ──── Helpers ────
 
@@ -137,9 +140,9 @@ function WickLayer(props: any) {
   );
 }
 
-// ──── Custom tooltip ────
+// ──── Custom tooltip (memoized) ────
 
-function CustomTooltip({ active, payload }: any) {
+const CustomTooltip = memo(function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.[0]?.payload) return null;
   const d: OHLCDay = payload[0].payload;
   const color = d.isUp ? '#26a69a' : '#ef5350';
@@ -159,32 +162,85 @@ function CustomTooltip({ active, payload }: any) {
       </div>
     </div>
   );
-}
+});
 
 // ──── Main component ────
 
 export default function CandlestickChart() {
-  const allData = useRef(generateHistoricalData());
+  // Store full data in ref, only bump a counter to trigger re-render
+  const allDataRef = useRef(generateHistoricalData());
+  const [tick, setTick] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState<TimeframeKey>('1Y');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Zoom/pan state: endIndex is always the right edge, visibleCount is how many bars visible
-  const [visibleCount, setVisibleCount] = useState<number | null>(null); // null = use timeframe
-  const [endIndex, setEndIndex] = useState<number | null>(null); // null = end of data
-  const dragRef = useRef<{ startX: number; startEnd: number } | null>(null);
+  // Simulated live WebSocket tick — mutate ref in place, bump counter
+  useEffect(() => {
+    const id = setInterval(() => {
+      const data = allDataRef.current;
+      const last = data[data.length - 1];
+      const volatility = last.close * 0.004;
+      const newClose = Math.round(last.close + (Math.random() - 0.48) * volatility);
+
+      last.close = newClose;
+      last.high = Math.max(last.high, newClose);
+      last.low = Math.min(last.low, newClose);
+      last.isUp = newClose >= last.open;
+      last.base = Math.min(last.open, newClose);
+      last.body = Math.abs(newClose - last.open) || 1;
+
+      setTick((t) => t + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Y-axis zoom state
+  const [yZoomFactor, setYZoomFactor] = useState(1);
+  const yAxisDragRef = useRef<{ startY: number; startZoom: number } | null>(null);
+
+  // Pan/zoom state
+  const [visibleCount, setVisibleCount] = useState<number | null>(null);
+  const [endIndex, setEndIndex] = useState<number | null>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const sourceData = allData.current;
+  // Smooth scrolling refs
+  const floatEndRef = useRef<number | null>(null);
+  const momentumRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startEnd: number;
+    lastX: number;
+    lastTime: number;
+    velocity: number;
+  } | null>(null);
+
+  const sourceData = allDataRef.current;
+
+  // Resolve CSS variable to a real color for SVG
+  const gridColor = useRef('#e5e5e5');
+  useEffect(() => {
+    const root = document.documentElement;
+    const raw = getComputedStyle(root).getPropertyValue('--border').trim();
+    if (raw) {
+      gridColor.current = `hsl(${raw})`;
+    }
+  }, []);
 
   // When timeframe changes, reset zoom/pan
   const handleTimeframe = useCallback((key: TimeframeKey) => {
     setActiveTimeframe(key);
     setVisibleCount(null);
     setEndIndex(null);
+    setYZoomFactor(1);
+    floatEndRef.current = null;
+    momentumRef.current = 0;
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
   }, []);
 
   // Compute the visible window
   const { chartData, windowStart, windowEnd } = useMemo(() => {
+    // tick is used to trigger recomputation on live updates
+    void tick;
     let count: number;
     if (visibleCount != null) {
       count = visibleCount;
@@ -203,7 +259,7 @@ export default function CandlestickChart() {
       windowStart: start,
       windowEnd: actualEnd,
     };
-  }, [sourceData, activeTimeframe, visibleCount, endIndex]);
+  }, [sourceData, activeTimeframe, visibleCount, endIndex, tick]);
 
   const lastCandle = chartData[chartData.length - 1];
   const prevCandle = chartData.length > 1 ? chartData[chartData.length - 2] : null;
@@ -218,54 +274,173 @@ export default function CandlestickChart() {
       if (d.low < min) min = d.low;
       if (d.high > max) max = d.high;
     }
-    const pad = (max - min) * 0.05;
-    return [min - pad, max + pad];
-  }, [chartData]);
+    const range = max - min;
+    const mid = (max + min) / 2;
+    const halfRange = (range * yZoomFactor) / 2;
+    const pad = halfRange * 0.05;
+    return [mid - halfRange - pad, mid + halfRange + pad];
+  }, [chartData, yZoomFactor]);
 
-  // Mouse wheel zoom
+  // Commit float position to state (clamped to integer)
+  const commitEnd = useCallback((floatEnd: number) => {
+    const currentCount = windowEnd - windowStart;
+    const clamped = Math.max(currentCount, Math.min(sourceData.length, Math.round(floatEnd)));
+    setEndIndex(clamped);
+  }, [windowEnd, windowStart, sourceData.length]);
+
+  // Momentum animation loop
+  const runMomentum = useCallback(() => {
+    const tick = () => {
+      const v = momentumRef.current;
+      if (Math.abs(v) < MOMENTUM_MIN) {
+        momentumRef.current = 0;
+        rafIdRef.current = null;
+        return;
+      }
+
+      const currentFloat = floatEndRef.current ?? sourceData.length;
+      const currentCount = windowEnd - windowStart;
+      const nextFloat = Math.max(currentCount, Math.min(sourceData.length, currentFloat + v));
+      floatEndRef.current = nextFloat;
+      momentumRef.current = v * MOMENTUM_FRICTION;
+
+      commitEnd(nextFloat);
+      rafIdRef.current = requestAnimationFrame(tick);
+    };
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    rafIdRef.current = requestAnimationFrame(tick);
+  }, [sourceData.length, windowEnd, windowStart, commitEnd]);
+
+  // Mouse wheel: vertical = zoom, horizontal (shift or trackpad) = smooth scroll
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
+
+    momentumRef.current = 0;
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
     const currentCount = windowEnd - windowStart;
-    const zoomStep = Math.max(2, Math.round(currentCount * 0.1));
-    let newCount: number;
+    const hasHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
 
-    if (e.deltaY > 0) {
-      // Zoom out
-      newCount = Math.min(MAX_VISIBLE, currentCount + zoomStep, sourceData.length);
+    if (hasHorizontal || e.shiftKey) {
+      const delta = e.shiftKey ? e.deltaY : e.deltaX;
+      const barsToScroll = delta * 0.05;
+      const currentFloat = floatEndRef.current ?? (endIndex ?? sourceData.length);
+      const nextFloat = Math.max(currentCount, Math.min(sourceData.length, currentFloat + barsToScroll));
+      floatEndRef.current = nextFloat;
+
+      if (endIndex == null) setEndIndex(sourceData.length);
+      commitEnd(nextFloat);
     } else {
-      // Zoom in
-      newCount = Math.max(MIN_VISIBLE, currentCount - zoomStep);
+      const zoomStep = Math.max(2, Math.round(currentCount * 0.1));
+      let newCount: number;
+      if (e.deltaY > 0) {
+        newCount = Math.min(MAX_VISIBLE, currentCount + zoomStep, sourceData.length);
+      } else {
+        newCount = Math.max(MIN_VISIBLE, currentCount - zoomStep);
+      }
+      setVisibleCount(newCount);
+      if (endIndex == null) setEndIndex(sourceData.length);
     }
+  }, [windowStart, windowEnd, sourceData.length, endIndex, commitEnd]);
 
-    setVisibleCount(newCount);
-    // Keep the right edge pinned
-    if (endIndex == null) {
-      setEndIndex(sourceData.length);
-    }
-  }, [windowStart, windowEnd, sourceData.length, endIndex]);
+  // Drag to pan with velocity tracking — throttled via rAF
+  const dragRafRef = useRef<number | null>(null);
 
-  // Drag to pan
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    momentumRef.current = 0;
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    const currentEnd = floatEndRef.current ?? endIndex ?? sourceData.length;
     dragRef.current = {
       startX: e.clientX,
-      startEnd: endIndex ?? sourceData.length,
+      startEnd: currentEnd,
+      lastX: e.clientX,
+      lastTime: performance.now(),
+      velocity: 0,
     };
   }, [endIndex, sourceData.length]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!dragRef.current || !chartContainerRef.current) return;
-    const dx = e.clientX - dragRef.current.startX;
-    const containerWidth = chartContainerRef.current.clientWidth;
-    const currentCount = windowEnd - windowStart;
-    // Convert pixel drag to bar offset
-    const barsPerPixel = currentCount / containerWidth;
-    const barShift = Math.round(dx * barsPerPixel);
-    const newEnd = Math.max(currentCount, Math.min(sourceData.length, dragRef.current.startEnd - barShift));
-    setEndIndex(newEnd);
-  }, [sourceData.length, windowStart, windowEnd]);
+
+    // Throttle to one update per animation frame
+    if (dragRafRef.current) return;
+    const clientX = e.clientX;
+
+    dragRafRef.current = requestAnimationFrame(() => {
+      dragRafRef.current = null;
+      if (!dragRef.current || !chartContainerRef.current) return;
+
+      const now = performance.now();
+      const dx = clientX - dragRef.current.startX;
+      const containerWidth = chartContainerRef.current.clientWidth;
+      const currentCount = windowEnd - windowStart;
+      const barsPerPixel = currentCount / containerWidth;
+      const newFloat = dragRef.current.startEnd - dx * barsPerPixel;
+
+      const dt = now - dragRef.current.lastTime;
+      if (dt > 0) {
+        const instantVelocity = (dragRef.current.lastX - clientX) * barsPerPixel / dt;
+        dragRef.current.velocity = dragRef.current.velocity * 0.7 + instantVelocity * 0.3;
+      }
+      dragRef.current.lastX = clientX;
+      dragRef.current.lastTime = now;
+
+      floatEndRef.current = newFloat;
+      commitEnd(newFloat);
+    });
+  }, [windowStart, windowEnd, commitEnd]);
 
   const handleMouseUp = useCallback(() => {
+    if (!dragRef.current) return;
+    const v = dragRef.current.velocity * 16;
     dragRef.current = null;
+
+    if (Math.abs(v) > MOMENTUM_MIN) {
+      momentumRef.current = v;
+      runMomentum();
+    }
+  }, [runMomentum]);
+
+  // Y-axis drag to zoom
+  const handleYAxisMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    yAxisDragRef.current = { startY: e.clientY, startZoom: yZoomFactor };
+
+    const handleMove = (ev: MouseEvent) => {
+      if (!yAxisDragRef.current) return;
+      const dy = ev.clientY - yAxisDragRef.current.startY;
+      const sensitivity = 0.005;
+      const newZoom = Math.max(0.1, Math.min(5, yAxisDragRef.current.startZoom + dy * sensitivity));
+      setYZoomFactor(newZoom);
+    };
+
+    const handleUp = () => {
+      yAxisDragRef.current = null;
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleUp);
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleUp);
+  }, [yZoomFactor]);
+
+  const handleYAxisDoubleClick = useCallback(() => {
+    setYZoomFactor(1);
+  }, []);
+
+  // Cleanup rAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      if (dragRafRef.current) cancelAnimationFrame(dragRafRef.current);
+    };
   }, []);
 
   return (
@@ -342,74 +517,83 @@ export default function CandlestickChart() {
       })()}
 
       {/* Chart */}
-      <div
-        ref={chartContainerRef}
-        className="flex-1 min-h-0 cursor-grab active:cursor-grabbing"
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
-            barCategoryGap="20%"
-            onMouseMove={(state: any) => {
-              if (state?.activeTooltipIndex != null) {
-                setHoveredIndex(state.activeTooltipIndex);
-              }
-            }}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDateShort}
-              tick={{ fontSize: 10 }}
-              tickLine={false}
-              axisLine={{ stroke: 'hsl(var(--border))' }}
-              interval="preserveStartEnd"
-              minTickGap={50}
-            />
-            <YAxis
-              domain={[yMin, yMax]}
-              tickFormatter={formatSum}
-              tick={{ fontSize: 10 }}
-              tickLine={false}
-              axisLine={false}
-              width={70}
-              orientation="right"
-            />
-            <Tooltip content={<CustomTooltip />} cursor={false} />
-            <Bar
-              dataKey="base"
-              stackId="candle"
-              fill="transparent"
-              isAnimationActive={false}
-            />
-            <Bar
-              dataKey="body"
-              stackId="candle"
-              isAnimationActive={false}
-              radius={[1, 1, 0, 0]}
+      <div className="flex-1 min-h-0 relative flex">
+        <div
+          ref={chartContainerRef}
+          className="flex-1 min-h-0 cursor-grab active:cursor-grabbing"
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
+              barCategoryGap="20%"
+              onMouseMove={(state: any) => {
+                if (state?.activeTooltipIndex != null) {
+                  setHoveredIndex(state.activeTooltipIndex);
+                }
+              }}
+              onMouseLeave={() => setHoveredIndex(null)}
             >
-              {chartData.map((entry, index) => {
-                const isHovered = hoveredIndex === index;
-                const upColor = isHovered ? '#2edccc' : '#26a69a';
-                const downColor = isHovered ? '#ff7b78' : '#ef5350';
-                return (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={gridColor.current}
+                strokeOpacity={0.5}
+              />
+              <XAxis
+                dataKey="date"
+                tickFormatter={formatDateShort}
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={{ stroke: gridColor.current }}
+                interval="preserveStartEnd"
+                minTickGap={50}
+              />
+              <YAxis
+                domain={[yMin, yMax]}
+                tickFormatter={formatSum}
+                tick={{ fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                width={70}
+                orientation="right"
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.5 }} />
+              <Bar
+                dataKey="base"
+                stackId="candle"
+                fill="transparent"
+                isAnimationActive={false}
+              />
+              <Bar
+                dataKey="body"
+                stackId="candle"
+                isAnimationActive={false}
+                radius={[2, 2, 2, 2]}
+              >
+                {chartData.map((entry, index) => (
                   <Cell
                     key={index}
-                    fill={entry.isUp ? upColor : downColor}
-                    style={isHovered ? { filter: 'brightness(1.3)' } : undefined}
+                    fill={entry.isUp ? '#26a69a' : '#ef5350'}
                   />
-                );
-              })}
-            </Bar>
-            <Customized component={WickLayer} />
-          </BarChart>
-        </ResponsiveContainer>
+                ))}
+              </Bar>
+              <Customized component={WickLayer} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Y-axis drag zone overlay (right side) */}
+        <div
+          className="absolute right-0 top-0 bottom-0 cursor-ns-resize hover:bg-muted/30 transition-colors"
+          style={{ width: 70 }}
+          onMouseDown={handleYAxisMouseDown}
+          onDoubleClick={handleYAxisDoubleClick}
+          title="Drag to zoom price axis, double-click to reset"
+        />
       </div>
     </div>
   );
