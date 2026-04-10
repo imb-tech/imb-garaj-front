@@ -1,6 +1,6 @@
 import { useUser } from "@/constants/useUser"
 import { useLocation } from "@tanstack/react-router"
-import { Settings, User } from "lucide-react"
+import { Settings, Shield, User } from "lucide-react"
 import { ReactNode, useMemo } from "react"
 
 export interface MenuItem {
@@ -101,6 +101,14 @@ export const useItems = () =>
                 items: [
                     { label: "Transportlar", path: "/managers", extraPaths: ["/manager-trips"] },
                     { label: "Kassa", path: "/kassa" },
+                ],
+            },
+            {
+                label: "Oxrana",
+                icon: <Shield size={18} />,
+                path: "/security",
+                items: [
+                    { label: "So'rovlar", path: "/security" },
                 ],
             },
             {

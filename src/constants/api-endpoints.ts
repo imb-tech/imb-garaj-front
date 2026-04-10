@@ -58,6 +58,9 @@ export const MANAGERS_CASHFLOW_TRIP_STAT = "manager/cashflow/trip"
 export const MANAGERS_CASHFLOW_DRIVER_STAT = "manager/cashflow/driver"
 export const MANAGERS_EXPENSE_CATEGORIES = "manager/expense/category"
 
+/** ===== SECURITY ===== */
+export const SECURITY_REQUESTS = "security/requests"
+
 /** ===== CHECKOUT ===== */
 export const CHECKOUT_MAIN = "checkout/main"
 export const DRIVERS_BALANCE = "users/drivers/balance"
