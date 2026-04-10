@@ -1,39 +1,59 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
-import { SECURITY_REQUESTS } from "@/constants/api-endpoints"
-import { useGet } from "@/hooks/useGet"
-import { usePatch } from "@/hooks/usePatch"
-import { useQueryClient } from "@tanstack/react-query"
-import { useSearch } from "@tanstack/react-router"
 import { ColumnDef } from "@tanstack/react-table"
 import { Check, X } from "lucide-react"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
+const mockData: SecurityRequestType[] = [
+    {
+        id: 1,
+        car_number: "01 A 777 AA",
+        driver_name: "Abdullayev Jasur",
+        status: "pending",
+        created_at: "2026-04-10T08:30:00Z",
+    },
+    {
+        id: 2,
+        car_number: "40 B 123 CB",
+        driver_name: "Karimov Sherzod",
+        status: "approved",
+        created_at: "2026-04-10T07:15:00Z",
+    },
+    {
+        id: 3,
+        car_number: "73 C 456 DA",
+        driver_name: "Toshmatov Bekzod",
+        status: "rejected",
+        created_at: "2026-04-09T16:45:00Z",
+    },
+    {
+        id: 4,
+        car_number: "01 D 999 AA",
+        driver_name: "Raximov Otabek",
+        status: "pending",
+        created_at: "2026-04-10T09:00:00Z",
+    },
+    {
+        id: 5,
+        car_number: "26 E 321 BA",
+        driver_name: "Nurmatov Sardor",
+        status: "pending",
+        created_at: "2026-04-10T09:30:00Z",
+    },
+]
+
 const SecurityPage = () => {
-    const search = useSearch({ strict: false })
-    const queryClient = useQueryClient()
-
-    const { data, isLoading } = useGet<ListResponse<SecurityRequestType>>(
-        SECURITY_REQUESTS,
-        {
-            params: {
-                page: search.page,
-                page_size: search.page_size,
-            },
-        },
-    )
-
-    const { mutate: updateStatus, isPending } = usePatch({
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [SECURITY_REQUESTS] })
-            toast.success("Holat yangilandi")
-        },
-    })
+    const [data, setData] = useState<SecurityRequestType[]>(mockData)
 
     const handleAction = (id: number, status: "approved" | "rejected") => {
-        updateStatus(`${SECURITY_REQUESTS}/${id}`, { status })
+        setData((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, status } : item)),
+        )
+        toast.success(
+            status === "approved" ? "Tasdiqlandi" : "Rad etildi",
+        )
     }
 
     const columns = useMemo<ColumnDef<SecurityRequestType>[]>(
@@ -59,7 +79,7 @@ const SecurityPage = () => {
                     const s = row.original.status
                     if (s === "approved" || s === 1) {
                         return (
-                            <Badge className="bg-green-100 text-green-700 hover:bg-green-100 gap-1">
+                            <Badge variant="default" className="gap-1">
                                 <Check className="w-3.5 h-3.5" />
                                 Tasdiqlangan
                             </Badge>
@@ -74,7 +94,7 @@ const SecurityPage = () => {
                         )
                     }
                     return (
-                        <Badge variant="outline" className="gap-1">
+                        <Badge variant="orange" className="gap-1">
                             Kutilmoqda
                         </Badge>
                     )
@@ -85,18 +105,22 @@ const SecurityPage = () => {
                 header: "Amallar",
                 cell: ({ row }) => {
                     const s = row.original.status
-                    if (s === "approved" || s === 1 || s === "rejected" || s === 2) {
+                    if (
+                        s === "approved" ||
+                        s === 1 ||
+                        s === "rejected" ||
+                        s === 2
+                    ) {
                         return null
                     }
                     return (
                         <div className="flex items-center gap-2">
                             <Button
                                 size="sm"
-                                disabled={isPending}
+                                variant="default"
                                 onClick={() =>
                                     handleAction(row.original.id, "approved")
                                 }
-                                className="h-8 gap-1 bg-green-600 hover:bg-green-700"
                             >
                                 <Check className="w-4 h-4" />
                                 Tasdiqlash
@@ -104,11 +128,9 @@ const SecurityPage = () => {
                             <Button
                                 size="sm"
                                 variant="destructive"
-                                disabled={isPending}
                                 onClick={() =>
                                     handleAction(row.original.id, "rejected")
                                 }
-                                className="h-8 gap-1"
                             >
                                 <X className="w-4 h-4" />
                                 Rad etish
@@ -118,20 +140,14 @@ const SecurityPage = () => {
                 },
             },
         ],
-        [isPending],
+        [],
     )
 
     return (
         <DataTable
             numeration
-            loading={isLoading}
             columns={columns}
-            data={data?.results}
-            paginationProps={{
-                totalPages: data?.total_pages,
-                paramName: "page",
-                pageSizeParamName: "page_size",
-            }}
+            data={data}
         />
     )
 }

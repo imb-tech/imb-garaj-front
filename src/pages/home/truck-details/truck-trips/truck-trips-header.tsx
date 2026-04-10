@@ -2,7 +2,7 @@ import { ParamCombobox } from "@/components/as-params/combobox"
 import ParamDateRange from "@/components/as-params/date-picker-range"
 import { Button } from "@/components/ui/button" // Import Button
 import {
-    COMMON_SELECTABLE_VEHICLE_TYPE,
+    VEHICLES,
     SETTINGS_SELECTABLE_USERS,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -23,10 +23,9 @@ const TruckTripsHeader = () => {
     )
 
     const { data: vehicleData } = useGet<ListResponse<VehicleType>>(
-        COMMON_SELECTABLE_VEHICLE_TYPE,
+        VEHICLES,
+        { params: { page_size: 10000 } },
     )
-    console.log("check",vehicleData);
-    
 
     const hasActiveFilters =
         search.driver ||
@@ -76,7 +75,7 @@ const TruckTripsHeader = () => {
                     paramName="vehicle"
                     options={vehicleData?.results ?? []}
                     valueKey="id"
-                    labelKey="type"
+                    labelKey="truck_number"
                     label="Transportlar"
                     className="w-full"
                     addButtonProps={{

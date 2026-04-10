@@ -1,16 +1,17 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
-const vehicleTypeOptions = [
-    { value: "truck", label: "Avtomobil" },
-    { value: "trailer", label: "Tirkama" },
-]
+const TYPE_LABELS: Record<number, string> = {
+    1: "Yuk tashuvchi",
+    2: "Qazuvchi",
+}
+
 export const useColumnsVehicleTable = () => {
-    return useMemo<ColumnDef<VehicleRoleType>[]>(
+    return useMemo<ColumnDef<any>[]>(
         () => [
             {
-                accessorKey: "name",
-                header: "Avtomobil nomi",
+                accessorKey: "truck_number",
+                header: "Avtomobil raqami",
                 enableSorting: true,
             },
             {
@@ -18,19 +19,21 @@ export const useColumnsVehicleTable = () => {
                 header: "Avtomobil turi",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const typeValue = row.getValue("type")
-
-                    const vehicleType = vehicleTypeOptions.find(
-                        (option) => option.value === typeValue,
+                    const typeValue = row.getValue("type") as number
+                    return (
+                        <span className="text-xs px-2 py-0.5 rounded-md bg-muted font-medium">
+                            {TYPE_LABELS[typeValue] ?? "—"}
+                        </span>
                     )
-
-                    return vehicleType ? vehicleType.label : typeValue
                 },
             },
             {
-                accessorKey: "owner",
-                header: "Egasi",
+                accessorKey: "driver",
+                header: "Haydovchi",
                 enableSorting: true,
+                cell: ({ row }) => {
+                    return row.getValue("driver") || "—"
+                },
             },
         ],
         [],

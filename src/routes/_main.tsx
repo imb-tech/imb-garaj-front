@@ -22,23 +22,13 @@ function MainLayout() {
     return (
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
-            <SidebarInset>
-                <div className="w-full h-full overflow-y-auto">
-                    <div
-                        className={cn(
-                            "fixed top-0 right-0 z-30 transition-[width,height,padding] w-full",
-                        )}
-                    >
-                        <Header />
-                    </div>
+            <SidebarInset className="overflow-y-auto max-h-svh">
+                <div className="sticky top-0 z-30">
+                    <Header />
+                </div>
 
-                    <main
-                        className={cn(
-                            "mx-auto p-4 h-full overflow-y-auto   pt-20 flex flex-col pb-10",
-                        )}
-                    >
-                        <Outlet />
-                    </main>
+                <div className="mx-auto p-4 flex flex-col pb-10 w-full">
+                    <Outlet />
                 </div>
             </SidebarInset>
         </SidebarProvider>

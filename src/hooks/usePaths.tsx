@@ -100,6 +100,7 @@ export const useItems = () =>
                 extraPaths: ["/manager-trips"],
                 items: [
                     { label: "Transportlar", path: "/managers", extraPaths: ["/manager-trips"] },
+                    { label: "Navbat", path: "/navbat" },
                     { label: "Kassa", path: "/kassa" },
                 ],
             },
@@ -135,10 +136,6 @@ export const useItems = () =>
                     {
                         label: "To'lov turlari",
                         path: "/payment-types",
-                    },
-                    {
-                        label: "Xarajat turlari",
-                        path: "/expense-types",
                     },
                 ],
             },

@@ -30,53 +30,67 @@ const Header = () => {
         return match?.path ?? pathname
     }, [childPaths, pathname])
 
-    return (
-        <header className="p-2 gap-4 flex items-center justify-between bg-card border-b border-border max-w-full box-border">
-            <div className="flex items-center xl:gap-6 max-w-full overflow-x-auto custom-scrollbar">
-                <div
-                    className={cn(
-                        "flex items-center gap-3 transition-all duration-300 min-w-0",
-                        open && "min-w-[13rem]",
-                    )}
-                >
-                    <SidebarTrigger className="text-gray-500 dark:text-white" />
-                    <h1 className="font-bold text-primary text-2xl ">
-                        China-Logistics
-                    </h1>
-                </div>
-                {!!childPaths.length && (
-                    <Tabs
-                        className="hidden xl:flex overflow-x-auto custom-scrollbar max-w-full"
-                        value={activeTab}
-                        onValueChange={(path) => navigate({ to: path })}
-                    >
-                        <TabsList className="gap-2 bg-transparent ">
-                            {childPaths?.map((link) => (
-                                <TabsTrigger key={link.label} value={link.path}>
-                                    {link.icon} {link.label}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </Tabs>
-                )}
-            </div>
+    const tabsContent = !!childPaths.length && (
+        <Tabs
+            className="flex overflow-x-auto custom-scrollbar max-w-full"
+            value={activeTab}
+            onValueChange={(path) => navigate({ to: path })}
+        >
+            <TabsList className="gap-2 bg-transparent">
+                {childPaths?.map((link) => (
+                    <TabsTrigger key={link.label} value={link.path} className="text-xs sm:text-sm">
+                        {link.icon} {link.label}
+                    </TabsTrigger>
+                ))}
+            </TabsList>
+        </Tabs>
+    )
 
-            <hgroup className="flex items-center gap-2 sm:gap-4">
-                {pathname.startsWith("/moliya") && (
-                    <ParamDateRange
-                        from="from_date"
-                        to="to_date"
-                        addButtonProps={{
-                            className: "!bg-muted/50 h-8 text-xs min-w-28 justify-start",
-                        }}
-                    />
-                )}
-                <div className="flex sm:gap-2">
-                    <ThemeColorToggle />
+    return (
+        <div>
+            <header className="p-2 gap-4 flex items-center justify-between bg-card border-b border-border max-w-full box-border">
+                <div className="flex items-center xl:gap-6 max-w-full overflow-x-auto custom-scrollbar">
+                    <div
+                        className={cn(
+                            "flex items-center gap-3 transition-all duration-300 min-w-0",
+                            open && "min-w-[13rem]",
+                        )}
+                    >
+                        <SidebarTrigger className="text-gray-500 dark:text-white" />
+                        <h1 className="font-bold text-primary text-2xl ">
+                            China-Logistics
+                        </h1>
+                    </div>
+                    {/* Desktop: tabs in header */}
+                    <div className="hidden xl:block">
+                        {tabsContent}
+                    </div>
                 </div>
-                {isMobile && <NavUser />}
-            </hgroup>
-        </header>
+
+                <hgroup className="flex items-center gap-2 sm:gap-4">
+                    {pathname.startsWith("/moliya") && (
+                        <ParamDateRange
+                            from="from_date"
+                            to="to_date"
+                            addButtonProps={{
+                                className: "!bg-muted/50 h-8 text-xs min-w-28 justify-start",
+                            }}
+                        />
+                    )}
+                    <div className="flex sm:gap-2">
+                        <ThemeColorToggle />
+                    </div>
+                    {isMobile && <NavUser />}
+                </hgroup>
+            </header>
+
+            {/* Mobile/tablet: tabs below header */}
+            {tabsContent && (
+                <div className="xl:hidden overflow-x-auto custom-scrollbar bg-card border-b border-border px-2 py-1">
+                    {tabsContent}
+                </div>
+            )}
+        </div>
     )
 }
 

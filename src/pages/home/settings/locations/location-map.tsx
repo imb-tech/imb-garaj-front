@@ -8,6 +8,7 @@ import {
     Polygon,
 } from "@react-google-maps/api"
 import { Navigation, Plus, Trash } from "lucide-react"
+import { useTheme } from "@/layouts/theme"
 import {
     forwardRef,
     useCallback,
@@ -21,6 +22,26 @@ const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAP_API_KEY
 const LIBRARIES: ("drawing" | "places")[] = ["drawing", "places"]
 const DEFAULT_CENTER = { lat: 39.6542, lng: 66.9597 } // Uzbekistan
 const DEFAULT_ZOOM = 6
+
+const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
+    { elementType: "geometry", stylers: [{ color: "#1a2744" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#8ec3f0" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#1a2744" }] },
+    { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#2a4070" }] },
+    { featureType: "administrative.country", elementType: "labels.text.fill", stylers: [{ color: "#7baad4" }] },
+    { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#a8d0f0" }] },
+    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#6a9ec4" }] },
+    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#1c3050" }] },
+    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#5a8ab0" }] },
+    { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#243b5e" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#7baad4" }] },
+    { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#2d4a72" }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#345580" }] },
+    { featureType: "road.highway.controlled_access", elementType: "geometry", stylers: [{ color: "#3d6090" }] },
+    { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#6a9ec4" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1d35" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3a6a9e" }] },
+]
 
 const containerStyle = {
     width: "100%",
@@ -59,6 +80,8 @@ const closePolygon = (path: google.maps.LatLngLiteral[]) => {
 
 const LocationMap = forwardRef<LocationMapRef, Props>(
     function LocationMapComponent({ onPolygonChange, defaultPolygon }, ref) {
+        const { theme } = useTheme()
+        const isDark = theme === "dark"
         const mapRef = useRef<google.maps.Map | null>(null)
         const [polygonPaths, setPolygonPaths] = useState<
             google.maps.LatLngLiteral[][]
@@ -134,14 +157,17 @@ const LocationMap = forwardRef<LocationMapRef, Props>(
 
         const addPolygon = useCallback(
             (path: google.maps.LatLngLiteral[]) => {
-                setPolygonPaths((prev) => {
-                    const next = [...prev, path]
-                    savePolygonsToForm(next)
-                    return next
-                })
-                setSelectedIndex(polygonPaths.length)
+                // Only one polygon allowed — replace existing
+                Object.keys(polyStoreRef.current).forEach((k) =>
+                    clearListeners(Number(k)),
+                )
+                polyStoreRef.current = {}
+                const next = [path]
+                setPolygonPaths(next)
+                savePolygonsToForm(next)
+                setSelectedIndex(0)
             },
-            [savePolygonsToForm, polygonPaths.length],
+            [savePolygonsToForm],
         )
 
         const clearAllPolygons = useCallback(() => {
@@ -301,6 +327,14 @@ const LocationMap = forwardRef<LocationMapRef, Props>(
             [clearAllPolygons],
         )
 
+        // Sync theme with map
+        useEffect(() => {
+            if (!mapRef.current || !mapLoaded) return
+            mapRef.current.setOptions({
+                styles: isDark ? DARK_MAP_STYLES : [],
+            })
+        }, [isDark, mapLoaded])
+
         // Load default polygon when map is ready
         const defaultApplied = useRef(false)
         useEffect(() => {
@@ -387,6 +421,7 @@ const LocationMap = forwardRef<LocationMapRef, Props>(
                                     window.google?.maps?.ControlPosition
                                         ?.TOP_RIGHT,
                             },
+                            styles: isDark ? DARK_MAP_STYLES : undefined,
                         }}
                     >
                         {polygonPaths.map((path, i) => {
@@ -499,17 +534,19 @@ const LocationMap = forwardRef<LocationMapRef, Props>(
                     >
                         <Trash size={20} />
                     </button>
-                    <button
-                        onClick={() => setPolygonMode(true)}
-                        className={cn(
-                            "h-10 w-10 flex items-center justify-center rounded shadow-md bg-white text-black hover:bg-zinc-100 cursor-pointer",
-                            polygonMode &&
-                                "bg-orange-500 text-white hover:bg-orange-600",
-                        )}
-                        type="button"
-                    >
-                        <Plus size={20} />
-                    </button>
+                    {polygonPaths.length === 0 && (
+                        <button
+                            onClick={() => setPolygonMode(true)}
+                            className={cn(
+                                "h-10 w-10 flex items-center justify-center rounded shadow-md bg-white text-black hover:bg-zinc-100 cursor-pointer",
+                                polygonMode &&
+                                    "bg-orange-500 text-white hover:bg-orange-600",
+                            )}
+                            type="button"
+                        >
+                            <Plus size={20} />
+                        </button>
+                    )}
                     <button
                         onClick={goToMyLocation}
                         className="h-10 w-10 flex items-center justify-center rounded shadow-md bg-white text-black hover:bg-zinc-100 cursor-pointer"

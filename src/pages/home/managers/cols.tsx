@@ -79,11 +79,6 @@ export const useColumnsManagersVehicles = () => {
                     return <span className="text-muted-foreground">{loading_name || unloading_name || "-"}</span>
                 },
             },
-            {
-                accessorKey: "pending_orders",
-                header: "Kutilayotgan reyslar",
-                enableSorting: true,
-            },
         ],
         [],
     )

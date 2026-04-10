@@ -24,4 +24,5 @@ dist-ssr
 *.sln
 *.sw?
 
-
+# Swagger docs
+.swagger-docs.yaml

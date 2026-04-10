@@ -129,7 +129,6 @@ const AddDriverModal = () => {
                 />
 
                 <FormInput
-                    required
                     registerOptions={{
                         maxLength: {
                             value: 9,
@@ -156,7 +155,6 @@ const AddDriverModal = () => {
                         },
                     }}
                     thousandSeparator={""}
-                    required
                     name="driver.pinfl"
                     label="PINFL"
                     control={form.control}
@@ -164,7 +162,6 @@ const AddDriverModal = () => {
                 />
 
                 <FormInput
-                    required
                     uppercase={true}
                     name="driver.driver_license"
                     label="Haydovchilik guvohnomasi"
@@ -173,7 +170,6 @@ const AddDriverModal = () => {
                 />
 
                 <FormNumberInput
-                    required
                     name="driver.experience"
                     label="Ish tajribasi (yil)"
                     control={form.control}
@@ -182,12 +178,12 @@ const AddDriverModal = () => {
                 />
 
                 <FormDatePicker
-                    required
                     name="driver.driver_license_date"
                     label="Guvohnoma amal qilish muddati"
                     control={form.control}
                     placeholder="15/12/2025"
                 />
+
                 <div className="flex items-center justify-end gap-2 md:col-span-2">
                     <Button
                         className="min-w-36 w-full md:w-max"

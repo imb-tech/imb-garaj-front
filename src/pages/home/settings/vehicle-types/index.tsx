@@ -12,7 +12,7 @@ import { useColumnsVehicleTable } from "./vehicle-cols"
 
 const VehicleTypePage = () => {
     const search = useSearch({ strict: false })
-    const { data, isLoading } = useGet<ListResponse<VehicleRoleType>>(
+    const { data, isLoading } = useGet<ListResponse<any>>(
         SETTINGS_VEHICLE_TYPE,
         {
             params: {
@@ -23,17 +23,17 @@ const VehicleTypePage = () => {
         },
     )
     const { getData, setData } = useGlobalStore()
-    const item = getData<VehicleRoleType>(SETTINGS_VEHICLE_TYPE)
+    const item = getData<any>(SETTINGS_VEHICLE_TYPE)
 
     const { openModal: openDeleteModal } = useModal("delete")
     const { openModal: openCreateModal } = useModal(`create`)
     const columns = useColumnsVehicleTable()
 
-    const handleDelete = (row: { original: VehicleRoleType }) => {
+    const handleDelete = (row: { original: any }) => {
         setData(SETTINGS_VEHICLE_TYPE, row.original)
         openDeleteModal()
     }
-    const handleEdit = (item: VehicleRoleType) => {
+    const handleEdit = (item: any) => {
         setData(SETTINGS_VEHICLE_TYPE, item)
         openCreateModal()
     }
@@ -65,8 +65,8 @@ const VehicleTypePage = () => {
             <Modal
                 title={
                     item?.id ?
-                        "Avtomobil turinni tahrirlash"
-                    :   " Avtomobil qo'shish"
+                        "Avtomobilni tahrirlash"
+                    :   "Avtomobil qo'shish"
                 }
                 modalKey="create"
             >

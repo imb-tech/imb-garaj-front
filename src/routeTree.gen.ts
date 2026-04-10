@@ -69,6 +69,9 @@ const MainManagersTransportsIndexLazyImport = createFileRoute(
 const MainManagersTechnicCheckIndexLazyImport = createFileRoute(
   '/_main/_managers/technic-check/',
 )()
+const MainManagersNavbatIndexLazyImport = createFileRoute(
+  '/_main/_managers/navbat/',
+)()
 const MainSettingsLocationsCreateLazyImport = createFileRoute(
   '/_main/_settings/locations/create',
 )()
@@ -243,6 +246,14 @@ const MainManagersTechnicCheckIndexLazyRoute =
     ),
   )
 
+const MainManagersNavbatIndexLazyRoute =
+  MainManagersNavbatIndexLazyImport.update({
+    path: '/navbat/',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/_managers/navbat/index.lazy').then((d) => d.Route),
+  )
+
 const MainSettingsLocationsCreateLazyRoute =
   MainSettingsLocationsCreateLazyImport.update({
     path: '/locations/create',
@@ -401,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSettingsLocationsCreateLazyImport
       parentRoute: typeof MainImport
     }
+    '/_main/_managers/navbat/': {
+      id: '/_main/_managers/navbat/'
+      path: '/navbat'
+      fullPath: '/navbat'
+      preLoaderRoute: typeof MainManagersNavbatIndexLazyImport
+      parentRoute: typeof MainImport
+    }
     '/_main/_managers/technic-check/': {
       id: '/_main/_managers/technic-check/'
       path: '/technic-check'
@@ -546,6 +564,7 @@ interface MainRouteChildren {
   MainTrucksOrdersIdRoute: typeof MainTrucksOrdersIdRoute
   MainTrucksTruckDetailIdRoute: typeof MainTrucksTruckDetailIdRoute
   MainSettingsLocationsCreateLazyRoute: typeof MainSettingsLocationsCreateLazyRoute
+  MainManagersNavbatIndexLazyRoute: typeof MainManagersNavbatIndexLazyRoute
   MainManagersTechnicCheckIndexLazyRoute: typeof MainManagersTechnicCheckIndexLazyRoute
   MainManagersTransportsIndexLazyRoute: typeof MainManagersTransportsIndexLazyRoute
   MainSettingsDriversIndexLazyRoute: typeof MainSettingsDriversIndexLazyRoute
@@ -575,6 +594,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainTrucksOrdersIdRoute: MainTrucksOrdersIdRoute,
   MainTrucksTruckDetailIdRoute: MainTrucksTruckDetailIdRoute,
   MainSettingsLocationsCreateLazyRoute: MainSettingsLocationsCreateLazyRoute,
+  MainManagersNavbatIndexLazyRoute: MainManagersNavbatIndexLazyRoute,
   MainManagersTechnicCheckIndexLazyRoute:
     MainManagersTechnicCheckIndexLazyRoute,
   MainManagersTransportsIndexLazyRoute: MainManagersTransportsIndexLazyRoute,
@@ -612,6 +632,7 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/locations/create': typeof MainSettingsLocationsCreateLazyRoute
+  '/navbat': typeof MainManagersNavbatIndexLazyRoute
   '/technic-check': typeof MainManagersTechnicCheckIndexLazyRoute
   '/transports': typeof MainManagersTransportsIndexLazyRoute
   '/security': typeof MainSecuritySecurityIndexLazyRoute
@@ -643,6 +664,7 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof MainTrucksOrdersIdRoute
   '/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/locations/create': typeof MainSettingsLocationsCreateLazyRoute
+  '/navbat': typeof MainManagersNavbatIndexLazyRoute
   '/technic-check': typeof MainManagersTechnicCheckIndexLazyRoute
   '/transports': typeof MainManagersTransportsIndexLazyRoute
   '/security': typeof MainSecuritySecurityIndexLazyRoute
@@ -677,6 +699,7 @@ export interface FileRoutesById {
   '/_main/_trucks/orders/$id': typeof MainTrucksOrdersIdRoute
   '/_main/_trucks/truck-detail/$id': typeof MainTrucksTruckDetailIdRoute
   '/_main/_settings/locations/create': typeof MainSettingsLocationsCreateLazyRoute
+  '/_main/_managers/navbat/': typeof MainManagersNavbatIndexLazyRoute
   '/_main/_managers/technic-check/': typeof MainManagersTechnicCheckIndexLazyRoute
   '/_main/_managers/transports/': typeof MainManagersTransportsIndexLazyRoute
   '/_main/_security/security/': typeof MainSecuritySecurityIndexLazyRoute
@@ -710,6 +733,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/truck-detail/$id'
     | '/locations/create'
+    | '/navbat'
     | '/technic-check'
     | '/transports'
     | '/security'
@@ -740,6 +764,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/truck-detail/$id'
     | '/locations/create'
+    | '/navbat'
     | '/technic-check'
     | '/transports'
     | '/security'
@@ -772,6 +797,7 @@ export interface FileRouteTypes {
     | '/_main/_trucks/orders/$id'
     | '/_main/_trucks/truck-detail/$id'
     | '/_main/_settings/locations/create'
+    | '/_main/_managers/navbat/'
     | '/_main/_managers/technic-check/'
     | '/_main/_managers/transports/'
     | '/_main/_security/security/'
@@ -837,6 +863,7 @@ export const routeTree = rootRoute
         "/_main/_trucks/orders/$id",
         "/_main/_trucks/truck-detail/$id",
         "/_main/_settings/locations/create",
+        "/_main/_managers/navbat/",
         "/_main/_managers/technic-check/",
         "/_main/_managers/transports/",
         "/_main/_settings/drivers/",
@@ -906,6 +933,10 @@ export const routeTree = rootRoute
     },
     "/_main/_settings/locations/create": {
       "filePath": "_main/_settings/locations/create.lazy.tsx",
+      "parent": "/_main"
+    },
+    "/_main/_managers/navbat/": {
+      "filePath": "_main/_managers/navbat/index.lazy.tsx",
       "parent": "/_main"
     },
     "/_main/_managers/technic-check/": {

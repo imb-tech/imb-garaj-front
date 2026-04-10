@@ -82,7 +82,7 @@ export function NavMain() {
                                         if (mobile) toggleSidebar()
                                     }}
                                 >
-                                    <span>{icon}</span>
+                                    {icon}
                                     <span>{label}</span>
                                     
                                     {pending && (
