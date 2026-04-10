@@ -1,6 +1,6 @@
 import { useUser } from "@/constants/useUser"
 import { useLocation } from "@tanstack/react-router"
-import { Settings, Truck, User, Coins } from "lucide-react"
+import { Settings, User } from "lucide-react"
 import { ReactNode, useMemo } from "react"
 
 export interface MenuItem {
@@ -101,21 +101,7 @@ export const useItems = () =>
                 items: [
                     { label: "Transportlar", path: "/managers", extraPaths: ["/manager-trips"] },
                     { label: "Kassa", path: "/kassa" },
-                    {
-                        label: "Texnik ko'rik",
-                        path: "/technic-check",
-                    },
                 ],
-            },
-            {
-                label: "Investor",
-                icon: <Truck width={18} />,
-                path: "/truck",
-            },
-            {
-                label: "Moliya",
-                icon: <Coins width={18} />,
-                path: "/moliya",
             },
             {
                 label: "Sozlamalar",
@@ -133,10 +119,6 @@ export const useItems = () =>
                     {
                         label: "Haydovchilar",
                         path: "/drivers",
-                    },
-                    {
-                        label: "Rollar",
-                        path: "/roles",
                     },
                     {
                         label: "Mashina turlari",

@@ -10,7 +10,7 @@ export const useColumnsVehicleTable = () => {
         () => [
             {
                 accessorKey: "name",
-                header: " Avtomobil nomi",
+                header: "Avtomobil nomi",
                 enableSorting: true,
             },
             {
@@ -26,6 +26,11 @@ export const useColumnsVehicleTable = () => {
 
                     return vehicleType ? vehicleType.label : typeValue
                 },
+            },
+            {
+                accessorKey: "owner",
+                header: "Egasi",
+                enableSorting: true,
             },
         ],
         [],

@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
-import { formatPhoneNumber } from "../customers/phone-number"
+import { formatPhoneNumber } from "@/lib/format-phone-number"
 export const useColumnsDriverTable = () => {
     return useMemo<ColumnDef<DriversType>[]>(
         () => [

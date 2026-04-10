@@ -15,8 +15,8 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 const vehicleTypeOptions = [
-    { value: "truck", label: "Avtomobil" },
-    { value: "trailer", label: "Tirkama" },
+    { value: "truck", label: "Yuk tashuvchi" },
+    { value: "excavator", label: "Qazuvchi" },
 ]
 
 const AddVehicleModal = () => {

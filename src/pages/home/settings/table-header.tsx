@@ -11,6 +11,7 @@ interface TableHeaderProps {
     url: string
     searchKey: string
     pageKey: string
+    onAdd?: () => void
 }
 
 const TableHeader = ({
@@ -18,11 +19,16 @@ const TableHeader = ({
     storeKey,
     searchKey,
     pageKey,
+    onAdd,
 }: TableHeaderProps) => {
     const { openModal: openCreateModal } = useModal("create")
     const { clearKey } = useGlobalStore()
 
     const handleAdd = () => {
+        if (onAdd) {
+            onAdd()
+            return
+        }
         if (storeKey) {
             clearKey(storeKey)
         }

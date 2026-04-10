@@ -68,14 +68,6 @@ export const useColumnsManagersTrips = (opts?: {
                     <div>{(row.original as any).completed_order_count || "0"}</div>
                 ),
             },
-            {
-                accessorKey: "pending_order_count",
-                header: "Kutilayotgan reyslar",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div>{row.original.pending_order_count || "0"}</div>
-                ),
-            },
             // {
             //     accessorKey: "status",
             //     header: "Aylanma statusi",
@@ -86,22 +78,6 @@ export const useColumnsManagersTrips = (opts?: {
             //     },
             // },
 
-            {
-                accessorKey: "income_uzs",
-                header: "Tushum (uzs)",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div>{formatMoney(row.original.income_uzs)}</div>
-                ),
-            },
-            {
-                accessorKey: "income_usd",
-                header: "Tushum (usd)",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <div>{formatMoney(row.original.income_usd)}</div>
-                ),
-            },
             {
                 accessorKey: "start_mileage",
                 header: "Kirish probegi",

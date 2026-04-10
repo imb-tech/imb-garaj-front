@@ -1,66 +1,49 @@
+import { DataTable } from "@/components/ui/datatable"
+import { useNavigate } from "@tanstack/react-router"
+import { useLocationColumns } from "./location-cols"
+import { MOCK_LOCATIONS } from "./mock-data"
+import type { LocationItem } from "./types"
 import ParamInput from "@/components/as-params/input"
-import Modal from "@/components/custom/modal"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { SETTINGS_COUNTRIES } from "@/constants/api-endpoints"
-import { useModal } from "@/hooks/useModal"
-import { useGlobalStore } from "@/store/global-store"
-import { CirclePlus, Plus, PlusCircle } from "lucide-react"
-import CountriesTable from "./tables/country"
-import AddCountriesModal from "./tables/country/add-country"
+import { PlusCircle } from "lucide-react"
 
 const Locations = () => {
-    const { openModal } = useModal("country-modal")
-    const { clearKey } = useGlobalStore()
+    const navigate = useNavigate()
+    const columns = useLocationColumns()
 
-    const handleCountyModalOpen = () => {
-        clearKey(SETTINGS_COUNTRIES)
-        openModal()
+    const handleEdit = (row: LocationItem) => {
+        navigate({ to: "/locations/$id", params: { id: String(row.id) } })
+    }
+
+    const handleCreate = () => {
+        navigate({ to: "/locations/create" })
     }
 
     return (
-        <>
-            <Card>
-                <CardHeader className="pb-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <CardTitle className="text-xl font-semibold tracking-tight">
-                            Davlatlar
-                        </CardTitle>
-                        <div className="flex items-center  gap-4">
-                            <div className="w-full sm:w-[360px]">
-                                <ParamInput
-                                    fullWidth
-                                    placeholder="Qidirish..."
-                                    searchKey="country_search"
-                                    pageKey="page"
-                                />
-                            </div>
-                            <Button
-                                className="flex items-center gap-2"
-                                onClick={handleCountyModalOpen}
-                            >
-                                <CirclePlus size={18} />
-                                Qo'shish
-                            </Button>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-0 pt-0">
-                    <div className="h-full rounded-md overflow-hidden">
-                        <div className="h-full ">
-                            <CountriesTable />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-            <Modal
-                size="max-w-xl"
-                title="Davlat qo'shish"
-                modalKey="country-modal"
-            >
-                <AddCountriesModal />
-            </Modal>
-        </>
+        <DataTable
+            columns={columns}
+            data={MOCK_LOCATIONS}
+            onEdit={({ original }) => handleEdit(original)}
+            onRowClick={handleEdit}
+            numeration
+            viewAll
+            head={
+                <div className="flex items-center justify-between gap-3 mb-3">
+                    <ParamInput
+                        fullWidth
+                        searchKey="location_search"
+                        pageKey="page"
+                    />
+                    <Button
+                        className="flex items-center gap-2"
+                        onClick={handleCreate}
+                        icon={<PlusCircle size={18} />}
+                    >
+                        Qo'shish
+                    </Button>
+                </div>
+            }
+        />
     )
 }
 

@@ -2,12 +2,14 @@ import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowRight } from "lucide-react"
 import { useMemo } from "react"
-import { STATUS_LABELS } from "./managers-trips/cols"
+const AYLANMA_LABELS: Record<number, string> = {
+    1: "Faol",
+    2: "Faol emas",
+}
 
-const STATUS_COLORS: Record<number, string> = {
-    1: "bg-green-500/10 text-green-600 border-transparent",    // Band
-    2: "bg-gray-500/10 text-gray-500 border-transparent",       // Bo'sh
-    3: "bg-orange-500/10 text-orange-600 border-transparent",  // Ta'mirda
+const AYLANMA_COLORS: Record<number, string> = {
+    1: "bg-green-500/10 text-green-600 border-transparent",
+    2: "bg-gray-500/10 text-gray-500 border-transparent",
 }
 
 export const useColumnsManagersVehicles = () => {
@@ -43,10 +45,10 @@ export const useColumnsManagersVehicles = () => {
                 enableSorting: true,
                 cell: ({ row }) => {
                     const status = row.original?.status
-                    const colorClass = STATUS_COLORS[status] || "bg-gray-500/10 text-gray-500 border-gray-200"
+                    const colorClass = AYLANMA_COLORS[status] || "bg-gray-500/10 text-gray-500 border-transparent"
                     return (
                         <Badge variant="outline" className={colorClass}>
-                            {STATUS_LABELS[status] || "-"}
+                            {AYLANMA_LABELS[status] || "Faol emas"}
                         </Badge>
                     )
                 },
