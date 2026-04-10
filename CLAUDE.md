@@ -24,3 +24,27 @@
 - `src/lib/` — Utility functions
 - `src/layouts/` — Layout components
 - `src/routes/` — Route definitions (auto-generated `routeTree.gen.ts`)
+
+## Branch: imb-xitoy — China Logistics
+
+### What's been done
+
+- **Sidebar cleanup:** Removed Investor, Moliya, Rollar nav items — not needed for this project
+- **Locations page (`/locations`):** Rebuilt from countries/regions/districts CRUD into a map-based location system
+  - DataTable listing locations with Name and Type (Yuklash/Tushirish) columns
+  - Uses hardcoded mock data (`mock-data.ts`) — no backend yet
+  - `/locations/$id` — Edit page with Google Maps polygon drawing (adapted from hr-shadcn)
+  - `/locations/create` — New location page, same map UI
+  - POST/PATCH disabled, logs to console with toast until backend is ready
+- **Managers trips (`/managers`):**
+  - "Aylanma statusi" changed to Faol / Faol emas (was Band/Bo'sh/Ta'mirda)
+  - Removed columns: Tushum (uzs), Tushum (usd), Kutilayotgan reyslar
+- **Bug fix:** Fixed broken import in `driver-cols.tsx` (`formatPhoneNumber` path)
+
+### Agenda / TODO
+
+- Backend API for `common/locations` — once ready, swap mock data for `useGet`/`usePost`/`usePatch`
+- Location types from backend — confirm if `loading`/`unloading` matches API enum
+- Polygon data format — confirm GeoJSON Polygon structure matches backend expectations
+- Aylanma logic — daily rotation, needs backend field to determine Faol/Faol emas based on today's aylanma
+- Moliya & Investor pages — removed from nav but code still exists, can be cleaned up later if not needed
