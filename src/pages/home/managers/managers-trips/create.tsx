@@ -1,3 +1,4 @@
+import { FormDatePicker } from "@/components/form/date-picker"
 import { FormCombobox } from "@/components/form/combobox"
 import FileUpload from "@/components/form/file-upload"
 import { FormNumberInput } from "@/components/form/number-input"
@@ -8,6 +9,7 @@ import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
+import { IS_READY } from "@/store/ready-mode"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
 import { X } from "lucide-react"
@@ -150,6 +152,15 @@ export default function CreateManagerTrips() {
                     label="Haydovchi"
                 />
 
+                {(!IS_READY || isEdit) && (
+                    <FormDatePicker
+                        control={control}
+                        required
+                        name="start"
+                        label="Boshlash sanasi"
+                    />
+                )}
+
                 <FormNumberInput
                     name="start_mileage"
                     required
@@ -203,6 +214,11 @@ export default function CreateManagerTrips() {
                 )}
                 {item?.id && (
                     <>
+                        <FormDatePicker
+                            control={control}
+                            name="end"
+                            label="Tugatish sanasi"
+                        />
                         <FormNumberInput
                             name="end_mileage"
                             required

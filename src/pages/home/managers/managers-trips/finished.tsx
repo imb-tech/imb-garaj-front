@@ -7,6 +7,7 @@ import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { usePatch } from "@/hooks/usePatch"
 import { useGlobalStore } from "@/store/global-store"
+import { IS_READY } from "@/store/ready-mode"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
 import { X } from "lucide-react"
@@ -77,6 +78,14 @@ export default function FinishManagerTrips() {
     return (
         <div className="max-h-[80vh] overflow-y-auto pr-2 pl-2 no-scrollbar-x">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+                {!IS_READY && (
+                    <FormDatePicker
+                        control={control}
+                        required
+                        name="end"
+                        label="Tugatish sanasi"
+                    />
+                )}
                 <FormNumberInput
                     name="end_mileage"
                     required
