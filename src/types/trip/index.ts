@@ -82,6 +82,7 @@ type TripOrdersRow = {
     unloading: number
     trip: number
     cargo_type: string | number
+    direction: number | null
     date: string | number
     client: string
     payment_type: string | number

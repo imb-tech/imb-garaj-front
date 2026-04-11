@@ -1,37 +1,51 @@
 import { FormCombobox } from "@/components/form/combobox"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
-import { useModal } from "@/hooks/useModal"
-import { useGlobalStore } from "@/store/global-store"
 import {
-    ROUTE_CONFIG_KEY,
-    useRouteConfigsStore,
-    type RouteConfig,
-} from "@/store/route-configs-store"
+    COMMON_DIRECTIONS,
+    SETTINGS_SELECTABLE_CARGO_TYPE,
+    SETTINGS_SELECTABLE_CLIENT,
+    SETTINGS_SELECTABLE_DISTRICT,
+    SETTINGS_SELECTABLE_PAYMENT_TYPE,
+} from "@/constants/api-endpoints"
+import { useGet } from "@/hooks/useGet"
+import { useModal } from "@/hooks/useModal"
+import { usePatch } from "@/hooks/usePatch"
+import { usePost } from "@/hooks/usePost"
+import { useGlobalStore } from "@/store/global-store"
+import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import {
-    CARGO_TYPE_OPTIONS,
-    CLIENT_OPTIONS,
-    CURRENCY_OPTIONS,
-    LOCATION_OPTIONS,
-    PAYMENT_TYPE_OPTIONS,
-} from "./options"
 
-type FormValues = Omit<RouteConfig, "id">
+type Direction = {
+    id?: number
+    owner: number | null
+    load: number | null
+    unload: number | null
+    cargo_type: number | null
+    payment_type: number | null
+    currency: number | null
+    amount: string | null
+}
+
+type SelectItem = { id: number | string; name: string }
+
+const CURRENCY_OPTIONS = [
+    { id: 1, name: "UZS - So'm" },
+    { id: 2, name: "USD - AQSh dollari" },
+]
 
 const AddRouteConfigModal = () => {
+    const queryClient = useQueryClient()
     const { closeModal } = useModal("create")
     const { getData, clearKey } = useGlobalStore()
-    const current = getData<RouteConfig>(ROUTE_CONFIG_KEY)
-    const add = useRouteConfigsStore((s) => s.add)
-    const update = useRouteConfigsStore((s) => s.update)
+    const current = getData<Direction>(COMMON_DIRECTIONS)
 
-    const form = useForm<FormValues>({
+    const form = useForm<Direction>({
         defaultValues: {
-            client: current?.client ?? null,
-            loading: current?.loading ?? null,
-            unloading: current?.unloading ?? null,
+            owner: current?.owner ?? null,
+            load: current?.load ?? null,
+            unload: current?.unload ?? null,
             cargo_type: current?.cargo_type ?? null,
             payment_type: current?.payment_type ?? null,
             currency: current?.currency ?? null,
@@ -41,40 +55,50 @@ const AddRouteConfigModal = () => {
 
     const { handleSubmit, control, reset } = form
 
-    const onSubmit = (values: FormValues) => {
-        if (current?.id) {
-            update(current.id, values)
-            toast.success("Yo'nalish tahrirlandi!")
-        } else {
-            add(values)
-            toast.success("Yo'nalish qo'shildi!")
-        }
+    const { data: clientData } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CLIENT, {
+        params: { model_name: "client" },
+    })
+    const { data: districtsData } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_DISTRICT, {
+        params: { model_name: "district" },
+    })
+    const { data: cargoType } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CARGO_TYPE, {
+        params: { model_name: "cargo-type" },
+    })
+    const { data: paymentType } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_PAYMENT_TYPE, {
+        params: { model_name: "payment-type" },
+    })
+
+    const onSuccess = () => {
+        toast.success(
+            `Yo'nalish muvaffaqiyatli ${current?.id ? "tahrirlandi!" : "qo'shildi!"}`,
+        )
         reset()
-        clearKey(ROUTE_CONFIG_KEY)
+        clearKey(COMMON_DIRECTIONS)
         closeModal()
+        queryClient.refetchQueries({ queryKey: [COMMON_DIRECTIONS] })
+    }
+
+    const { mutate: postMutate, isPending: isPendingCreate } = usePost({ onSuccess })
+    const { mutate: updateMutate, isPending: isPendingUpdate } = usePatch({ onSuccess })
+
+    const isPending = isPendingCreate || isPendingUpdate
+
+    const onSubmit = (values: Direction) => {
+        if (current?.id) {
+            updateMutate(`${COMMON_DIRECTIONS}/${current.id}`, values)
+        } else {
+            postMutate(COMMON_DIRECTIONS, values)
+        }
     }
 
     return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-2 gap-4"
-        >
-            <FormCombobox
-                required
-                label="Yuk egasi"
-                name="client"
-                control={control}
-                options={CLIENT_OPTIONS}
-                labelKey="name"
-                valueKey="id"
-                placeholder="Yuk egasini tanlang"
-            />
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
             <FormCombobox
                 required
                 label="Yuklash manzili"
-                name="loading"
+                name="load"
                 control={control}
-                options={LOCATION_OPTIONS}
+                options={districtsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
@@ -82,19 +106,29 @@ const AddRouteConfigModal = () => {
             <FormCombobox
                 required
                 label="Yuk tushirish manzili"
-                name="unloading"
+                name="unload"
                 control={control}
-                options={LOCATION_OPTIONS}
+                options={districtsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
             />
             <FormCombobox
                 required
+                label="Yuk egasi"
+                name="owner"
+                control={control}
+                options={clientData}
+                labelKey="name"
+                valueKey="id"
+                placeholder="Yuk egasini tanlang"
+            />
+            <FormCombobox
+                required
                 label="Yuk turi"
                 name="cargo_type"
                 control={control}
-                options={CARGO_TYPE_OPTIONS}
+                options={cargoType}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Yuk turini tanlang"
@@ -104,7 +138,7 @@ const AddRouteConfigModal = () => {
                 label="To'lov turi"
                 name="payment_type"
                 control={control}
-                options={PAYMENT_TYPE_OPTIONS}
+                options={paymentType}
                 valueKey="id"
                 labelKey="name"
                 placeholder="To'lov turini tanlang"
@@ -129,7 +163,7 @@ const AddRouteConfigModal = () => {
             />
 
             <div className="col-span-2 flex items-center justify-end mt-3">
-                <Button className="min-w-36" type="submit">
+                <Button className="min-w-36" type="submit" loading={isPending}>
                     Saqlash
                 </Button>
             </div>

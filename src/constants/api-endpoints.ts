@@ -62,4 +62,9 @@ export const MANAGERS_EXPENSE_CATEGORIES = "manager/expense/category"
 /** ===== CHECKOUT ===== */
 export const CHECKOUT_MAIN = "checkout/main"
 export const DRIVERS_BALANCE = "users/drivers/balance"
-// export const
+
+/** ===== DIRECTIONS ===== */
+export const COMMON_DIRECTIONS = "common/directions"
+export const COMMON_DIRECTIONS_LOADS = "common/directions/loads"
+export const COMMON_DIRECTIONS_CLIENTS = "common/directions/clients"
+export const COMMON_DIRECTIONS_CARGO_TYPES = "common/directions/cargo-types"

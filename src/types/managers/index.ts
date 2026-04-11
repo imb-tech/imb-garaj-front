@@ -52,6 +52,8 @@ type ManagerOrders = {
     unloading_name: string
     cargo_type: number
     cargo_type_name: string
+    client: number
+    direction: number | null
     date: string
     type: number
     status: number

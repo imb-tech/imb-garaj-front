@@ -27,7 +27,7 @@ export const useColumnsManagersOrders = () => {
                 header: "Tushirish joyi",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <div className="">{row.original.loading_name || "-"}</div>
+                    <div className="">{row.original.unloading_name || "-"}</div>
                 ),
             },
             {

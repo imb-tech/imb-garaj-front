@@ -1,13 +1,9 @@
 import { FormCombobox } from "@/components/form/combobox"
 import { FormDatePicker } from "@/components/form/date-picker"
-import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
 import {
+    COMMON_DIRECTIONS,
     MANAGERS_ORDERS,
-    SETTINGS_SELECTABLE_CARGO_TYPE,
-    SETTINGS_SELECTABLE_CLIENT,
-    SETTINGS_SELECTABLE_DISTRICT,
-    SETTINGS_SELECTABLE_PAYMENT_TYPE,
     TRIPS_ORDERS,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -17,13 +13,42 @@ import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
-import { Plus, X } from "lucide-react"
-import { useFieldArray, useForm } from "react-hook-form"
+import { useEffect, useMemo, useRef } from "react"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-type ClientType = {
-    id: number | string
-    name: string
+type Option = { id: number; name: string }
+
+type Direction = {
+    id: number
+    owner: number
+    owner_name: string
+    load: number
+    load_name: string
+    unload: number
+    unload_name: string
+    cargo_type: number
+    cargo_type_name: string
+    payment_type: number
+    currency: 1 | 2
+    amount: string | null
+}
+
+// Distinct options derived from a list of directions. `picker` pulls the
+// `{ id, name }` pair off each row and we de-duplicate by id.
+const distinctOptions = (
+    rows: Direction[],
+    picker: (d: Direction) => { id: number; name: string },
+): Option[] => {
+    const seen = new Set<number>()
+    const out: Option[] = []
+    for (const row of rows) {
+        const { id, name } = picker(row)
+        if (seen.has(id)) continue
+        seen.add(id)
+        out.push({ id, name })
+    }
+    return out.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 const AddTripOrders = () => {
@@ -32,23 +57,6 @@ const AddTripOrders = () => {
     const { getData, clearKey } = useGlobalStore()
     const { closeModal } = useModal(MANAGERS_ORDERS)
     const currentTripOrder = getData<TripOrdersRow>(MANAGERS_ORDERS)
-
-    const { data: districtsData } = useGet<DistrictType[]>(
-        SETTINGS_SELECTABLE_DISTRICT,
-        { params: { model_name: "district" } },
-    )
-    const { data: clientData } = useGet<ClientType[]>(
-        SETTINGS_SELECTABLE_CLIENT,
-        { params: { model_name: "client" } },
-    )
-    const { data: paymentType } = useGet<ClientType[]>(
-        SETTINGS_SELECTABLE_PAYMENT_TYPE,
-        { params: { model_name: "payment-type" } },
-    )
-    const { data: cargoType } = useGet<ClientType[]>(
-        SETTINGS_SELECTABLE_CARGO_TYPE,
-        { params: { model_name: "cargo-type" } },
-    )
 
     const form = useForm<any>({
         defaultValues: {
@@ -60,26 +68,142 @@ const AddTripOrders = () => {
             client: currentTripOrder?.client,
             cargo_type: currentTripOrder?.cargo_type,
             status: currentTripOrder?.status,
-            incomes:
-                currentTripOrder?.incomes?.length ?
-                    currentTripOrder.incomes
-                :   [
-                        {
-                            payment_type: null,
-                            currency: null,
-                            currency_course: null,
-                            amount: null,
-                        },
-                    ],
         },
     })
 
-    const { handleSubmit, control, reset, watch } = form
+    const { handleSubmit, control, reset, watch, setValue } = form
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "incomes",
-    })
+    const loadingValue = watch("loading")
+    const unloadingValue = watch("unloading")
+    const clientValue = watch("client")
+    const cargoTypeValue = watch("cargo_type")
+
+    // Cascading reset refs
+    const prevLoadingRef = useRef(loadingValue)
+    const prevUnloadingRef = useRef(unloadingValue)
+    const prevClientRef = useRef(clientValue)
+
+    // Single source of truth — one fetch against /common/directions/.
+    // Every cascading dropdown + the matched-direction lookup is derived
+    // from this response in memory.
+    const { data: directionsResponse } = useGet<ListResponse<Direction>>(
+        COMMON_DIRECTIONS,
+        { params: { page_size: 10000 } },
+    )
+
+    const directions = useMemo(
+        () => directionsResponse?.results ?? [],
+        [directionsResponse],
+    )
+
+    // Yuklash manzili — distinct loads across all directions.
+    const loadsData = useMemo(
+        () =>
+            distinctOptions(directions, (d) => ({
+                id: d.load,
+                name: d.load_name,
+            })),
+        [directions],
+    )
+
+    // Yuk tushirish manzili — distinct unloads for the chosen load.
+    const unloadsData = useMemo(() => {
+        if (!loadingValue) return []
+        const rows = directions.filter((d) => d.load === Number(loadingValue))
+        return distinctOptions(rows, (d) => ({
+            id: d.unload,
+            name: d.unload_name,
+        }))
+    }, [directions, loadingValue])
+
+    // Yuk egasi — distinct owners for (load, unload).
+    const clientsData = useMemo(() => {
+        if (!loadingValue || !unloadingValue) return []
+        const rows = directions.filter(
+            (d) =>
+                d.load === Number(loadingValue) &&
+                d.unload === Number(unloadingValue),
+        )
+        return distinctOptions(rows, (d) => ({
+            id: d.owner,
+            name: d.owner_name,
+        }))
+    }, [directions, loadingValue, unloadingValue])
+
+    // Yuk turi — distinct cargo types for (load, unload, owner).
+    const cargoTypesData = useMemo(() => {
+        if (!loadingValue || !unloadingValue || !clientValue) return []
+        const rows = directions.filter(
+            (d) =>
+                d.load === Number(loadingValue) &&
+                d.unload === Number(unloadingValue) &&
+                d.owner === Number(clientValue),
+        )
+        return distinctOptions(rows, (d) => ({
+            id: d.cargo_type,
+            name: d.cargo_type_name,
+        }))
+    }, [directions, loadingValue, unloadingValue, clientValue])
+
+    // The resolved Direction config — supplies payment_type / currency / amount.
+    // On edit, if the saved order already has a `direction` FK, prefer it as a
+    // shortcut so we don't depend on the 4 cascading values matching exactly.
+    const matchedDirection = useMemo(() => {
+        if (currentTripOrder?.direction) {
+            const byId = directions.find(
+                (d) => d.id === Number(currentTripOrder.direction),
+            )
+            if (byId) return byId
+        }
+        if (
+            !loadingValue ||
+            !unloadingValue ||
+            !clientValue ||
+            !cargoTypeValue
+        )
+            return undefined
+        return directions.find(
+            (d) =>
+                d.load === Number(loadingValue) &&
+                d.unload === Number(unloadingValue) &&
+                d.owner === Number(clientValue) &&
+                d.cargo_type === Number(cargoTypeValue),
+        )
+    }, [
+        directions,
+        loadingValue,
+        unloadingValue,
+        clientValue,
+        cargoTypeValue,
+        currentTripOrder?.direction,
+    ])
+
+    // When loading changes → clear unloading, client, cargo_type
+    useEffect(() => {
+        if (prevLoadingRef.current !== loadingValue) {
+            setValue("unloading", null)
+            setValue("client", null)
+            setValue("cargo_type", null)
+            prevLoadingRef.current = loadingValue
+        }
+    }, [loadingValue, setValue])
+
+    // When unloading changes → clear client, cargo_type
+    useEffect(() => {
+        if (prevUnloadingRef.current !== unloadingValue) {
+            setValue("client", null)
+            setValue("cargo_type", null)
+            prevUnloadingRef.current = unloadingValue
+        }
+    }, [unloadingValue, setValue])
+
+    // When client changes → clear cargo_type
+    useEffect(() => {
+        if (prevClientRef.current !== clientValue) {
+            setValue("cargo_type", null)
+            prevClientRef.current = clientValue
+        }
+    }, [clientValue, setValue])
 
     const onSuccess = () => {
         toast.success(
@@ -98,17 +222,23 @@ const AddTripOrders = () => {
     const isPending = creating || updating
 
     const onSubmit = (data: any) => {
-        const formattedIncomes = data.incomes.map((p: any) => {
-            const income: any = {
-                currency: p.currency,
-                amount: String(p.amount),
-                payment_type: p.payment_type,
-            }
-            if (p.currency === 2 && p.currency_course) {
-                income.currency_course = String(p.currency_course)
-            }
-            return income
-        })
+        if (!matchedDirection) {
+            toast.error(
+                "Tanlangan yo'nalish uchun sozlama topilmadi. Avval Yo'nalishlar sozlamasida yaratib oling.",
+            )
+            return
+        }
+
+        const incomes = [
+            {
+                payment_type: matchedDirection.payment_type,
+                currency: matchedDirection.currency,
+                amount:
+                    matchedDirection.amount != null ?
+                        String(matchedDirection.amount)
+                    :   "0",
+            },
+        ]
 
         const formattedData = {
             loading: data.loading,
@@ -119,7 +249,8 @@ const AddTripOrders = () => {
             trip: id,
             status: data?.status,
             cargo_type: data?.cargo_type,
-            incomes: formattedIncomes,
+            direction: matchedDirection.id,
+            incomes,
         }
 
         if (currentTripOrder?.id) {
@@ -140,8 +271,8 @@ const AddTripOrders = () => {
                 name="type"
                 control={control}
                 options={[
-                    { id: 1, name: "Band" },
-                    { id: 2, name: "Bo'sh" },
+                    { id: 1, name: "Yukli" },
+                    { id: 2, name: "Yuksiz" },
                 ]}
                 valueKey="id"
                 labelKey="name"
@@ -157,20 +288,10 @@ const AddTripOrders = () => {
             />
             <FormCombobox
                 required
-                label="Yuk egasi"
-                name="client"
-                control={control}
-                options={clientData}
-                labelKey="name"
-                valueKey="id"
-                placeholder="Yuk egasini tanlang"
-            />
-            <FormCombobox
-                required
                 label="Yuklash manzili"
                 name="loading"
                 control={control}
-                options={districtsData}
+                options={loadsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
@@ -180,10 +301,38 @@ const AddTripOrders = () => {
                 label="Yuk tushirish manzili"
                 name="unloading"
                 control={control}
-                options={districtsData}
+                options={unloadsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
+                addButtonProps={{ disabled: !loadingValue }}
+            />
+            <FormCombobox
+                required
+                label="Yuk egasi"
+                name="client"
+                control={control}
+                options={clientsData}
+                labelKey="name"
+                valueKey="id"
+                placeholder="Yuk egasini tanlang"
+                addButtonProps={{
+                    disabled: !loadingValue || !unloadingValue,
+                }}
+            />
+            <FormCombobox
+                required
+                label="Yuk turi"
+                name={`cargo_type`}
+                control={control}
+                options={cargoTypesData}
+                valueKey="id"
+                labelKey="name"
+                placeholder="Yuk turini tanlang"
+                addButtonProps={{
+                    disabled:
+                        !loadingValue || !unloadingValue || !clientValue,
+                }}
             />
             <FormCombobox
                 options={[
@@ -210,7 +359,7 @@ const AddTripOrders = () => {
                     },
                     {
                         id: "3",
-                        name: "Bekor qilinid",
+                        name: "Bekor qilindi",
                     },
                     {
                         id: "2",
@@ -224,103 +373,6 @@ const AddTripOrders = () => {
                 name="status"
                 control={form.control}
             />
-            <FormCombobox
-                required
-                label="Yuk turi"
-                name={`cargo_type`}
-                control={control}
-                options={cargoType}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Yuk turini tanlang"
-            />
-            <div className="col-span-2 flex flex-col gap-4">
-                {fields.map((field, index) => {
-                    const selectedCurrency = watch(`incomes.${index}.currency`)
-
-                    return (
-                        <div
-                            key={field.id}
-                            className="grid grid-cols-2 gap-4 border rounded-lg p-4 relative"
-                        >
-                            <span className="col-span-2 font-medium text-sm text-muted-foreground">
-                                Tushum #{index + 1}
-                            </span>
-
-                            <FormCombobox
-                                required
-                                label="To'lov turi"
-                                name={`incomes.${index}.payment_type`}
-                                control={control}
-                                options={paymentType || undefined}
-                                valueKey="id"
-                                labelKey="name"
-                                placeholder="To'lov turini tanlang"
-                            />
-                            <FormCombobox
-                                required
-                                label="Valyuta"
-                                name={`incomes.${index}.currency`}
-                                control={control}
-                                options={[
-                                    { value: 1, label: "UZS - So'm" },
-                                    { value: 2, label: "USD - AQSh dollari" },
-                                ]}
-                                valueKey="value"
-                                labelKey="label"
-                                placeholder="Valyutani tanlang"
-                            />
-                            {selectedCurrency === 2 && (
-                                <FormNumberInput
-                                    required
-                                    thousandSeparator=" "
-                                    name={`incomes.${index}.currency_course`}
-                                    label="Valyuta kursi"
-                                    placeholder="12 206 UZS"
-                                    control={control}
-                                />
-                            )}
-                            <FormNumberInput
-                                required
-                                name={`incomes.${index}.amount`}
-                                thousandSeparator=" "
-                                label="Summa"
-                                placeholder="12 206 000 UZS"
-                                control={control}
-                            />
-
-                            {fields.length > 1 && (
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    className="absolute top-3 right-3"
-                                    onClick={() => remove(index)}
-                                >
-                                    <X className="w-4 h-4" />
-                                </Button>
-                            )}
-                        </div>
-                    )
-                })}
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() =>
-                        append({
-                            payment_type: null,
-                            currency: null,
-                            currency_course: null,
-                            amount: null,
-                        })
-                    }
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tushum qo'shish
-                </Button>
-            </div>
 
             <div className="col-span-2 flex justify-end gap-4 pt-4">
                 <Button type="submit" loading={isPending} disabled={isPending}>
