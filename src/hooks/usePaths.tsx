@@ -175,6 +175,10 @@ export const useItems = () =>
                         label: "Xarajat turlari",
                         path: "/expense-types",
                     },
+                    {
+                        label: "Yo'nalishlar",
+                        path: "/route-configs",
+                    },
                 ],
             },
         ],
