@@ -139,6 +139,10 @@ export const useItems = () =>
                         path: "/locations",
                     },
                     {
+                        label: "Yo'nalishlar",
+                        path: "/route-configs",
+                    },
+                    {
                         label: "Foydalanuvchilar",
                         path: "/users",
                     },
@@ -174,10 +178,6 @@ export const useItems = () =>
                     {
                         label: "Xarajat turlari",
                         path: "/expense-types",
-                    },
-                    {
-                        label: "Yo'nalishlar",
-                        path: "/route-configs",
                     },
                 ],
             },

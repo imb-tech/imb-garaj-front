@@ -1,12 +1,8 @@
-import { ParamCombobox } from "@/components/as-params/combobox"
 import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
 import {
     COMMON_DIRECTIONS,
-    COMMON_DIRECTIONS_CARGO_TYPES,
-    COMMON_DIRECTIONS_CLIENTS,
-    COMMON_DIRECTIONS_LOADS,
     SETTINGS_SELECTABLE_PAYMENT_TYPE,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -37,11 +33,6 @@ type Direction = {
 
 type SelectItem = { id: number | string; name: string }
 
-const CURRENCY_OPTIONS: SelectItem[] = [
-    { id: 1, name: "UZS" },
-    { id: 2, name: "USD" },
-]
-
 const RouteConfigsPage = () => {
     const search = useSearch({ strict: false }) as Record<string, any>
     const { getData, setData } = useGlobalStore()
@@ -50,12 +41,6 @@ const RouteConfigsPage = () => {
     const { openModal: openDeleteModal } = useModal("delete")
     const { openModal: openCreateModal } = useModal("create")
 
-    const loadFilter = search.load
-    const unloadFilter = search.unload
-    const ownerFilter = search.owner
-    const cargoTypeFilter = search.cargo_type
-    const currencyFilter = search.currency
-
     const { data, isLoading } = useGet<ListResponse<Direction>>(
         COMMON_DIRECTIONS,
         {
@@ -63,43 +48,7 @@ const RouteConfigsPage = () => {
                 search: search.route_configs_search,
                 page: search.page,
                 page_size: search.page_size,
-                load: loadFilter,
-                unload: unloadFilter,
-                owner: ownerFilter,
-                cargo_type: cargoTypeFilter,
-                currency: currencyFilter,
             },
-        },
-    )
-
-    // Cascading filter options from directions endpoints
-    const { data: loadsOptions } = useGet<SelectItem[]>(COMMON_DIRECTIONS_LOADS)
-
-    const { data: unloadsOptions } = useGet<SelectItem[]>(
-        COMMON_DIRECTIONS_LOADS,
-        {
-            params: { load: loadFilter },
-            enabled: !!loadFilter,
-        },
-    )
-
-    const { data: clientsOptions } = useGet<SelectItem[]>(
-        COMMON_DIRECTIONS_CLIENTS,
-        {
-            params: { load: loadFilter, unload: unloadFilter },
-            enabled: !!loadFilter && !!unloadFilter,
-        },
-    )
-
-    const { data: cargoTypesOptions } = useGet<SelectItem[]>(
-        COMMON_DIRECTIONS_CARGO_TYPES,
-        {
-            params: {
-                load: loadFilter,
-                unload: unloadFilter,
-                owner: ownerFilter,
-            },
-            enabled: !!loadFilter && !!unloadFilter && !!ownerFilter,
         },
     )
 
@@ -163,63 +112,13 @@ const RouteConfigsPage = () => {
                     pageSizeParamName: "page_size",
                 }}
                 head={
-                    <div className="flex flex-col gap-3">
-                        <TableHeader
-                            fileName="Yo'nalishlar"
-                            url="excel"
-                            storeKey={COMMON_DIRECTIONS}
-                            searchKey="route_configs_search"
-                            pageKey="page"
-                        />
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                            <ParamCombobox
-                                paramName="load"
-                                label="Yuklash manzili"
-                                options={loadsOptions ?? []}
-                                asloClear={[
-                                    "unload",
-                                    "owner",
-                                    "cargo_type",
-                                    "page",
-                                ]}
-                            />
-                            <ParamCombobox
-                                paramName="unload"
-                                label="Yuk tushirish manzili"
-                                options={unloadsOptions ?? []}
-                                asloClear={["owner", "cargo_type", "page"]}
-                                addButtonProps={{ disabled: !loadFilter }}
-                            />
-                            <ParamCombobox
-                                paramName="owner"
-                                label="Yuk egasi"
-                                options={clientsOptions ?? []}
-                                asloClear={["cargo_type", "page"]}
-                                addButtonProps={{
-                                    disabled: !loadFilter || !unloadFilter,
-                                }}
-                            />
-                            <ParamCombobox
-                                paramName="cargo_type"
-                                label="Yuk turi"
-                                options={cargoTypesOptions ?? []}
-                                asloClear={["page"]}
-                                addButtonProps={{
-                                    disabled:
-                                        !loadFilter ||
-                                        !unloadFilter ||
-                                        !ownerFilter,
-                                }}
-                            />
-                            <ParamCombobox
-                                paramName="currency"
-                                label="Valyuta"
-                                options={CURRENCY_OPTIONS}
-                                asloClear={["page"]}
-                                isSearch={false}
-                            />
-                        </div>
-                    </div>
+                    <TableHeader
+                        fileName="Yo'nalishlar"
+                        url="excel"
+                        storeKey={COMMON_DIRECTIONS}
+                        searchKey="route_configs_search"
+                        pageKey="page"
+                    />
                 }
             />
             <DeleteModal path={COMMON_DIRECTIONS} id={item?.id} />

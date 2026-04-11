@@ -35,15 +35,15 @@ export const useDirectionColumns = () =>
             { accessorKey: "cargo_type_name", header: "Yuk turi" },
             { accessorKey: "payment_type_name", header: "To'lov turi" },
             {
+                accessorKey: "amount",
+                header: "Summa",
+                cell: ({ row }) => formatAmount(row.original.amount ?? null),
+            },
+            {
                 accessorKey: "currency",
                 header: "Valyuta",
                 cell: ({ row }) =>
                     CURRENCY_LABELS[row.original.currency] ?? "-",
-            },
-            {
-                accessorKey: "amount",
-                header: "Summa",
-                cell: ({ row }) => formatAmount(row.original.amount ?? null),
             },
         ],
         [],
