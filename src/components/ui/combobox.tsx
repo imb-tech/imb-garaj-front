@@ -89,7 +89,7 @@ export function Combobox<T extends Record<string, any>>({
                     variant={"outline"}
                     role="combobox"
                     className={cn(
-                        "w-full justify-between relative   px-2 hover:bg-card font-normal ",
+                        "w-full justify-between relative   px-4 hover:bg-card font-normal ",
                         value && "font-medium text-foreground",
                         isError && "border border-destructive",
                         className,

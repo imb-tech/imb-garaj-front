@@ -62,6 +62,10 @@ const AddTripOrders = () => {
         defaultValues: {
             loading: currentTripOrder?.loading,
             unloading: currentTripOrder?.unloading,
+            route:
+                currentTripOrder?.loading && currentTripOrder?.unloading
+                    ? `${currentTripOrder.loading}-${currentTripOrder.unloading}`
+                    : null,
             trip: id,
             date: currentTripOrder?.date,
             type: currentTripOrder?.type,
@@ -73,6 +77,7 @@ const AddTripOrders = () => {
 
     const { handleSubmit, control, reset, watch, setValue } = form
 
+    const routeValue = watch("route")
     const loadingValue = watch("loading")
     const unloadingValue = watch("unloading")
     const clientValue = watch("client")
@@ -96,25 +101,23 @@ const AddTripOrders = () => {
         [directionsResponse],
     )
 
-    // Yuklash manzili — distinct loads across all directions.
-    const loadsData = useMemo(
-        () =>
-            distinctOptions(directions, (d) => ({
-                id: d.load,
-                name: d.load_name,
-            })),
-        [directions],
-    )
-
-    // Yuk tushirish manzili — distinct unloads for the chosen load.
-    const unloadsData = useMemo(() => {
-        if (!loadingValue) return []
-        const rows = directions.filter((d) => d.load === Number(loadingValue))
-        return distinctOptions(rows, (d) => ({
-            id: d.unload,
-            name: d.unload_name,
-        }))
-    }, [directions, loadingValue])
+    // Yo'nalish — "Yuklash → Yuk tushirish" combined pairs.
+    const routeOptions = useMemo(() => {
+        const seen = new Set<string>()
+        const out: { id: string; name: string; load: number; unload: number }[] = []
+        for (const d of directions) {
+            const key = `${d.load}-${d.unload}`
+            if (seen.has(key)) continue
+            seen.add(key)
+            out.push({
+                id: key,
+                name: `${d.load_name} → ${d.unload_name}`,
+                load: d.load,
+                unload: d.unload,
+            })
+        }
+        return out.sort((a, b) => a.name.localeCompare(b.name))
+    }, [directions])
 
     // Yuk egasi — distinct owners for (load, unload).
     const clientsData = useMemo(() => {
@@ -178,24 +181,32 @@ const AddTripOrders = () => {
         currentTripOrder?.direction,
     ])
 
-    // When loading changes → clear unloading, client, cargo_type
+    // Sync route → loading + unloading
     useEffect(() => {
-        if (prevLoadingRef.current !== loadingValue) {
+        if (routeValue) {
+            const selected = routeOptions.find((r) => r.id === routeValue)
+            if (selected) {
+                setValue("loading", selected.load)
+                setValue("unloading", selected.unload)
+            }
+        } else {
+            setValue("loading", null)
             setValue("unloading", null)
+        }
+    }, [routeValue, routeOptions, setValue])
+
+    // When route (loading/unloading) changes → clear client, cargo_type
+    useEffect(() => {
+        if (
+            prevLoadingRef.current !== loadingValue ||
+            prevUnloadingRef.current !== unloadingValue
+        ) {
             setValue("client", null)
             setValue("cargo_type", null)
             prevLoadingRef.current = loadingValue
-        }
-    }, [loadingValue, setValue])
-
-    // When unloading changes → clear client, cargo_type
-    useEffect(() => {
-        if (prevUnloadingRef.current !== unloadingValue) {
-            setValue("client", null)
-            setValue("cargo_type", null)
             prevUnloadingRef.current = unloadingValue
         }
-    }, [unloadingValue, setValue])
+    }, [loadingValue, unloadingValue, setValue])
 
     // When client changes → clear cargo_type
     useEffect(() => {
@@ -263,7 +274,7 @@ const AddTripOrders = () => {
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto no-scrollbar-x"
+            className="grid grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto no-scrollbar-x p-1"
         >
             <FormCombobox
                 required
@@ -288,24 +299,14 @@ const AddTripOrders = () => {
             />
             <FormCombobox
                 required
-                label="Yuklash manzili"
-                name="loading"
+                label="Yo'nalish"
+                name="route"
                 control={control}
-                options={loadsData}
+                options={routeOptions}
                 valueKey="id"
                 labelKey="name"
-                placeholder="Hududni tanlang"
-            />
-            <FormCombobox
-                required
-                label="Yuk tushirish manzili"
-                name="unloading"
-                control={control}
-                options={unloadsData}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Hududni tanlang"
-                addButtonProps={{ disabled: !loadingValue }}
+                placeholder="Yo'nalishni tanlang"
+                wrapperClassName="col-span-2"
             />
             <FormCombobox
                 required
@@ -317,7 +318,7 @@ const AddTripOrders = () => {
                 valueKey="id"
                 placeholder="Yuk egasini tanlang"
                 addButtonProps={{
-                    disabled: !loadingValue || !unloadingValue,
+                    disabled: !routeValue,
                 }}
             />
             <FormCombobox
@@ -330,8 +331,7 @@ const AddTripOrders = () => {
                 labelKey="name"
                 placeholder="Yuk turini tanlang"
                 addButtonProps={{
-                    disabled:
-                        !loadingValue || !unloadingValue || !clientValue,
+                    disabled: !routeValue || !clientValue,
                 }}
             />
             <FormCombobox
