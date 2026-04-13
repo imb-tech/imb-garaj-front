@@ -1,4 +1,5 @@
 import { FormCombobox } from "@/components/form/combobox"
+import { FormDatePicker } from "@/components/form/date-picker"
 import { FormNumberInput } from "@/components/form/number-input"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +27,7 @@ type Direction = {
     payment_type: number | null
     currency: number | null
     amount: string | null
+    valid_from: string | null
 }
 
 type SelectItem = { id: number | string; name: string }
@@ -50,6 +52,7 @@ const AddRouteConfigModal = () => {
             payment_type: current?.payment_type ?? null,
             currency: current?.currency ?? null,
             amount: current?.amount ?? null,
+            valid_from: current?.valid_from ?? null,
         },
     })
 
@@ -160,6 +163,13 @@ const AddRouteConfigModal = () => {
                 label="Summa"
                 placeholder="12 206 000"
                 control={control}
+            />
+            <FormDatePicker
+                label="Qaysi sanadan amal qiladi"
+                control={control}
+                name="valid_from"
+                placeholder="Sanani tanlang"
+                className="w-full"
             />
 
             <div className="col-span-2 flex items-center justify-end mt-3">

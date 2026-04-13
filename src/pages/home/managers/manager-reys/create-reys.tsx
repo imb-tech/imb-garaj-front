@@ -197,20 +197,22 @@ const AddTripOrders = () => {
             },
         ]
 
-        const formattedData = {
-            loading: data.loading,
-            unloading: data.unloading,
-            date: data.date,
-            trip: id,
-            cargo_type: data?.cargo_type,
-            direction: matchedDirection.id,
-            incomes,
+        const formData = new FormData()
+        formData.append("loading", data.loading)
+        formData.append("unloading", data.unloading)
+        formData.append("date", data.date)
+        formData.append("trip", String(id))
+        if (data.cargo_type && data.cargo_type !== 0) {
+            formData.append("cargo_type", data.cargo_type)
         }
+        formData.append("direction", String(matchedDirection.id))
+        formData.append("incomes", JSON.stringify(incomes))
+        images.forEach((file) => formData.append("images", file))
 
         if (currentTripOrder?.id) {
-            update(`${MANAGERS_ORDERS}/${currentTripOrder.id}`, formattedData)
+            update(`${MANAGERS_ORDERS}/${currentTripOrder.id}`, formData)
         } else {
-            create(MANAGERS_ORDERS, formattedData)
+            create(MANAGERS_ORDERS, formData)
         }
     }
 

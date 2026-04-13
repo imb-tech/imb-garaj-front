@@ -108,15 +108,15 @@ export const useItems = () =>
                 ],
             },
             {
-                label: "Investor",
-                icon: <Truck width={18} />,
-                path: "/truck",
-            },
-            {
                 label: "Buxgalteriya",
                 icon: <Wallet width={18} />,
                 path: "/buxgalteriya",
                 pending: true,
+            },
+            {
+                label: "Investor",
+                icon: <Truck width={18} />,
+                path: "/truck",
             },
             {
                 label: "Moliya",
