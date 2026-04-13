@@ -13,8 +13,9 @@ import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
+import { ImageIcon, X } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
-import { useForm } from "react-hook-form"
+import { useController, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 type Option = { id: number; name: string }
@@ -34,8 +35,6 @@ type Direction = {
     amount: string | null
 }
 
-// Distinct options derived from a list of directions. `picker` pulls the
-// `{ id, name }` pair off each row and we de-duplicate by id.
 const distinctOptions = (
     rows: Direction[],
     picker: (d: Direction) => { id: number; name: string },
@@ -62,35 +61,23 @@ const AddTripOrders = () => {
         defaultValues: {
             loading: currentTripOrder?.loading,
             unloading: currentTripOrder?.unloading,
-            route:
-                currentTripOrder?.loading && currentTripOrder?.unloading
-                    ? `${currentTripOrder.loading}-${currentTripOrder.unloading}`
-                    : null,
             trip: id,
-            date: currentTripOrder?.date,
-            type: currentTripOrder?.type,
-            client: currentTripOrder?.client,
+            date: currentTripOrder?.date ?? new Date().toISOString().split("T")[0],
             cargo_type: currentTripOrder?.cargo_type,
             status: currentTripOrder?.status,
+            rasm: null,
         },
     })
 
     const { handleSubmit, control, reset, watch, setValue } = form
 
-    const routeValue = watch("route")
     const loadingValue = watch("loading")
     const unloadingValue = watch("unloading")
-    const clientValue = watch("client")
     const cargoTypeValue = watch("cargo_type")
 
-    // Cascading reset refs
     const prevLoadingRef = useRef(loadingValue)
     const prevUnloadingRef = useRef(unloadingValue)
-    const prevClientRef = useRef(clientValue)
 
-    // Single source of truth — one fetch against /common/directions/.
-    // Every cascading dropdown + the matched-direction lookup is derived
-    // from this response in memory.
     const { data: directionsResponse } = useGet<ListResponse<Direction>>(
         COMMON_DIRECTIONS,
         { params: { page_size: 10000 } },
@@ -101,26 +88,25 @@ const AddTripOrders = () => {
         [directionsResponse],
     )
 
-    // Yo'nalish — "Yuklash → Yuk tushirish" combined pairs.
-    const routeOptions = useMemo(() => {
-        const seen = new Set<string>()
-        const out: { id: string; name: string; load: number; unload: number }[] = []
-        for (const d of directions) {
-            const key = `${d.load}-${d.unload}`
-            if (seen.has(key)) continue
-            seen.add(key)
-            out.push({
-                id: key,
-                name: `${d.load_name} → ${d.unload_name}`,
-                load: d.load,
-                unload: d.unload,
-            })
-        }
-        return out.sort((a, b) => a.name.localeCompare(b.name))
-    }, [directions])
+    const loadsData = useMemo(
+        () =>
+            distinctOptions(directions, (d) => ({
+                id: d.load,
+                name: d.load_name,
+            })),
+        [directions],
+    )
 
-    // Yuk egasi — distinct owners for (load, unload).
-    const clientsData = useMemo(() => {
+    const unloadsData = useMemo(() => {
+        if (!loadingValue) return []
+        const rows = directions.filter((d) => d.load === Number(loadingValue))
+        return distinctOptions(rows, (d) => ({
+            id: d.unload,
+            name: d.unload_name,
+        }))
+    }, [directions, loadingValue])
+
+    const cargoTypesData = useMemo(() => {
         if (!loadingValue || !unloadingValue) return []
         const rows = directions.filter(
             (d) =>
@@ -128,29 +114,11 @@ const AddTripOrders = () => {
                 d.unload === Number(unloadingValue),
         )
         return distinctOptions(rows, (d) => ({
-            id: d.owner,
-            name: d.owner_name,
-        }))
-    }, [directions, loadingValue, unloadingValue])
-
-    // Yuk turi — distinct cargo types for (load, unload, owner).
-    const cargoTypesData = useMemo(() => {
-        if (!loadingValue || !unloadingValue || !clientValue) return []
-        const rows = directions.filter(
-            (d) =>
-                d.load === Number(loadingValue) &&
-                d.unload === Number(unloadingValue) &&
-                d.owner === Number(clientValue),
-        )
-        return distinctOptions(rows, (d) => ({
             id: d.cargo_type,
             name: d.cargo_type_name,
         }))
-    }, [directions, loadingValue, unloadingValue, clientValue])
+    }, [directions, loadingValue, unloadingValue])
 
-    // The resolved Direction config — supplies payment_type / currency / amount.
-    // On edit, if the saved order already has a `direction` FK, prefer it as a
-    // shortcut so we don't depend on the 4 cascading values matching exactly.
     const matchedDirection = useMemo(() => {
         if (currentTripOrder?.direction) {
             const byId = directions.find(
@@ -158,63 +126,35 @@ const AddTripOrders = () => {
             )
             if (byId) return byId
         }
-        if (
-            !loadingValue ||
-            !unloadingValue ||
-            !clientValue ||
-            !cargoTypeValue
-        )
-            return undefined
+        if (!loadingValue || !unloadingValue || !cargoTypeValue) return undefined
         return directions.find(
             (d) =>
                 d.load === Number(loadingValue) &&
                 d.unload === Number(unloadingValue) &&
-                d.owner === Number(clientValue) &&
                 d.cargo_type === Number(cargoTypeValue),
         )
     }, [
         directions,
         loadingValue,
         unloadingValue,
-        clientValue,
         cargoTypeValue,
         currentTripOrder?.direction,
     ])
 
-    // Sync route → loading + unloading
     useEffect(() => {
-        if (routeValue) {
-            const selected = routeOptions.find((r) => r.id === routeValue)
-            if (selected) {
-                setValue("loading", selected.load)
-                setValue("unloading", selected.unload)
-            }
-        } else {
-            setValue("loading", null)
+        if (prevLoadingRef.current !== loadingValue) {
             setValue("unloading", null)
-        }
-    }, [routeValue, routeOptions, setValue])
-
-    // When route (loading/unloading) changes → clear client, cargo_type
-    useEffect(() => {
-        if (
-            prevLoadingRef.current !== loadingValue ||
-            prevUnloadingRef.current !== unloadingValue
-        ) {
-            setValue("client", null)
             setValue("cargo_type", null)
             prevLoadingRef.current = loadingValue
+        }
+    }, [loadingValue, setValue])
+
+    useEffect(() => {
+        if (prevUnloadingRef.current !== unloadingValue) {
+            setValue("cargo_type", null)
             prevUnloadingRef.current = unloadingValue
         }
-    }, [loadingValue, unloadingValue, setValue])
-
-    // When client changes → clear cargo_type
-    useEffect(() => {
-        if (prevClientRef.current !== clientValue) {
-            setValue("cargo_type", null)
-            prevClientRef.current = clientValue
-        }
-    }, [clientValue, setValue])
+    }, [unloadingValue, setValue])
 
     const onSuccess = () => {
         toast.success(
@@ -255,8 +195,6 @@ const AddTripOrders = () => {
             loading: data.loading,
             unloading: data.unloading,
             date: data.date,
-            type: data.type,
-            client: data.client,
             trip: id,
             status: data?.status,
             cargo_type: data?.cargo_type,
@@ -271,100 +209,136 @@ const AddTripOrders = () => {
         }
     }
 
+    const { field: rasmField } = useController({ name: "rasm", control })
+    const rasmInputRef = useRef<HTMLInputElement>(null)
+    const rasmPreview =
+        rasmField.value instanceof File ?
+            URL.createObjectURL(rasmField.value)
+        : typeof rasmField.value === "string" ? rasmField.value
+        : null
+
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto no-scrollbar-x p-1"
+            className="flex flex-col gap-4 max-h-[72vh] overflow-y-auto pr-1 no-scrollbar-x"
         >
+            {/* Qayerdan → Qayerga route visual */}
+            <div className="flex gap-3">
+                {/* Connector */}
+                <div className="flex flex-col items-center pt-2.5 shrink-0">
+                    <div className="w-3 h-3 rounded-full bg-primary" />
+                    <div
+                        className="w-px flex-1 my-1"
+                        style={{
+                            backgroundImage:
+                                "repeating-linear-gradient(to bottom, hsl(var(--primary)/0.4) 0px, hsl(var(--primary)/0.4) 5px, transparent 5px, transparent 10px)",
+                        }}
+                    />
+                    <div className="w-3 h-3 rounded-full border-2 border-primary bg-background" />
+                </div>
+
+                {/* Inputs stacked */}
+                <div className="flex flex-col gap-2 flex-1">
+                    <FormCombobox
+                        required
+                        name="loading"
+                        control={control}
+                        options={loadsData}
+                        valueKey="id"
+                        labelKey="name"
+                        placeholder="Qayerdan"
+                    />
+                    <FormCombobox
+                        required
+                        name="unloading"
+                        control={control}
+                        options={unloadsData}
+                        valueKey="id"
+                        labelKey="name"
+                        placeholder="Qayerga"
+                        addButtonProps={{ disabled: !loadingValue }}
+                    />
+                </div>
+            </div>
+
+            {/* Mahsulot turi */}
             <FormCombobox
                 required
-                label="Buyurtma turi"
-                name="type"
-                control={control}
-                options={[
-                    { id: 1, name: "Yukli" },
-                    { id: 2, name: "Yuksiz" },
-                ]}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Buyurtmani tanlang"
-            />
-            <FormDatePicker
-                required
-                label="Sana"
-                control={control}
-                name="date"
-                placeholder="Sanani tanlang"
-                className="w-full"
-            />
-            <FormCombobox
-                required
-                label="Yo'nalish"
-                name="route"
-                control={control}
-                options={routeOptions}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Yo'nalishni tanlang"
-                wrapperClassName="col-span-2"
-            />
-            <FormCombobox
-                required
-                label="Yuk egasi"
-                name="client"
-                control={control}
-                options={clientsData}
-                labelKey="name"
-                valueKey="id"
-                placeholder="Yuk egasini tanlang"
-                addButtonProps={{
-                    disabled: !routeValue,
-                }}
-            />
-            <FormCombobox
-                required
-                label="Yuk turi"
-                name={`cargo_type`}
+                label="Mahsulot turi"
+                name="cargo_type"
                 control={control}
                 options={cargoTypesData}
                 valueKey="id"
                 labelKey="name"
-                placeholder="Yuk turini tanlang"
+                placeholder="Mahsulot turini tanlang"
                 addButtonProps={{
-                    disabled: !routeValue || !clientValue,
+                    disabled: !loadingValue || !unloadingValue,
                 }}
             />
+
+            {/* Rasm yuklash */}
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium">Rasm</span>
+                <div
+                    className="relative border-2 border-dashed rounded-xl overflow-hidden cursor-pointer transition-colors hover:border-primary/60 group"
+                    style={{ minHeight: 100 }}
+                    onClick={() => rasmInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                        e.preventDefault()
+                        const file = e.dataTransfer.files?.[0]
+                        if (file) rasmField.onChange(file)
+                    }}
+                >
+                    {rasmPreview ? (
+                        <>
+                            <img
+                                src={rasmPreview}
+                                alt="rasm"
+                                className="w-full max-h-48 object-cover"
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    rasmField.onChange(null)
+                                }}
+                                className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-destructive hover:text-white transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-2 py-7 text-muted-foreground group-hover:text-primary transition-colors">
+                            <ImageIcon size={28} strokeWidth={1.5} />
+                            <span className="text-xs">
+                                Rasm yuklash yoki bu yerga tashlang
+                            </span>
+                        </div>
+                    )}
+                </div>
+                <input
+                    ref={rasmInputRef}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) rasmField.onChange(file)
+                    }}
+                />
+            </div>
+
+            {/* Status */}
             <FormCombobox
                 options={[
-                    {
-                        id: "0",
-                        name: "Kutilmoqda",
-                    },
-                    {
-                        id: "1",
-                        name: "Boshlandi",
-                    },
-
-                    {
-                        id: "5",
-                        name: "Yuklash",
-                    },
-                    {
-                        id: "6",
-                        name: "Yo'lda",
-                    },
-                    {
-                        id: "7",
-                        name: "Tushirish",
-                    },
-                    {
-                        id: "3",
-                        name: "Bekor qilindi",
-                    },
-                    {
-                        id: "2",
-                        name: "Tugallandi",
-                    },
+                    { id: "0", name: "Kutilmoqda" },
+                    { id: "1", name: "Boshlandi" },
+                    { id: "5", name: "Yuklash" },
+                    { id: "6", name: "Yo'lda" },
+                    { id: "7", name: "Tushirish" },
+                    { id: "3", name: "Bekor qilindi" },
+                    { id: "2", name: "Tugallandi" },
                 ]}
                 labelKey="name"
                 valueKey="id"
@@ -374,7 +348,17 @@ const AddTripOrders = () => {
                 control={form.control}
             />
 
-            <div className="col-span-2 flex justify-end gap-4 pt-4">
+            {/* Sana */}
+            <FormDatePicker
+                required
+                label="Sana"
+                control={control}
+                name="date"
+                placeholder="Sanani tanlang"
+                className="w-full"
+            />
+
+            <div className="flex justify-end pt-1">
                 <Button type="submit" loading={isPending} disabled={isPending}>
                     Saqlash
                 </Button>
