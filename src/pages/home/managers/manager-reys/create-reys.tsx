@@ -2,6 +2,10 @@ import { FormCombobox } from "@/components/form/combobox"
 import { FormDatePicker } from "@/components/form/date-picker"
 import { Button } from "@/components/ui/button"
 import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog"
+import {
     COMMON_DIRECTIONS,
     MANAGERS_ORDERS,
     TRIPS_ORDERS,
@@ -13,8 +17,8 @@ import { usePost } from "@/hooks/usePost"
 import { useGlobalStore } from "@/store/global-store"
 import { useQueryClient } from "@tanstack/react-query"
 import { useParams } from "@tanstack/react-router"
-import { ImageIcon, X } from "lucide-react"
-import { useEffect, useMemo, useRef } from "react"
+import { ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useController, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -62,10 +66,9 @@ const AddTripOrders = () => {
             loading: currentTripOrder?.loading,
             unloading: currentTripOrder?.unloading,
             trip: id,
-            date: currentTripOrder?.date ?? new Date().toISOString().split("T")[0],
             cargo_type: currentTripOrder?.cargo_type,
-            status: currentTripOrder?.status,
-            rasm: null,
+            date: currentTripOrder?.date ?? new Date().toISOString().split("T")[0],
+            images: [] as File[],
         },
     })
 
@@ -113,10 +116,13 @@ const AddTripOrders = () => {
                 d.load === Number(loadingValue) &&
                 d.unload === Number(unloadingValue),
         )
-        return distinctOptions(rows, (d) => ({
-            id: d.cargo_type,
-            name: d.cargo_type_name,
-        }))
+        return [
+            { id: 0, name: "Yuksiz" },
+            ...distinctOptions(rows, (d) => ({
+                id: d.cargo_type,
+                name: d.cargo_type_name,
+            })),
+        ]
     }, [directions, loadingValue, unloadingValue])
 
     const matchedDirection = useMemo(() => {
@@ -196,7 +202,6 @@ const AddTripOrders = () => {
             unloading: data.unloading,
             date: data.date,
             trip: id,
-            status: data?.status,
             cargo_type: data?.cargo_type,
             direction: matchedDirection.id,
             incomes,
@@ -209,153 +214,162 @@ const AddTripOrders = () => {
         }
     }
 
-    const { field: rasmField } = useController({ name: "rasm", control })
+    const [previewIndex, setPreviewIndex] = useState<number | null>(null)
+    const { field: imagesField } = useController({ name: "images", control })
     const rasmInputRef = useRef<HTMLInputElement>(null)
-    const rasmPreview =
-        rasmField.value instanceof File ?
-            URL.createObjectURL(rasmField.value)
-        : typeof rasmField.value === "string" ? rasmField.value
-        : null
+    const images: File[] = imagesField.value ?? []
+
+    const addImages = (files: FileList | File[]) => {
+        const newFiles = Array.from(files)
+        imagesField.onChange([...images, ...newFiles])
+    }
+
+    const removeImage = (index: number) => {
+        imagesField.onChange(images.filter((_, i) => i !== index))
+    }
 
     return (
+        <>
         <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 max-h-[72vh] overflow-y-auto pr-1 no-scrollbar-x"
         >
             {/* Qayerdan → Qayerga route visual */}
-            <div className="flex gap-3">
-                {/* Connector */}
-                <div className="flex flex-col items-center pt-2.5 shrink-0">
-                    <div className="w-3 h-3 rounded-full bg-primary" />
-                    <div
-                        className="w-px flex-1 my-1"
-                        style={{
-                            backgroundImage:
-                                "repeating-linear-gradient(to bottom, hsl(var(--primary)/0.4) 0px, hsl(var(--primary)/0.4) 5px, transparent 5px, transparent 10px)",
-                        }}
-                    />
-                    <div className="w-3 h-3 rounded-full border-2 border-primary bg-background" />
+            <div className="rounded-lg border bg-card/50 p-4">
+                <div className="flex gap-3">
+                    {/* Connector */}
+                    <div className="relative shrink-0 w-3">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[18px] w-3 h-3 rounded-full bg-primary" />
+                        <div
+                            className="absolute left-1/2 -translate-x-1/2 w-px"
+                            style={{
+                                top: 30,
+                                bottom: 18,
+                                backgroundImage:
+                                    "repeating-linear-gradient(to bottom, hsl(var(--primary)/0.4) 0px, hsl(var(--primary)/0.4) 5px, transparent 5px, transparent 10px)",
+                            }}
+                        />
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-[18px] w-3 h-3 rounded-full border-2 border-primary bg-background" />
+                    </div>
+
+                    {/* Inputs stacked */}
+                    <div className="flex flex-col gap-4 flex-1">
+                        <FormCombobox
+                            required
+                            name="loading"
+                            control={control}
+                            options={loadsData}
+                            valueKey="id"
+                            labelKey="name"
+                            placeholder="Qayerdan"
+                        />
+                        <FormCombobox
+                            required
+                            name="unloading"
+                            control={control}
+                            options={unloadsData}
+                            valueKey="id"
+                            labelKey="name"
+                            placeholder="Qayerga"
+                            addButtonProps={{ disabled: !loadingValue }}
+                        />
+                    </div>
                 </div>
 
-                {/* Inputs stacked */}
-                <div className="flex flex-col gap-2 flex-1">
+            </div>
+
+            {/* Mahsulot turi + Sana */}
+            <div className="flex gap-3">
+                <div className="flex-1">
                     <FormCombobox
-                        required
-                        name="loading"
+                        label="Mahsulot turi"
+                        name="cargo_type"
                         control={control}
-                        options={loadsData}
+                        options={cargoTypesData}
                         valueKey="id"
                         labelKey="name"
-                        placeholder="Qayerdan"
+                        placeholder="Yuksiz"
+                        addButtonProps={{
+                            disabled: !loadingValue || !unloadingValue,
+                        }}
                     />
-                    <FormCombobox
+                </div>
+                <div className="flex-1">
+                    <FormDatePicker
                         required
-                        name="unloading"
+                        label="Sana"
                         control={control}
-                        options={unloadsData}
-                        valueKey="id"
-                        labelKey="name"
-                        placeholder="Qayerga"
-                        addButtonProps={{ disabled: !loadingValue }}
+                        name="date"
+                        placeholder="Sanani tanlang"
+                        className="w-full"
                     />
                 </div>
             </div>
 
-            {/* Mahsulot turi */}
-            <FormCombobox
-                required
-                label="Mahsulot turi"
-                name="cargo_type"
-                control={control}
-                options={cargoTypesData}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Mahsulot turini tanlang"
-                addButtonProps={{
-                    disabled: !loadingValue || !unloadingValue,
-                }}
-            />
-
-            {/* Rasm yuklash */}
-            <div className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium">Rasm</span>
-                <div
-                    className="relative border-2 border-dashed rounded-xl overflow-hidden cursor-pointer transition-colors hover:border-primary/60 group"
-                    style={{ minHeight: 100 }}
-                    onClick={() => rasmInputRef.current?.click()}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                        e.preventDefault()
-                        const file = e.dataTransfer.files?.[0]
-                        if (file) rasmField.onChange(file)
-                    }}
-                >
-                    {rasmPreview ? (
-                        <>
+            {/* Yuklangan rasmlar */}
+            {images.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {images.map((file, index) => (
+                        <div
+                            key={index}
+                            className="relative w-20 h-20 rounded-lg overflow-hidden border cursor-pointer"
+                            onClick={() => setPreviewIndex(index)}
+                        >
                             <img
-                                src={rasmPreview}
-                                alt="rasm"
-                                className="w-full max-h-48 object-cover"
+                                src={URL.createObjectURL(file)}
+                                alt={`rasm-${index}`}
+                                className="w-full h-full object-cover"
                             />
                             <button
                                 type="button"
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    rasmField.onChange(null)
+                                    removeImage(index)
                                 }}
-                                className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-destructive hover:text-white transition-colors"
+                                className="absolute top-1 right-1 bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-destructive hover:text-white transition-colors"
                             >
-                                <X size={14} />
+                                <X size={12} />
                             </button>
-                        </>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center gap-2 py-7 text-muted-foreground group-hover:text-primary transition-colors">
-                            <ImageIcon size={28} strokeWidth={1.5} />
-                            <span className="text-xs">
-                                Rasm yuklash yoki bu yerga tashlang
-                            </span>
                         </div>
-                    )}
+                    ))}
                 </div>
-                <input
-                    ref={rasmInputRef}
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) rasmField.onChange(file)
-                    }}
-                />
+            )}
+
+            {/* Rasm yuklash */}
+            <div
+                className="border-2 border-dashed rounded-xl overflow-hidden cursor-pointer transition-colors hover:border-primary/60 group"
+                style={{ minHeight: 100 }}
+                onClick={() => rasmInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                    e.preventDefault()
+                    if (e.dataTransfer.files?.length) {
+                        addImages(e.dataTransfer.files)
+                    }
+                }}
+            >
+                <div className="flex flex-col items-center justify-center gap-2 py-7 text-muted-foreground group-hover:text-primary transition-colors">
+                    <ImageIcon size={28} strokeWidth={1.5} />
+                    <span className="text-sm font-medium">
+                        Rasm yuklash yoki bu yerga tashlang
+                    </span>
+                    <span className="text-xs">
+                        Probeg / TTN rasmini yuklang
+                    </span>
+                </div>
             </div>
-
-            {/* Status */}
-            <FormCombobox
-                options={[
-                    { id: "0", name: "Kutilmoqda" },
-                    { id: "1", name: "Boshlandi" },
-                    { id: "5", name: "Yuklash" },
-                    { id: "6", name: "Yo'lda" },
-                    { id: "7", name: "Tushirish" },
-                    { id: "3", name: "Bekor qilindi" },
-                    { id: "2", name: "Tugallandi" },
-                ]}
-                labelKey="name"
-                valueKey="id"
-                required
-                label="Status"
-                name="status"
-                control={form.control}
-            />
-
-            {/* Sana */}
-            <FormDatePicker
-                required
-                label="Sana"
-                control={control}
-                name="date"
-                placeholder="Sanani tanlang"
-                className="w-full"
+            <input
+                ref={rasmInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={(e) => {
+                    if (e.target.files?.length) {
+                        addImages(e.target.files)
+                        e.target.value = ""
+                    }
+                }}
             />
 
             <div className="flex justify-end pt-1">
@@ -364,6 +378,51 @@ const AddTripOrders = () => {
                 </Button>
             </div>
         </form>
+
+        <Dialog
+            open={previewIndex !== null}
+            onOpenChange={() => setPreviewIndex(null)}
+        >
+            <DialogContent className="max-w-2xl p-2">
+                {previewIndex !== null && images[previewIndex] && (
+                    <div className="relative flex items-center justify-center">
+                        {images.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setPreviewIndex(
+                                        (previewIndex - 1 + images.length) %
+                                            images.length,
+                                    )
+                                }
+                                className="absolute left-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                        )}
+                        <img
+                            src={URL.createObjectURL(images[previewIndex])}
+                            alt="preview"
+                            className="w-full h-auto rounded-lg"
+                        />
+                        {images.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setPreviewIndex(
+                                        (previewIndex + 1) % images.length,
+                                    )
+                                }
+                                className="absolute right-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
+        </>
     )
 }
 
