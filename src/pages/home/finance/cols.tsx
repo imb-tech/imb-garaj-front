@@ -15,7 +15,8 @@ export interface OwnerStatistic {
     fuel_per_km: number
     income_uzs: number | null
     income_usd: number | null
-    total_expense: number | null
+    expense_uzs: number | null
+    expense_usd: number | null
     cargo_type_name: string | null
 }
 
@@ -113,11 +114,37 @@ export const useCostCols = () => {
                 },
             },
             {
-                header: "Jami xarajat",
-                accessorKey: "total_expense",
+                header: "Xarajat (UZS)",
+                accessorKey: "expense_uzs",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    return <span className="text-red-600 font-medium">{row.original.total_expense !== null ? formatMoney(row.original.total_expense) : "—"}</span>
+                    return <span className="text-red-600 font-medium">{row.original.expense_uzs !== null ? formatMoney(row.original.expense_uzs) : "—"}</span>
+                },
+            },
+            {
+                header: "Xarajat (USD)",
+                accessorKey: "expense_usd",
+                enableSorting: true,
+                cell: ({ row }) => {
+                    return <span className="text-red-600 font-medium">{row.original.expense_usd !== null ? `$${formatMoney(row.original.expense_usd)}` : "—"}</span>
+                },
+            },
+            {
+                header: "Foyda (UZS)",
+                id: "profit_uzs",
+                enableSorting: true,
+                cell: ({ row }) => {
+                    const profit = (row.original.income_uzs ?? 0) - (row.original.expense_uzs ?? 0)
+                    return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{formatMoney(profit)}</span>
+                },
+            },
+            {
+                header: "Foyda (USD)",
+                id: "profit_usd",
+                enableSorting: true,
+                cell: ({ row }) => {
+                    const profit = (row.original.income_usd ?? 0) - (row.original.expense_usd ?? 0)
+                    return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{`$${formatMoney(profit)}`}</span>
                 },
             },
         ],
