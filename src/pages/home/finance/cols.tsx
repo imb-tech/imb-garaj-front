@@ -115,7 +115,7 @@ export const useCostCols = () => {
                 enableSorting: true,
                 cell: ({ row }) => {
                     const v = toNum(row.original.income_usd)
-                    return <span className="text-green-600 font-medium">{v ? `$${formatMoney(v)}` : "—"}</span>
+                    return <span className="text-green-600 font-medium">{v ? <>${formatMoney(v)}</> : "—"}</span>
                 },
             },
             {
@@ -133,7 +133,7 @@ export const useCostCols = () => {
                 enableSorting: true,
                 cell: ({ row }) => {
                     const v = toNum(row.original.expense_usd)
-                    return <span className="text-red-600 font-medium">{v ? `$${formatMoney(v)}` : "—"}</span>
+                    return <span className="text-red-600 font-medium">{v ? <>${formatMoney(v)}</> : "—"}</span>
                 },
             },
             {
@@ -151,7 +151,7 @@ export const useCostCols = () => {
                 enableSorting: true,
                 cell: ({ row }) => {
                     const profit = toNum(row.original.income_usd) - toNum(row.original.expense_usd)
-                    return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{`$${formatMoney(profit)}`}</span>
+                    return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>${formatMoney(profit)}</span>
                 },
             },
         ],
