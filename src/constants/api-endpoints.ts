@@ -14,7 +14,7 @@ export const TRIPS_ORDERS_PAYMENT = "trips/order-payments"
 
 export const SHIFTS = "hr/"
 export const LOGIN = "auth/login"
-export const PROFILE = "/"
+export const PROFILE = "profile"
 export const ORDER_CASHFLOWS = "checkout/order-cashflows"
 
 /** ===== SETTINGS ===== */
