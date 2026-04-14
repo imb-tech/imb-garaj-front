@@ -13,12 +13,15 @@ export interface OwnerStatistic {
     fuel: string
     fuel_consume: number | null
     fuel_per_km: number
-    income_uzs: number | null
-    income_usd: number | null
-    expense_uzs: number | null
-    expense_usd: number | null
+    income_uzs: string | number | null
+    income_usd: string | number | null
+    expense_uzs: string | number | null
+    expense_usd: string | number | null
     cargo_type_name: string | null
 }
+
+const toNum = (v: string | number | null | undefined): number =>
+    Number(v ?? 0) || 0
 
 export const useCostCols = () => {
     return useMemo<ColumnDef<OwnerStatistic>[]>(
@@ -102,7 +105,8 @@ export const useCostCols = () => {
                 accessorKey: "income_uzs",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    return <span className="text-green-600 font-medium">{row.original.income_uzs !== null ? formatMoney(row.original.income_uzs) : "—"}</span>
+                    const v = toNum(row.original.income_uzs)
+                    return <span className="text-green-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
             {
@@ -110,7 +114,8 @@ export const useCostCols = () => {
                 accessorKey: "income_usd",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    return <span className="text-green-600 font-medium">{row.original.income_usd !== null ? `$${formatMoney(row.original.income_usd)}` : "—"}</span>
+                    const v = toNum(row.original.income_usd)
+                    return <span className="text-green-600 font-medium">{v ? `$${formatMoney(v)}` : "—"}</span>
                 },
             },
             {
@@ -118,7 +123,8 @@ export const useCostCols = () => {
                 accessorKey: "expense_uzs",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    return <span className="text-red-600 font-medium">{row.original.expense_uzs !== null ? formatMoney(row.original.expense_uzs) : "—"}</span>
+                    const v = toNum(row.original.expense_uzs)
+                    return <span className="text-red-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
             {
@@ -126,7 +132,8 @@ export const useCostCols = () => {
                 accessorKey: "expense_usd",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    return <span className="text-red-600 font-medium">{row.original.expense_usd !== null ? `$${formatMoney(row.original.expense_usd)}` : "—"}</span>
+                    const v = toNum(row.original.expense_usd)
+                    return <span className="text-red-600 font-medium">{v ? `$${formatMoney(v)}` : "—"}</span>
                 },
             },
             {
@@ -134,7 +141,7 @@ export const useCostCols = () => {
                 id: "profit_uzs",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const profit = (row.original.income_uzs ?? 0) - (row.original.expense_uzs ?? 0)
+                    const profit = toNum(row.original.income_uzs) - toNum(row.original.expense_uzs)
                     return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{formatMoney(profit)}</span>
                 },
             },
@@ -143,7 +150,7 @@ export const useCostCols = () => {
                 id: "profit_usd",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const profit = (row.original.income_usd ?? 0) - (row.original.expense_usd ?? 0)
+                    const profit = toNum(row.original.income_usd) - toNum(row.original.expense_usd)
                     return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{`$${formatMoney(profit)}`}</span>
                 },
             },
