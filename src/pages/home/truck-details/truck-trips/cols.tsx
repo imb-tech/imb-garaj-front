@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { formatMoney } from "@/lib/format-money"
-import { ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 export interface OrderTripType {
@@ -10,8 +9,7 @@ export interface OrderTripType {
     unloading_name: string
     cargo_type_name: string | null
     client_name: string | null
-    income_uzs: number
-    income_usd: number
+    income: number
     type: number
 }
 
@@ -23,27 +21,18 @@ export interface TripDailyStatisticType {
     end_mileage_image: string | null
     fuel_consume: number
     orders_trip: OrderTripType[]
-    is_summary?: boolean // indicator for parent row grouping
 }
 
-export const useCostCols = () => {
-    return useMemo<ColumnDef<TripDailyStatisticType | OrderTripType>[]>(
+export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void }) => {
+    return useMemo<ColumnDef<any>[]>(
         () => [
             {
-                header: "Sana / Reys",
+                header: "Sana",
                 accessorKey: "date",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
-                    if (data.is_summary) {
-                        return (
-                            <div className="font-bold text-black text-sm flex items-center gap-1.5">
-                                {data.start_date && data.end_date ? 
-                                    <>{data.start_date} <ArrowRight size={14} className="opacity-80"/> {data.end_date} jami</> 
-                                : "Jami"}
-                            </div>
-                        )
-                    }
+                    const data = row.original;
+                    if (data.is_summary) return <span className="font-bold text-black">Jami</span>
                     return <span className="font-medium text-muted-foreground">{data.date}</span>
                 },
             },
@@ -52,7 +41,7 @@ export const useCostCols = () => {
                 accessorKey: "route",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
+                    const data = row.original;
                     if (data.is_summary) return null;
                     return (
                         <span>
@@ -66,16 +55,15 @@ export const useCostCols = () => {
                 accessorKey: "cargo_type_name",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
-                    
+                    const data = row.original;
+                    if (data.is_summary) {
+                        return <span className="font-bold text-black">{data.cargo_type_name || ""}</span>
+                    }
                     if (data.type === 2) {
                         return <Badge variant="secondary">Bo'sh</Badge>
                     }
                     if (data.type === 1 && !data.cargo_type_name) {
                         return <Badge variant="default" className="bg-green-500/10 text-green-600 hover:bg-green-500/15">Band</Badge>
-                    }
-                    if (data.is_summary) {
-                        return <span className="font-bold text-black">{data.cargo_type_name || "—"}</span>
                     }
                     return <span>{data.cargo_type_name || "—"}</span>
                 },
@@ -85,41 +73,17 @@ export const useCostCols = () => {
                 accessorKey: "client_name",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
+                    const data = row.original;
                     if (data.is_summary) return null;
                     return <span>{data.client_name || "—"}</span>
                 },
             },
             {
-                header: "Tushum (UZS)",
-                accessorKey: "income_uzs",
-                enableSorting: false,
-                cell: ({ row }) => {
-                    const data = row.original as any;
-                    if (data.is_summary) {
-                        return <span className="font-bold text-black">{data.income_uzs ? formatMoney(data.income_uzs) : ""}</span>
-                    }
-                    return <span className="font-medium text-green-600">{formatMoney(data.income_uzs)}</span>
-                },
-            },
-            {
-                header: "Tushum (USD)",
-                accessorKey: "income_usd",
-                enableSorting: false,
-                cell: ({ row }) => {
-                    const data = row.original as any;
-                    if (data.is_summary) {
-                        return <span className="font-bold text-black">{data.income_usd ? `$${formatMoney(data.income_usd)}` : ""}</span>
-                    }
-                    return <span className="font-medium text-green-600">{data.income_usd ? `$${formatMoney(data.income_usd)}` : "—"}</span>
-                },
-            },
-            {
-                header: "Masofa (Probeg)",
+                header: "Masofa",
                 accessorKey: "total_mileage",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
+                    const data = row.original;
                     if (!data.is_summary) return null;
                     return <span className="font-bold text-black">{data.total_mileage} km</span>
                 },
@@ -129,9 +93,21 @@ export const useCostCols = () => {
                 accessorKey: "fuel_consume",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
+                    const data = row.original;
                     if (!data.is_summary) return null;
                     return <span className="font-bold text-black">{data.fuel_consume}</span>
+                },
+            },
+            {
+                header: "Tushum",
+                accessorKey: "income",
+                enableSorting: false,
+                cell: ({ row }) => {
+                    const data = row.original;
+                    if (data.is_summary) {
+                        return <span className="font-bold text-black">{data.income ? formatMoney(data.income) : "—"}</span>
+                    }
+                    return <span className="font-medium text-green-600">{data.income ? formatMoney(data.income) : "—"}</span>
                 },
             },
             {
@@ -139,13 +115,35 @@ export const useCostCols = () => {
                 accessorKey: "total_expense",
                 enableSorting: false,
                 cell: ({ row }) => {
-                    const data = row.original as any;
+                    const data = row.original;
                     if (!data.is_summary) return null;
-                    return <span className="font-bold text-black">{data.total_expense ? formatMoney(data.total_expense) : "—"}</span>
+                    return (
+                        <span
+                            className="font-bold text-black underline cursor-pointer hover:text-primary"
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                opts?.onExpenseClick?.(data.trip_id)
+                            }}
+                        >
+                            {data.total_expense ? formatMoney(data.total_expense) : "—"}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: "Foyda",
+                id: "profit",
+                enableSorting: false,
+                cell: ({ row }) => {
+                    const data = row.original;
+                    if (!data.is_summary) return null;
+                    const profit = (data.income || 0) - (data.total_expense || 0)
+                    return <span className={`font-bold ${profit >= 0 ? "text-black" : "text-red-600"}`}>{formatMoney(profit)}</span>
                 },
             },
         ],
-        [],
+        [opts?.onExpenseClick],
     )
 }
 
+export const useCostCols = useOrderCols

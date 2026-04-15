@@ -13,10 +13,8 @@ export interface OwnerStatistic {
     fuel: string
     fuel_consume: number | null
     fuel_per_km: number
-    income_uzs: string | number | null
-    income_usd: string | number | null
-    expense_uzs: string | number | null
-    expense_usd: string | number | null
+    income: string | number | null
+    expense: string | number | null
     cargo_type_name: string | null
 }
 
@@ -101,57 +99,30 @@ export const useCostCols = () => {
                 },
             },
             {
-                header: "Tushum (UZS)",
-                accessorKey: "income_uzs",
+                header: "Tushum",
+                accessorKey: "income",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const v = toNum(row.original.income_uzs)
+                    const v = toNum(row.original.income)
                     return <span className="text-green-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
             {
-                header: "Tushum (USD)",
-                accessorKey: "income_usd",
+                header: "Xarajat",
+                accessorKey: "expense",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const v = toNum(row.original.income_usd)
-                    return <span className="text-green-600 font-medium">{v ? <>${formatMoney(v)}</> : "—"}</span>
-                },
-            },
-            {
-                header: "Xarajat (UZS)",
-                accessorKey: "expense_uzs",
-                enableSorting: true,
-                cell: ({ row }) => {
-                    const v = toNum(row.original.expense_uzs)
+                    const v = toNum(row.original.expense)
                     return <span className="text-red-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
             {
-                header: "Xarajat (USD)",
-                accessorKey: "expense_usd",
+                header: "Foyda",
+                id: "profit",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const v = toNum(row.original.expense_usd)
-                    return <span className="text-red-600 font-medium">{v ? <>${formatMoney(v)}</> : "—"}</span>
-                },
-            },
-            {
-                header: "Foyda (UZS)",
-                id: "profit_uzs",
-                enableSorting: true,
-                cell: ({ row }) => {
-                    const profit = toNum(row.original.income_uzs) - toNum(row.original.expense_uzs)
+                    const profit = toNum(row.original.income) - toNum(row.original.expense)
                     return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>{formatMoney(profit)}</span>
-                },
-            },
-            {
-                header: "Foyda (USD)",
-                id: "profit_usd",
-                enableSorting: true,
-                cell: ({ row }) => {
-                    const profit = toNum(row.original.income_usd) - toNum(row.original.expense_usd)
-                    return <span className={`font-medium ${profit >= 0 ? "text-blue-600" : "text-red-600"}`}>${formatMoney(profit)}</span>
                 },
             },
         ],
