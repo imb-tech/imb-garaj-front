@@ -74,6 +74,12 @@ const MainManagersTransportsIndexLazyRouteImport = createFileRoute(
 const MainManagersTechnicCheckIndexLazyRouteImport = createFileRoute(
   '/_main/_managers/technic-check/',
 )()
+const MainSettingsUsersCreateIndexLazyRouteImport = createFileRoute(
+  '/_main/_settings/users/create/',
+)()
+const MainSettingsUsersIdEditLazyRouteImport = createFileRoute(
+  '/_main/_settings/users/$id/edit',
+)()
 
 const MainRoute = MainRouteImport.update({
   id: '/_main',
@@ -283,12 +289,30 @@ const MainManagersManagerTripsIdRoute =
     path: '/manager-trips/$id',
     getParentRoute: () => MainRoute,
   } as any)
+const MainSettingsUsersCreateIndexLazyRoute =
+  MainSettingsUsersCreateIndexLazyRouteImport.update({
+    id: '/_settings/users/create/',
+    path: '/users/create/',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/_settings/users/create/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const MainTripTripParentIdIndexRoute =
   MainTripTripParentIdIndexRouteImport.update({
     id: '/_trip/trip/$parentId/',
     path: '/trip/$parentId/',
     getParentRoute: () => MainRoute,
   } as any)
+const MainSettingsUsersIdEditLazyRoute =
+  MainSettingsUsersIdEditLazyRouteImport.update({
+    id: '/_settings/users/$id/edit',
+    path: '/users/$id/edit',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/_settings/users/$id/edit.lazy').then((d) => d.Route),
+  )
 const MainTripTripParentIdChildIdRoute =
   MainTripTripParentIdChildIdRouteImport.update({
     id: '/_trip/trip/$parentId/$childId',
@@ -330,7 +354,9 @@ export interface FileRoutesByFullPath {
   '/truck/': typeof MainTrucksTruckIndexLazyRoute
   '/manager-trips/manager-reys/$id': typeof MainManagersManagerTripsManagerReysIdRoute
   '/trip/$parentId/$childId': typeof MainTripTripParentIdChildIdRoute
+  '/users/$id/edit': typeof MainSettingsUsersIdEditLazyRoute
   '/trip/$parentId/': typeof MainTripTripParentIdIndexRoute
+  '/users/create/': typeof MainSettingsUsersCreateIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
@@ -360,7 +386,9 @@ export interface FileRoutesByTo {
   '/truck': typeof MainTrucksTruckIndexLazyRoute
   '/manager-trips/manager-reys/$id': typeof MainManagersManagerTripsManagerReysIdRoute
   '/trip/$parentId/$childId': typeof MainTripTripParentIdChildIdRoute
+  '/users/$id/edit': typeof MainSettingsUsersIdEditLazyRoute
   '/trip/$parentId': typeof MainTripTripParentIdIndexRoute
+  '/users/create': typeof MainSettingsUsersCreateIndexLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -393,7 +421,9 @@ export interface FileRoutesById {
   '/_main/_trucks/truck/': typeof MainTrucksTruckIndexLazyRoute
   '/_main/_managers/manager-trips/manager-reys/$id': typeof MainManagersManagerTripsManagerReysIdRoute
   '/_main/_trip/trip/$parentId/$childId': typeof MainTripTripParentIdChildIdRoute
+  '/_main/_settings/users/$id/edit': typeof MainSettingsUsersIdEditLazyRoute
   '/_main/_trip/trip/$parentId/': typeof MainTripTripParentIdIndexRoute
+  '/_main/_settings/users/create/': typeof MainSettingsUsersCreateIndexLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -425,7 +455,9 @@ export interface FileRouteTypes {
     | '/truck/'
     | '/manager-trips/manager-reys/$id'
     | '/trip/$parentId/$childId'
+    | '/users/$id/edit'
     | '/trip/$parentId/'
+    | '/users/create/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -455,7 +487,9 @@ export interface FileRouteTypes {
     | '/truck'
     | '/manager-trips/manager-reys/$id'
     | '/trip/$parentId/$childId'
+    | '/users/$id/edit'
     | '/trip/$parentId'
+    | '/users/create'
   id:
     | '__root__'
     | '/_auth'
@@ -487,7 +521,9 @@ export interface FileRouteTypes {
     | '/_main/_trucks/truck/'
     | '/_main/_managers/manager-trips/manager-reys/$id'
     | '/_main/_trip/trip/$parentId/$childId'
+    | '/_main/_settings/users/$id/edit'
     | '/_main/_trip/trip/$parentId/'
+    | '/_main/_settings/users/create/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -686,11 +722,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainManagersManagerTripsIdRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/_settings/users/create/': {
+      id: '/_main/_settings/users/create/'
+      path: '/users/create'
+      fullPath: '/users/create/'
+      preLoaderRoute: typeof MainSettingsUsersCreateIndexLazyRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/_trip/trip/$parentId/': {
       id: '/_main/_trip/trip/$parentId/'
       path: '/trip/$parentId'
       fullPath: '/trip/$parentId/'
       preLoaderRoute: typeof MainTripTripParentIdIndexRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/_settings/users/$id/edit': {
+      id: '/_main/_settings/users/$id/edit'
+      path: '/users/$id/edit'
+      fullPath: '/users/$id/edit'
+      preLoaderRoute: typeof MainSettingsUsersIdEditLazyRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/_trip/trip/$parentId/$childId': {
@@ -747,7 +797,9 @@ interface MainRouteChildren {
   MainTrucksTruckIndexLazyRoute: typeof MainTrucksTruckIndexLazyRoute
   MainManagersManagerTripsManagerReysIdRoute: typeof MainManagersManagerTripsManagerReysIdRoute
   MainTripTripParentIdChildIdRoute: typeof MainTripTripParentIdChildIdRoute
+  MainSettingsUsersIdEditLazyRoute: typeof MainSettingsUsersIdEditLazyRoute
   MainTripTripParentIdIndexRoute: typeof MainTripTripParentIdIndexRoute
+  MainSettingsUsersCreateIndexLazyRoute: typeof MainSettingsUsersCreateIndexLazyRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
@@ -783,7 +835,9 @@ const MainRouteChildren: MainRouteChildren = {
   MainManagersManagerTripsManagerReysIdRoute:
     MainManagersManagerTripsManagerReysIdRoute,
   MainTripTripParentIdChildIdRoute: MainTripTripParentIdChildIdRoute,
+  MainSettingsUsersIdEditLazyRoute: MainSettingsUsersIdEditLazyRoute,
   MainTripTripParentIdIndexRoute: MainTripTripParentIdIndexRoute,
+  MainSettingsUsersCreateIndexLazyRoute: MainSettingsUsersCreateIndexLazyRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)

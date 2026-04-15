@@ -1,6 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 
 type Action = {
@@ -23,12 +22,6 @@ export default function PermissionField() {
             name: "actions",
             defaultValue: [],
         }) as string[]) || []
-
-    const [enabled, setEnabled] = useState(() => actions.length > 0)
-
-    useEffect(() => {
-        if (actions?.length > 0) setEnabled(true)
-    }, [actions])
 
     const isChecked = (code?: string) => !!code && actions?.includes(code)
 
@@ -72,20 +65,9 @@ export default function PermissionField() {
         updateActions(updated)
     }
 
-    const handleToggle = (v: boolean) => {
-        setEnabled(v)
-        if (!v) form.setValue("actions", [])
-    }
-
     return (
         <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-                <Checkbox checked={enabled} onCheckedChange={handleToggle} />
-                <Label className="text-sm font-medium">Ruxsatlarni sozlash</Label>
-            </div>
-
-            {enabled && (
-                <div className="grid lg:grid-cols-3 sm:grid-cols-2 gap-3">
+            <div className="grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 gap-3">
                     {defaultModules.map((mod) => (
                         <div key={mod.name} className="bg-muted/50 rounded-xl p-4">
                             <Label className="flex items-center gap-2 font-semibold">
@@ -150,7 +132,6 @@ export default function PermissionField() {
                         </div>
                     ))}
                 </div>
-            )}
         </div>
     )
 }
