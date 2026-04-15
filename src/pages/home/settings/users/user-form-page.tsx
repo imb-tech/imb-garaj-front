@@ -65,19 +65,18 @@ const UserFormPage = () => {
 
     return (
         <div className="p-4">
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate({ to: "/users" })}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
-            >
-                <ArrowLeft size={18} />
-                <span>Foydalanuvchilar</span>
-            </Button>
-
-            <h1 className="text-xl font-semibold mb-6">
-                {id ? "Foydalanuvchini tahrirlash" : "Yangi foydalanuvchi"}
-            </h1>
+            <div className="flex items-center gap-3 mb-6">
+                <Button
+                    size="icon"
+                    onClick={() => navigate({ to: "/users" })}
+                    className="shrink-0"
+                >
+                    <ArrowLeft className="h-4" />
+                </Button>
+                <h1 className="text-xl font-semibold">
+                    {id ? "Foydalanuvchini tahrirlash" : "Yangi foydalanuvchi"}
+                </h1>
+            </div>
 
             <FormProvider {...form}>
                 <form
