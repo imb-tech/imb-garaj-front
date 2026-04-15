@@ -2,6 +2,7 @@ import DeleteModal from "@/components/custom/delete-modal"
 import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
 import { SETTINGS_DRIVERS } from "@/constants/api-endpoints"
+import { useHasAction } from "@/constants/useUser"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
@@ -11,6 +12,7 @@ import AddDriverModal from "./add-driver"
 import { useColumnsDriverTable } from "./driver-cols"
 
 const Drivers = () => {
+    const hasControl = useHasAction("settings_drivers_control")
     const navigate = useNavigate()
     const search = useSearch({ strict: false })
     const { data, isLoading } = useGet<ListResponse<DriversType>>(
@@ -54,14 +56,14 @@ const Drivers = () => {
                 loading={isLoading}
                 columns={columns}
                 data={data?.results}
-                onDelete={handleDelete}
-                onEdit={({ original }) => handleEdit(original)}
+                onDelete={hasControl ? handleDelete : undefined}
+                onEdit={hasControl ? ({ original }) => handleEdit(original) : undefined}
                 onRowClick={handleRowClick}
                 head={
                     <TableHeader
                         fileName="Haydovchilar"
                         url="excel"
-                        storeKey={SETTINGS_DRIVERS}
+                        storeKey={hasControl ? SETTINGS_DRIVERS : undefined}
                         pageKey="page"
                         searchKey="driver_search"
                     />

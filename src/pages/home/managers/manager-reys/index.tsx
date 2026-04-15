@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
 import { MANAGERS_ORDERS, MANAGERS_VEHICLES } from "@/constants/api-endpoints"
+import { useHasAction } from "@/constants/useUser"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
@@ -30,6 +31,7 @@ export default function ManagerReys() {
             page: search.page,
         },
     })
+    const hasControl = useHasAction("manager_vehicles_control")
     const cols = useColumnsManagersOrders()
     const handleEdit = (value: ManagerOrders) => {
         setData(MANAGERS_ORDERS, value)
@@ -54,8 +56,8 @@ export default function ManagerReys() {
                     paramName: "page",
                     pageSizeParamName: "page_size",
                 }}
-                onDelete={(row) => handleDelete(row.original)}
-                onEdit={(row) => handleEdit(row.original)}
+                onDelete={hasControl ? (row) => handleDelete(row.original) : undefined}
+                onEdit={hasControl ? (row) => handleEdit(row.original) : undefined}
                 head={
                     <div className="mb-4">
                         <div className="flex items-center justify-between">
@@ -70,10 +72,12 @@ export default function ManagerReys() {
                                     }
                                 />
                             </div>
-                            <Button onClick={handleAdd}>
-                                <Plus size={16} />
-                                Qo'shish
-                            </Button>
+                            {hasControl && (
+                                <Button onClick={handleAdd}>
+                                    <Plus size={16} />
+                                    Qo'shish
+                                </Button>
+                            )}
                         </div>
                     </div>
                 }

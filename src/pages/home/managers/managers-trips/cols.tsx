@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { MANAGERS_TRIPS } from "@/constants/api-endpoints"
+import { useHasAction } from "@/constants/useUser"
 import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
 import { useGlobalStore } from "@/store/global-store"
@@ -29,6 +30,7 @@ export const useColumnsManagersTrips = (opts?: {
     onDelete?: (item: ManagerTrips) => void
 }) => {
     const { onMoliya, onEdit, onDelete } = opts || {}
+    const hasControl = useHasAction("manager_vehicles_control")
     const { openModal: openFinished } = useModal(`${MANAGERS_TRIPS}-finished`)
     const { setData, getData } = useGlobalStore()
     const handleFinished = (item: ManagerTrips) => {
@@ -150,7 +152,7 @@ export const useColumnsManagersTrips = (opts?: {
                 header: " ",
                 cell: ({ row }) => (
                     <div className="flex items-center justify-end gap-2 py-2">
-                        {!row.original.end && (
+                        {hasControl && !row.original.end && (
                             <Button
                                 size="sm"
                                 className="bg-green-500/10 text-green-600 hover:bg-green-500/15"
@@ -173,26 +175,30 @@ export const useColumnsManagersTrips = (opts?: {
                                 onMoliya?.(row.original)
                             }}
                         />
-                        <Button
-                            icon={<SquarePen className="text-primary" size={16} />}
-                            size="sm"
-                            className="p-0 h-3"
-                            variant="ghost"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                onEdit?.(row.original)
-                            }}
-                        />
-                        <Button
-                            icon={<Trash2 className="text-red-500" size={16} />}
-                            size="sm"
-                            className="p-0 h-3"
-                            variant="ghost"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                onDelete?.(row.original)
-                            }}
-                        />
+                        {hasControl && (
+                            <>
+                                <Button
+                                    icon={<SquarePen className="text-primary" size={16} />}
+                                    size="sm"
+                                    className="p-0 h-3"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onEdit?.(row.original)
+                                    }}
+                                />
+                                <Button
+                                    icon={<Trash2 className="text-red-500" size={16} />}
+                                    size="sm"
+                                    className="p-0 h-3"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onDelete?.(row.original)
+                                    }}
+                                />
+                            </>
+                        )}
                     </div>
                 ),
             },

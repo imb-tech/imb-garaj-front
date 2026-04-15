@@ -7,6 +7,7 @@ import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useNavigate, useParams } from "@tanstack/react-router"
 import { ArrowLeft } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
 import { FormProvider, useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 import PermissionField from "./permission-field"
@@ -40,7 +41,10 @@ const UserFormPage = () => {
         ?.find((r) => r.id === selectedRole)?.name
     const isDriver = selectedRoleName?.toLowerCase() === "driver"
 
-    const onSuccess = () => {
+    const queryClient = useQueryClient()
+
+    const onSuccess = async () => {
+        await queryClient.invalidateQueries({ queryKey: [SETTINGS_USERS] })
         toast.success(
             id ? "Foydalanuvchi tahrirlandi!" : "Foydalanuvchi qo'shildi!",
         )

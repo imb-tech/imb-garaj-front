@@ -4,6 +4,7 @@ import { SETTINGS_USERS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
+import { useHasAction } from "@/constants/useUser"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import TableHeader from "../table-header"
 import { useColumnsUsersTable } from "./users-cols"
@@ -22,6 +23,7 @@ const UsersPage = () => {
     const item = getData<UserType>(SETTINGS_USERS)
 
     const { openModal: openDeleteModal } = useModal("delete")
+    const hasControl = useHasAction("settings_users_control")
     const columns = useColumnsUsersTable()
 
     const handleDelete = (row: { original: UserType }) => {
@@ -38,8 +40,8 @@ const UsersPage = () => {
                 loading={isLoading}
                 columns={columns}
                 data={data?.results}
-                onDelete={handleDelete}
-                onEdit={({ original }) => handleEdit(original)}
+                onDelete={hasControl ? handleDelete : undefined}
+                onEdit={hasControl ? ({ original }) => handleEdit(original) : undefined}
                 paginationProps={{
                     totalPages: data?.total_pages,
                     paramName: "page",
@@ -52,7 +54,7 @@ const UsersPage = () => {
                         storeKey={SETTINGS_USERS}
                         searchKey="first_name"
                         pageKey="page"
-                        onAdd={() => navigate({ to: "/users/create" })}
+                        onAdd={hasControl ? () => navigate({ to: "/users/create" }) : undefined}
                     />
                 }
             />

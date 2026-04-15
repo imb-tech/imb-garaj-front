@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
 import { MANAGERS_CASHFLOW, MANAGERS_EXPENSES, MANAGERS_TRIPS } from "@/constants/api-endpoints"
+import { useHasAction } from "@/constants/useUser"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
@@ -30,6 +31,7 @@ export default function ManagersTrips() {
     const { openModal: editTripModal } = useModal(`${MANAGERS_TRIPS}-finished`)
     const { openModal: createExpenses } = useModal(MANAGERS_EXPENSES)
     const { openModal: deleteTrip } = useModal(`${MANAGERS_TRIPS}-delete`)
+    const hasControl = useHasAction("manager_vehicles_control")
     const [isArchive, setIsArchive] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams({ strict: false })
@@ -158,10 +160,12 @@ export default function ManagersTrips() {
                                         onCheckedChange={setIsArchive}
                                     />
                                 </div>
-                                <Button onClick={handleAdd} disabled={hasOngoingTrip}>
-                                    <Plus size={16} />
-                                    Boshlash
-                                </Button>
+                                {hasControl && (
+                                    <Button onClick={handleAdd} disabled={hasOngoingTrip}>
+                                        <Plus size={16} />
+                                        Boshlash
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -8,6 +8,7 @@ import { useGet } from "@/hooks/useGet"
 import { formatMoney } from "@/lib/format-money"
 import { ColumnDef } from "@tanstack/react-table"
 import { useNavigate, useSearch } from "@tanstack/react-router"
+import { useHasAction } from "@/constants/useUser"
 import { Plus } from "lucide-react"
 import { useMemo } from "react"
 
@@ -87,6 +88,7 @@ const useTransactionCols = () => {
 
 
 const Kassa = () => {
+    const hasControl = useHasAction("manager_cashflow_control")
     const transactionCols = useTransactionCols()
     const navigate = useNavigate()
     const search = useSearch({ strict: false }) as any
@@ -136,20 +138,22 @@ const Kassa = () => {
                         </span>
                     </CardHeader>
                     <CardContent className="pt-0 space-y-3">
-                        <div className="gap-3 flex items-center justify-between">
-                            <Button
-                                variant="destructive"
-                                type="button"
-                                className="w-full"
-                            >
-                                <Plus size={20} />
-                                Chiqim
-                            </Button>
-                            <Button type="button" className="w-full">
-                                <Plus size={20} />
-                                Balans To'ldirish
-                            </Button>
-                        </div>
+                        {hasControl && (
+                            <div className="gap-3 flex items-center justify-between">
+                                <Button
+                                    variant="destructive"
+                                    type="button"
+                                    className="w-full"
+                                >
+                                    <Plus size={20} />
+                                    Chiqim
+                                </Button>
+                                <Button type="button" className="w-full">
+                                    <Plus size={20} />
+                                    Balans To'ldirish
+                                </Button>
+                            </div>
+                        )}
 
                         <div className="border-t pt-3">
                             <p className="text-sm text-muted-foreground">

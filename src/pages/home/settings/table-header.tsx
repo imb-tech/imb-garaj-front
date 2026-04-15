@@ -41,13 +41,15 @@ const TableHeader = ({
             <div className="flex items-center gap-3">
                 {/* <DownloadAsExcel url={"settings_url"} name={`${fileName}`} /> */}
 
-                <Button
-                    className="flex items-center gap-2"
-                    onClick={handleAdd}
-                    icon={<PlusCircle size={18} />}
-                >
-                    Qo'shish
-                </Button>
+                {(onAdd || storeKey) && (
+                    <Button
+                        className="flex items-center gap-2"
+                        onClick={handleAdd}
+                        icon={<PlusCircle size={18} />}
+                    >
+                        Qo'shish
+                    </Button>
+                )}
             </div>
         </div>
     )

@@ -5,6 +5,7 @@ import {
     COMMON_DIRECTIONS,
     SETTINGS_SELECTABLE_PAYMENT_TYPE,
 } from "@/constants/api-endpoints"
+import { useHasAction } from "@/constants/useUser"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
@@ -34,6 +35,7 @@ type Direction = {
 type SelectItem = { id: number | string; name: string }
 
 const RouteConfigsPage = () => {
+    const hasControl = useHasAction("settings_directions_control")
     const search = useSearch({ strict: false }) as Record<string, any>
     const { getData, setData } = useGlobalStore()
     const item = getData<Direction>(COMMON_DIRECTIONS)
@@ -103,8 +105,8 @@ const RouteConfigsPage = () => {
                 loading={isLoading}
                 columns={columns}
                 data={enriched}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
+                onDelete={hasControl ? handleDelete : undefined}
+                onEdit={hasControl ? handleEdit : undefined}
                 numeration
                 paginationProps={{
                     totalPages: data?.total_pages,
@@ -115,7 +117,7 @@ const RouteConfigsPage = () => {
                     <TableHeader
                         fileName="Yo'nalishlar"
                         url="excel"
-                        storeKey={COMMON_DIRECTIONS}
+                        storeKey={hasControl ? COMMON_DIRECTIONS : undefined}
                         searchKey="route_configs_search"
                         pageKey="page"
                     />
