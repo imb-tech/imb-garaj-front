@@ -29,7 +29,7 @@ const UserFormPage = () => {
             last_name: "",
             username: "",
             password: "",
-            role: undefined,
+            role: 2,
             actions: [],
         },
     })
@@ -43,25 +43,24 @@ const UserFormPage = () => {
 
     const queryClient = useQueryClient()
 
-    const onSuccess = async () => {
-        await queryClient.invalidateQueries({ queryKey: [SETTINGS_USERS] })
-        toast.success(
-            id ? "Foydalanuvchi tahrirlandi!" : "Foydalanuvchi qo'shildi!",
-        )
-        navigate({ to: "/users" })
-    }
-
-    const { mutate: postMutate, isPending: isPendingCreate } = usePost({ onSuccess })
-    const { mutate: updateMutate, isPending: isPendingUpdate } = usePatch({ onSuccess })
+    const { mutateAsync: postMutate, isPending: isPendingCreate } = usePost()
+    const { mutateAsync: updateMutate, isPending: isPendingUpdate } = usePatch()
     const isPending = isPendingCreate || isPendingUpdate
 
-    const onSubmit = (values: UserType) => {
-        if (id) {
-            const { password, ...rest } = values
-            updateMutate(`${SETTINGS_USERS}/${id}`, password ? values : rest)
-        } else {
-            postMutate(SETTINGS_USERS, values)
-        }
+    const onSubmit = async (values: UserType) => {
+        try {
+            if (id) {
+                const { password, ...rest } = values
+                await updateMutate(`${SETTINGS_USERS}/${id}`, password ? values : rest)
+            } else {
+                await postMutate(SETTINGS_USERS, values)
+            }
+            queryClient.removeQueries({ queryKey: [SETTINGS_USERS] })
+            toast.success(
+                id ? "Foydalanuvchi tahrirlandi!" : "Foydalanuvchi qo'shildi!",
+            )
+            navigate({ to: "/users" })
+        } catch { }
     }
 
     return (
