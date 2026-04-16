@@ -29,16 +29,18 @@ export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void 
             {
                 header: "Sana",
                 accessorKey: "date",
+                size: 100,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
-                    if (data.is_summary) return <span className="font-bold text-black">Jami</span>
+                    if (data.is_summary) return <span className="font-bold text-white">Jami</span>
                     return <span className="font-medium text-muted-foreground">{data.date}</span>
                 },
             },
             {
                 header: "Marshrut",
                 accessorKey: "route",
+                size: 200,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
@@ -53,12 +55,11 @@ export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void 
             {
                 header: "Yuk turi",
                 accessorKey: "cargo_type_name",
+                size: 100,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
-                    if (data.is_summary) {
-                        return <span className="font-bold text-black">{data.cargo_type_name || ""}</span>
-                    }
+                    if (data.is_summary) return null;
                     if (data.type === 2) {
                         return <Badge variant="secondary">Bo'sh</Badge>
                     }
@@ -71,6 +72,7 @@ export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void 
             {
                 header: "Firma (Mijoz)",
                 accessorKey: "client_name",
+                size: 120,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
@@ -81,64 +83,69 @@ export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void 
             {
                 header: "Masofa",
                 accessorKey: "total_mileage",
+                size: 80,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
                     if (!data.is_summary) return null;
-                    return <span className="font-bold text-black">{data.total_mileage} km</span>
+                    return <span className="font-bold text-white">{data.total_mileage} km</span>
                 },
             },
             {
                 header: "Yoqilg'i sarfi",
                 accessorKey: "fuel_consume",
+                size: 100,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
                     if (!data.is_summary) return null;
-                    return <span className="font-bold text-black">{data.fuel_consume}</span>
-                },
-            },
-            {
-                header: "Tushum",
-                accessorKey: "income",
-                enableSorting: false,
-                cell: ({ row }) => {
-                    const data = row.original;
-                    if (data.is_summary) {
-                        return <span className="font-bold text-black">{data.income ? formatMoney(data.income) : "—"}</span>
-                    }
-                    return <span className="font-medium text-green-600">{data.income ? formatMoney(data.income) : "—"}</span>
+                    return <span className="font-bold text-white">{data.fuel_consume}</span>
                 },
             },
             {
                 header: "Xarajat",
                 accessorKey: "total_expense",
+                size: 120,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
                     if (!data.is_summary) return null;
                     return (
                         <span
-                            className="font-bold text-black underline cursor-pointer hover:text-primary"
+                            className="font-bold text-white underline cursor-pointer hover:text-primary"
                             onClick={(e) => {
                                 e.stopPropagation()
                                 opts?.onExpenseClick?.(data.trip_id)
                             }}
                         >
-                            {data.total_expense ? formatMoney(data.total_expense) : "—"}
+                            {formatMoney(data.total_expense ?? 0)}
                         </span>
                     )
                 },
             },
             {
+                header: "Tushum",
+                accessorKey: "income",
+                size: 120,
+                enableSorting: false,
+                cell: ({ row }) => {
+                    const data = row.original;
+                    if (data.is_summary) {
+                        return <span className="font-bold text-white">{formatMoney(data.income ?? 0)}</span>
+                    }
+                    return <span className="font-medium text-green-600">{formatMoney(data.income ?? 0)}</span>
+                },
+            },
+            {
                 header: "Foyda",
                 id: "profit",
+                size: 120,
                 enableSorting: false,
                 cell: ({ row }) => {
                     const data = row.original;
                     if (!data.is_summary) return null;
                     const profit = (data.income || 0) - (data.total_expense || 0)
-                    return <span className={`font-bold ${profit >= 0 ? "text-black" : "text-red-600"}`}>{formatMoney(profit)}</span>
+                    return <span className={`font-bold ${profit > 0 ? "text-green-600" : profit < 0 ? "text-red-600" : "text-white"}`}>{formatMoney(profit)}</span>
                 },
             },
         ],

@@ -99,21 +99,21 @@ export const useCostCols = () => {
                 },
             },
             {
-                header: "Tushum",
-                accessorKey: "income",
-                enableSorting: true,
-                cell: ({ row }) => {
-                    const v = toNum(row.original.income)
-                    return <span className="text-green-600 font-medium">{v ? formatMoney(v) : "—"}</span>
-                },
-            },
-            {
                 header: "Xarajat",
                 accessorKey: "expense",
                 enableSorting: true,
                 cell: ({ row }) => {
                     const v = toNum(row.original.expense)
                     return <span className="text-red-600 font-medium">{v ? formatMoney(v) : "—"}</span>
+                },
+            },
+            {
+                header: "Tushum",
+                accessorKey: "income",
+                enableSorting: true,
+                cell: ({ row }) => {
+                    const v = toNum(row.original.income)
+                    return <span className="text-green-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
             {

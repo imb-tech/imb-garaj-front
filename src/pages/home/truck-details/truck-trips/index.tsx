@@ -66,16 +66,16 @@ const VehicleTrips = () => {
 
     return (
         <div className="space-y-6 mt-4">
-            {trips.map((trip) => (
+            {trips.map((trip, index) => (
                 <div key={trip.id}>
-                    <h3 className="text-center text-sm font-semibold text-muted-foreground mb-2">
-                        Aylanma ({trip.minDate || "—"} — {trip.maxDate || "—"})
+                    <h3 className="text-left text-sm font-semibold text-muted-foreground mb-2">
+                        {index + 1}. Aylanma ({trip.minDate || "—"} — {trip.maxDate || "—"})
                     </h3>
                     <DataTable
                         columns={columns as any}
                         data={trip.rows}
                         viewAll
-                        rowColor={(row: any) => row.is_summary ? "!bg-yellow-300 dark:!bg-yellow-500 hover:!bg-yellow-300 dark:hover:!bg-yellow-500 [&>td]:!py-1 [&>td]:!h-6" : ""}
+                        rowColor={(row: any) => row.is_summary ? "!bg-slate-200 dark:!bg-slate-700 hover:!bg-slate-200 dark:hover:!bg-slate-700 [&>td]:!py-1 [&>td]:!h-6" : ""}
                     />
                 </div>
             ))}

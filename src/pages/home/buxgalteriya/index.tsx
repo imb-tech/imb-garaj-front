@@ -1,0 +1,115 @@
+import { DataTable } from "@/components/ui/datatable"
+import {
+    MANAGERS_REYS,
+    SETTINGS_SELECTABLE_CLIENT,
+    SETTINGS_SELECTABLE_DISTRICT,
+    SETTINGS_SELECTABLE_CARGO_TYPE,
+} from "@/constants/api-endpoints"
+import { useGet } from "@/hooks/useGet"
+import { useSearch } from "@tanstack/react-router"
+import ParamDateRange from "@/components/as-params/date-picker-range"
+import { ParamCombobox } from "@/components/as-params/combobox"
+import ParamInput from "@/components/as-params/input"
+import { useAccountingCols, ReysOrder } from "./cols"
+
+type SelectItem = { id: number | string; name: string }
+
+const BuxgalteriyaPage = () => {
+    const search: any = useSearch({ strict: false })
+
+    const currentDate = new Date()
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+    const defaultDateRange =
+        !search?.from_date && !search?.to_date
+            ? { from: startOfMonth, to: endOfMonth }
+            : undefined
+
+    const { data: clients } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CLIENT)
+    const { data: districts } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_DISTRICT)
+    const { data: cargoTypes } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CARGO_TYPE)
+
+    const { data, isLoading } = useGet<ListResponse<ReysOrder>>(
+        MANAGERS_REYS,
+        {
+            params: {
+                from_date: search?.from_date,
+                to_date: search?.to_date,
+                page: search?.page,
+                page_size: search?.page_size,
+                search: search?.search,
+                client: search?.client,
+                loading: search?.loading,
+                unloading: search?.unloading,
+                cargo_type: search?.cargo_type,
+            },
+        },
+    )
+
+    const columns = useAccountingCols()
+
+    const comboStyle = {
+        className: "!bg-background dark:!bg-secondary min-w-44 justify-start",
+    }
+
+    return (
+        <div className="space-y-3">
+            <DataTable
+                columns={columns}
+                loading={isLoading}
+                data={data?.results || []}
+                numeration
+                paginationProps={{
+                    totalPages: data?.total_pages,
+                    paramName: "page",
+                    pageSizeParamName: "page_size",
+                }}
+                head={
+                    <div className="space-y-3 mb-3">
+                        <div className="flex items-center justify-end gap-3 flex-wrap">
+                            <ParamCombobox
+                                paramName="client"
+                                options={clients || []}
+                                label="Firma nomi"
+                                addButtonProps={comboStyle}
+                            />
+                            <ParamCombobox
+                                paramName="loading"
+                                options={districts || []}
+                                label="Yuklash joyi"
+                                addButtonProps={comboStyle}
+                            />
+                            <ParamCombobox
+                                paramName="unloading"
+                                options={districts || []}
+                                label="Tushirish joyi"
+                                addButtonProps={comboStyle}
+                            />
+                            <ParamCombobox
+                                paramName="cargo_type"
+                                options={cargoTypes || []}
+                                label="Yuk turi"
+                                addButtonProps={comboStyle}
+                            />
+                            <ParamInput
+                                searchKey="search"
+                                placeholder="Davlat raqami..."
+                                className="!bg-background dark:!bg-secondary min-w-40"
+                            />
+                            <ParamDateRange
+                                from="from_date"
+                                to="to_date"
+                                defaultValue={defaultDateRange}
+                                addButtonProps={{
+                                    className: "!bg-background dark:!bg-secondary min-w-44 justify-start",
+                                }}
+                            />
+                        </div>
+                    </div>
+                }
+            />
+        </div>
+    )
+}
+
+export default BuxgalteriyaPage

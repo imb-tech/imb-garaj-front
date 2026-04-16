@@ -28,6 +28,9 @@ const MainTexnikCheckIndexLazyRouteImport = createFileRoute(
 )()
 const MainMoliyaIndexLazyRouteImport = createFileRoute('/_main/moliya/')()
 const MainKassaIndexLazyRouteImport = createFileRoute('/_main/kassa/')()
+const MainBuxgalteriyaIndexLazyRouteImport = createFileRoute(
+  '/_main/buxgalteriya/',
+)()
 const MainManagersManagersLazyRouteImport = createFileRoute(
   '/_main/_managers/managers',
 )()
@@ -128,6 +131,14 @@ const MainKassaIndexLazyRoute = MainKassaIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_main/kassa/index.lazy').then((d) => d.Route),
 )
+const MainBuxgalteriyaIndexLazyRoute =
+  MainBuxgalteriyaIndexLazyRouteImport.update({
+    id: '/buxgalteriya/',
+    path: '/buxgalteriya/',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/buxgalteriya/index.lazy').then((d) => d.Route),
+  )
 const MainManagersManagersLazyRoute =
   MainManagersManagersLazyRouteImport.update({
     id: '/_managers/managers',
@@ -331,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
   '/managers': typeof MainManagersManagersLazyRoute
+  '/buxgalteriya/': typeof MainBuxgalteriyaIndexLazyRoute
   '/kassa/': typeof MainKassaIndexLazyRoute
   '/moliya/': typeof MainMoliyaIndexLazyRoute
   '/texnik-check/': typeof MainTexnikCheckIndexLazyRoute
@@ -363,6 +375,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
   '/managers': typeof MainManagersManagersLazyRoute
+  '/buxgalteriya': typeof MainBuxgalteriyaIndexLazyRoute
   '/kassa': typeof MainKassaIndexLazyRoute
   '/moliya': typeof MainMoliyaIndexLazyRoute
   '/texnik-check': typeof MainTexnikCheckIndexLazyRoute
@@ -398,6 +411,7 @@ export interface FileRoutesById {
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/': typeof MainIndexRoute
   '/_main/_managers/managers': typeof MainManagersManagersLazyRoute
+  '/_main/buxgalteriya/': typeof MainBuxgalteriyaIndexLazyRoute
   '/_main/kassa/': typeof MainKassaIndexLazyRoute
   '/_main/moliya/': typeof MainMoliyaIndexLazyRoute
   '/_main/texnik-check/': typeof MainTexnikCheckIndexLazyRoute
@@ -432,6 +446,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/managers'
+    | '/buxgalteriya/'
     | '/kassa/'
     | '/moliya/'
     | '/texnik-check/'
@@ -464,6 +479,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/managers'
+    | '/buxgalteriya'
     | '/kassa'
     | '/moliya'
     | '/texnik-check'
@@ -498,6 +514,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard'
     | '/_main/'
     | '/_main/_managers/managers'
+    | '/_main/buxgalteriya/'
     | '/_main/kassa/'
     | '/_main/moliya/'
     | '/_main/texnik-check/'
@@ -587,6 +604,13 @@ declare module '@tanstack/react-router' {
       path: '/kassa'
       fullPath: '/kassa/'
       preLoaderRoute: typeof MainKassaIndexLazyRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/buxgalteriya/': {
+      id: '/_main/buxgalteriya/'
+      path: '/buxgalteriya'
+      fullPath: '/buxgalteriya/'
+      preLoaderRoute: typeof MainBuxgalteriyaIndexLazyRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/_managers/managers': {
@@ -774,6 +798,7 @@ interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainIndexRoute: typeof MainIndexRoute
   MainManagersManagersLazyRoute: typeof MainManagersManagersLazyRoute
+  MainBuxgalteriyaIndexLazyRoute: typeof MainBuxgalteriyaIndexLazyRoute
   MainKassaIndexLazyRoute: typeof MainKassaIndexLazyRoute
   MainMoliyaIndexLazyRoute: typeof MainMoliyaIndexLazyRoute
   MainTexnikCheckIndexLazyRoute: typeof MainTexnikCheckIndexLazyRoute
@@ -806,6 +831,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainIndexRoute: MainIndexRoute,
   MainManagersManagersLazyRoute: MainManagersManagersLazyRoute,
+  MainBuxgalteriyaIndexLazyRoute: MainBuxgalteriyaIndexLazyRoute,
   MainKassaIndexLazyRoute: MainKassaIndexLazyRoute,
   MainMoliyaIndexLazyRoute: MainMoliyaIndexLazyRoute,
   MainTexnikCheckIndexLazyRoute: MainTexnikCheckIndexLazyRoute,

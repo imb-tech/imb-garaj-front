@@ -121,7 +121,6 @@ export const useItems = () =>
                 icon: <Wallet width={18} />,
                 path: "/buxgalteriya",
                 allowKey: "accounting_view",
-                pending: true,
             },
             {
                 label: "Investor",

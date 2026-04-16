@@ -301,6 +301,7 @@ export function DataTable<TData>({
                 {data?.length ?
                     <Table
                         className={`${className} select-text  bg-card rounded-md`}
+                        style={{ tableLayout: "fixed" }}
                     >
                         <TableHeader>
                             {table
@@ -346,6 +347,7 @@ export function DataTable<TData>({
                                                         className={cn(
                                                             " px-2 cursor-pointer",
                                                         )}
+                                                        style={header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined}
                                                         onClick={
                                                             (
                                                                 header.column

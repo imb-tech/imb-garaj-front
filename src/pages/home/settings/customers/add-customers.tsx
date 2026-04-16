@@ -83,7 +83,7 @@ const AddCustomerModal = () => {
                     <FormInput
                         required
                         name="name"
-                        label="F.I.O"
+                        label="Firma nomi"
                         methods={form}
                     />
 
@@ -94,6 +94,14 @@ const AddCustomerModal = () => {
                         label={"Telefon"}
                         name={"phone_number"}
                         placeholder="+998 __ ___ __ __"
+                    />
+
+                    <FormInput
+                        name="nds_percent"
+                        label="NDS foizi (%)"
+                        methods={form}
+                        type="number"
+                        placeholder="Masalan: 12"
                     />
 
                     <div className="flex items-center justify-end gap-2 md:col-span-2">

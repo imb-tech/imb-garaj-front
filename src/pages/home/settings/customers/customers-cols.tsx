@@ -7,7 +7,7 @@ export const useColumnsCustomersTable = () => {
         () => [
             {
                 accessorKey: "name",
-                header: "F.I.O",
+                header: "Firma nomi",
                 enableSorting: true,
                 cell: ({ row }) => (
                     <div className="min-w-[180px] w-[220px] truncate">
@@ -31,6 +31,14 @@ export const useColumnsCustomersTable = () => {
                     const digitsB = (phoneB || "").replace(/\D/g, "")
                     return digitsA.localeCompare(digitsB)
                 },
+            },
+            {
+                accessorKey: "nds_percent",
+                header: "NDS (%)",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row.original.nds_percent ?? "—"} %</span>
+                ),
             },
         ],
         [],
