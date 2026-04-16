@@ -76,49 +76,49 @@ export const useColumnsManagersOrders = () => {
             {
                 accessorKey: "pending_time",
                 header: "Pending vaqt",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.pending_time)}</span>,
             },
             {
                 accessorKey: "started_time",
                 header: "Boshlangan vaqt",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.started_time)}</span>,
             },
             {
                 accessorKey: "loading_time",
                 header: "Yuklash vaqti",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.loading_time)}</span>,
             },
             {
                 accessorKey: "in_transit_time",
                 header: "Yo’lda",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.in_transit_time)}</span>,
             },
             {
                 accessorKey: "unloading_time",
                 header: "Tushirish vaqti",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.unloading_time)}</span>,
             },
             {
                 accessorKey: "completed_time",
                 header: "Yakunlangan",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.completed_time)}</span>,
             },
             {
                 accessorKey: "canceled_time",
                 header: "Bekor qilingan",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.canceled_time)}</span>,
             },
             {
                 accessorKey: "archived_time",
                 header: "Arxivlangan",
-                size: 120,
+                size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.archived_time)}</span>,
             },
             {
@@ -142,11 +142,5 @@ const formatDateSafe = (value?: string) => {
 
     if (isNaN(date.getTime())) return "-"
 
-    return (
-        <>
-            {format(date, "yyyy-MM-dd")}
-            <br />
-            {format(date, "HH:mm")}
-        </>
-    )
+    return format(date, "yyyy-MM-dd HH:mm")
 }
