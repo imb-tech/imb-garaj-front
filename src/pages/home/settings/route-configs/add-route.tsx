@@ -6,7 +6,6 @@ import {
     COMMON_DIRECTIONS,
     SETTINGS_SELECTABLE_CARGO_TYPE,
     SETTINGS_SELECTABLE_CLIENT,
-    SETTINGS_SELECTABLE_DISTRICT,
     SETTINGS_SELECTABLE_PAYMENT_TYPE,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
@@ -61,8 +60,8 @@ const AddRouteConfigModal = () => {
     const { data: clientData } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CLIENT, {
         params: { model_name: "client" },
     })
-    const { data: districtsData } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_DISTRICT, {
-        params: { model_name: "district" },
+    const { data: regionsData } = useGet<SelectItem[]>("common/selectable/region", {
+        params: { model_name: "region" },
     })
     const { data: cargoType } = useGet<SelectItem[]>(SETTINGS_SELECTABLE_CARGO_TYPE, {
         params: { model_name: "cargo-type" },
@@ -101,7 +100,7 @@ const AddRouteConfigModal = () => {
                 label="Yuklash manzili"
                 name="load"
                 control={control}
-                options={districtsData}
+                options={regionsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
@@ -111,7 +110,7 @@ const AddRouteConfigModal = () => {
                 label="Yuk tushirish manzili"
                 name="unload"
                 control={control}
-                options={districtsData}
+                options={regionsData}
                 valueKey="id"
                 labelKey="name"
                 placeholder="Hududni tanlang"
