@@ -87,6 +87,13 @@ const AddCustomerModal = () => {
                         methods={form}
                     />
 
+                    <FormInput
+                        name="code"
+                        label="Firma kodi"
+                        methods={form}
+                        placeholder="Masalan: 100A"
+                    />
+
                     <FormFormatNumberInput
                         control={form.control}
                         format="+998 ## ### ## ##"

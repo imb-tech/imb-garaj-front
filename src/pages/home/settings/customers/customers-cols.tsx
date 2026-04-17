@@ -16,6 +16,14 @@ export const useColumnsCustomersTable = () => {
                 ),
             },
             {
+                accessorKey: "code",
+                header: "Firma kodi",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row.original.code || "—"}</span>
+                ),
+            },
+            {
                 accessorKey: "phone_number",
                 header: "Telefon raqami",
                 enableSorting: true,
