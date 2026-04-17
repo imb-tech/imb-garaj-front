@@ -63,6 +63,7 @@ const BuxgalteriyaPage = () => {
                     totalPages: data?.total_pages,
                     paramName: "page",
                     pageSizeParamName: "page_size",
+                    page_sizes: [25, 50, 100, 250, 500, 1000],
                 }}
                 head={
                     <div className="space-y-3 mb-3">

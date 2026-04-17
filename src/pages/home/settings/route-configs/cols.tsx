@@ -1,3 +1,4 @@
+import { formatMoney } from "@/lib/format-money"
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 
@@ -19,29 +20,25 @@ const CURRENCY_LABELS: Record<number, string> = {
     2: "USD",
 }
 
-const formatAmount = (amount: string | null) => {
-    if (!amount) return "-"
-    const n = Number(amount)
-    if (Number.isNaN(n)) return amount
-    return n.toLocaleString("fr-FR").replace(/\u00a0/g, " ")
-}
 
 export const useDirectionColumns = () =>
     useMemo<ColumnDef<DirectionRow>[]>(
         () => [
-            { accessorKey: "load_name", header: "Yuklash manzili" },
-            { accessorKey: "unload_name", header: "Yuk tushirish manzili" },
-            { accessorKey: "owner_name", header: "Yuk egasi" },
-            { accessorKey: "cargo_type_name", header: "Yuk turi" },
-            { accessorKey: "payment_type_name", header: "To'lov turi" },
+            { accessorKey: "load_name", header: "Yuklash manzili", enableSorting: true },
+            { accessorKey: "unload_name", header: "Yuk tushirish manzili", enableSorting: true },
+            { accessorKey: "owner_name", header: "Yuk egasi", enableSorting: true },
+            { accessorKey: "cargo_type_name", header: "Yuk turi", enableSorting: true },
+            { accessorKey: "payment_type_name", header: "To'lov turi", enableSorting: true },
             {
                 accessorKey: "amount",
                 header: "Summa",
-                cell: ({ row }) => formatAmount(row.original.amount ?? null),
+                enableSorting: true,
+                cell: ({ row }) => formatMoney(Number(row.original.amount ?? 0)),
             },
             {
                 accessorKey: "currency",
                 header: "Valyuta",
+                enableSorting: true,
                 cell: ({ row }) =>
                     CURRENCY_LABELS[row.original.currency] ?? "-",
             },

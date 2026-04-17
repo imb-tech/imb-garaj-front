@@ -35,26 +35,31 @@ export const useAccountingCols = () => {
                 header: "Firma nomi",
                 accessorKey: "client_name",
                 size: 140,
+                enableSorting: true,
             },
             {
                 header: "Sana",
                 accessorKey: "date",
                 size: 100,
+                enableSorting: true,
             },
             {
                 header: "Yuklash joyi",
                 accessorKey: "loading_name",
                 size: 130,
+                enableSorting: true,
             },
             {
                 header: "Tushirish joyi",
                 accessorKey: "unloading_name",
                 size: 130,
+                enableSorting: true,
             },
             {
                 header: "Avto turi",
                 accessorKey: "vehicle_type",
                 size: 100,
+                enableSorting: true,
                 cell: ({ row }) => (
                     <span className="uppercase">{row.original.vehicle_type || "—"}</span>
                 ),
@@ -63,16 +68,19 @@ export const useAccountingCols = () => {
                 header: "Davlat raqami",
                 accessorKey: "truck_number",
                 size: 120,
+                enableSorting: true,
             },
             {
                 header: "Yuk turi",
                 accessorKey: "cargo_type_name",
                 size: 110,
+                enableSorting: true,
             },
             {
                 header: "Summa S NDS",
                 accessorKey: "summa_s_nds",
                 size: 130,
+                enableSorting: true,
                 cell: ({ row }) => {
                     const v = toNum(row.original.summa_s_nds)
                     return <span className="font-medium">{formatMoney(v)}</span>
@@ -82,12 +90,14 @@ export const useAccountingCols = () => {
                 header: "%",
                 accessorKey: "pct",
                 size: 60,
+                enableSorting: true,
                 cell: ({ row }) => <span>{row.original.pct}%</span>,
             },
             {
                 header: "Naqd",
                 accessorKey: "naqd_amount",
                 size: 120,
+                enableSorting: true,
                 cell: ({ row }) => {
                     const v = toNum(row.original.naqd_amount)
                     return <span className="font-medium text-green-600">{formatMoney(v)}</span>

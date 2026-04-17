@@ -112,6 +112,7 @@ const RouteConfigsPage = () => {
                     totalPages: data?.total_pages,
                     paramName: "page",
                     pageSizeParamName: "page_size",
+                    page_sizes: [25, 50, 100, 250, 500, 1000],
                 }}
                 head={
                     <TableHeader
