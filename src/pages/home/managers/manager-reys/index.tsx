@@ -135,7 +135,7 @@ export default function ManagerReys() {
                                 </button>
                             )}
                             <img
-                                src={previewImages[previewIndex].image}
+                                src={previewImages[previewIndex].image.replace("http://", "https://")}
                                 alt="preview"
                                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                             />
