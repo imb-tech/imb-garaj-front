@@ -22,6 +22,7 @@ export interface ReysOrder {
     cargo_type: number
     cargo_type_name: string | null
     client_name: string | null
+    client_code: string | null
     summa_s_nds: string | number
     naqd_amount: string | number
     pct: number
@@ -31,6 +32,12 @@ export interface ReysOrder {
 export const useAccountingCols = () => {
     return useMemo<ColumnDef<ReysOrder>[]>(
         () => [
+            {
+                header: "Firma kodi",
+                accessorKey: "client_code",
+                size: 80,
+                enableSorting: true,
+            },
             {
                 header: "Firma nomi",
                 accessorKey: "client_name",

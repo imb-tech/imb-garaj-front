@@ -6,6 +6,15 @@ export const useColumnsCustomersTable = () => {
     return useMemo<ColumnDef<CustomersType>[]>(
         () => [
             {
+                accessorKey: "code",
+                header: "Firma kodi",
+                size: 80,
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row.original.code || "—"}</span>
+                ),
+            },
+            {
                 accessorKey: "name",
                 header: "Firma nomi",
                 enableSorting: true,
@@ -13,14 +22,6 @@ export const useColumnsCustomersTable = () => {
                     <div className="min-w-[180px] w-[220px] truncate">
                         {row.original.name || "-"}
                     </div>
-                ),
-            },
-            {
-                accessorKey: "code",
-                header: "Firma kodi",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row.original.code || "—"}</span>
                 ),
             },
             {
