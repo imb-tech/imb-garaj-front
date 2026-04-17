@@ -4,6 +4,10 @@ import { InlineBreadcrumb } from "@/components/header/breadcrumbs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/datatable"
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog"
 import { MANAGERS_ORDERS, MANAGERS_VEHICLES } from "@/constants/api-endpoints"
 import { useHasAction } from "@/constants/useUser"
 import { useGet } from "@/hooks/useGet"
@@ -11,7 +15,8 @@ import { useModal } from "@/hooks/useModal"
 import { formatMoney } from "@/lib/format-money"
 import { useGlobalStore } from "@/store/global-store"
 import { useParams, useSearch } from "@tanstack/react-router"
-import { Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { useState } from "react"
 import { useColumnsManagersOrders } from "./cols"
 import AddTripOrders from "./create-reys"
 
@@ -32,7 +37,17 @@ export default function ManagerReys() {
         },
     })
     const hasControl = useHasAction("manager_vehicles_control")
-    const cols = useColumnsManagersOrders()
+
+    const [previewImages, setPreviewImages] = useState<{ id: number; image: string }[]>([])
+    const [previewIndex, setPreviewIndex] = useState<number | null>(null)
+
+    const cols = useColumnsManagersOrders({
+        onImageClick: (images) => {
+            setPreviewImages(images)
+            setPreviewIndex(0)
+        },
+    })
+
     const handleEdit = (value: ManagerOrders) => {
         setData(MANAGERS_ORDERS, value)
         openTripModal()
@@ -97,6 +112,53 @@ export default function ManagerReys() {
                 modalKey={`${MANAGERS_ORDERS}-delete`}
                 id={currentSelected?.id}
             />
+
+            <Dialog
+                open={previewIndex !== null}
+                onOpenChange={() => setPreviewIndex(null)}
+            >
+                <DialogContent className="max-w-3xl p-2">
+                    {previewIndex !== null && previewImages[previewIndex] && (
+                        <div className="relative flex items-center justify-center">
+                            {previewImages.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setPreviewIndex(
+                                            (previewIndex - 1 + previewImages.length) %
+                                                previewImages.length,
+                                        )
+                                    }
+                                    className="absolute left-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                            )}
+                            <img
+                                src={previewImages[previewIndex].image}
+                                alt="preview"
+                                className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                            />
+                            {previewImages.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setPreviewIndex(
+                                            (previewIndex + 1) % previewImages.length,
+                                        )
+                                    }
+                                    className="absolute right-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            )}
+                            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur-sm text-sm px-3 py-1 rounded-full">
+                                {previewIndex + 1} / {previewImages.length}
+                            </span>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

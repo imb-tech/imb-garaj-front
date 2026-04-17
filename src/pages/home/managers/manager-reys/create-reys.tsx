@@ -132,12 +132,21 @@ const AddTripOrders = () => {
             )
             if (byId) return byId
         }
-        if (!loadingValue || !unloadingValue || !cargoTypeValue) return undefined
+        if (!loadingValue || !unloadingValue) return undefined
+        const cargoId = Number(cargoTypeValue)
+        if (cargoId) {
+            const exact = directions.find(
+                (d) =>
+                    d.load === Number(loadingValue) &&
+                    d.unload === Number(unloadingValue) &&
+                    d.cargo_type === cargoId,
+            )
+            if (exact) return exact
+        }
         return directions.find(
             (d) =>
                 d.load === Number(loadingValue) &&
-                d.unload === Number(unloadingValue) &&
-                d.cargo_type === Number(cargoTypeValue),
+                d.unload === Number(unloadingValue),
         )
     }, [
         directions,
@@ -197,14 +206,15 @@ const AddTripOrders = () => {
             },
         ]
 
+        const isEmpty = !data.cargo_type || data.cargo_type === 0
+
         const formData = new FormData()
         formData.append("loading", data.loading)
         formData.append("unloading", data.unloading)
         formData.append("date", data.date)
         formData.append("trip", String(id))
-        if (data.cargo_type && data.cargo_type !== 0) {
-            formData.append("cargo_type", data.cargo_type)
-        }
+        formData.append("type", isEmpty ? "2" : "1")
+        formData.append("cargo_type", isEmpty ? "" : data.cargo_type)
         formData.append("direction", String(matchedDirection.id))
         formData.append("incomes", JSON.stringify(incomes))
         images.forEach((file) => formData.append("images", file))

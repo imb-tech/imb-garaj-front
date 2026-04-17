@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { formatMoney } from "@/lib/format-money"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
+import { ImageIcon } from "lucide-react"
 import { useMemo } from "react"
 import { STATUS_TRIP } from "../managers-trips/cols"
 
@@ -14,7 +15,10 @@ const HOLAT_COLORS: Record<number, string> = {
     1: "bg-green-500/10 text-green-600 border-transparent",
     2: "bg-gray-500/10 text-gray-500 border-transparent",
 }
-export const useColumnsManagersOrders = () => {
+
+export const useColumnsManagersOrders = (opts?: {
+    onImageClick?: (images: { id: number; image: string }[]) => void
+}) => {
     return useMemo<ColumnDef<ManagerOrders>[]>(
         () => [
             {
@@ -74,6 +78,28 @@ export const useColumnsManagersOrders = () => {
                 },
             },
             {
+                id: "images",
+                header: "Rasm",
+                size: 60,
+                cell: ({ row }) => {
+                    const images = row.original?.images
+                    if (!images?.length) return <span className="text-muted-foreground">—</span>
+                    return (
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                opts?.onImageClick?.(images)
+                            }}
+                        >
+                            <ImageIcon size={16} />
+                            <span className="text-xs">{images.length}</span>
+                        </button>
+                    )
+                },
+            },
+            {
                 accessorKey: "pending_time",
                 header: "Pending vaqt",
                 size: 150,
@@ -93,7 +119,7 @@ export const useColumnsManagersOrders = () => {
             },
             {
                 accessorKey: "in_transit_time",
-                header: "Yo’lda",
+                header: "Yo'lda",
                 size: 150,
                 cell: ({ row }) => <span className="whitespace-nowrap">{formatDateSafe(row.original.in_transit_time)}</span>,
             },
@@ -131,7 +157,7 @@ export const useColumnsManagersOrders = () => {
                 },
             },
         ],
-        [],
+        [opts?.onImageClick],
     )
 }
 

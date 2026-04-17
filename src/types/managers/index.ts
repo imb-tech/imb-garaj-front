@@ -68,6 +68,7 @@ type ManagerOrders = {
     completed_time: string
     canceled_time: string
     archived_time: string
+    images?: { id: number; image: string }[]
 }
 
 type ManagerExpenses = {
