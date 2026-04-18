@@ -5,16 +5,12 @@ import { SETTINGS_REGIONS } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { useGlobalStore } from "@/store/global-store"
-import { useNavigate, useSearch } from "@tanstack/react-router"
-import { useEffect } from "react"
+import { useSearch } from "@tanstack/react-router"
 import TableHeaderLocation from "../../table-header"
 import AddRegionsModal from "./add-regions"
 import { useColumnsRegionsTable } from "./regions-cols"
 const RegionsTable = ({ country_id }: { country_id: number }) => {
-    const navigate = useNavigate()
     const search = useSearch({ strict: false })
-    const selectedRegionId =
-        search.region != null ? Number(search.region) : undefined
 
     const { data, isLoading } = useGet<ListResponse<RegionsType>>(
         `${SETTINGS_REGIONS}`,
@@ -43,35 +39,14 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
         openDeleteModal()
     }
 
-    const handleRowClick = (row: RegionsType) => {
-        const isCurrentlySelected = search.region === row.id
-
-        const updateSearch = (prev: typeof search): Partial<typeof search> => ({
-            ...prev,
-            region: isCurrentlySelected ? undefined : row.id,
-        })
-
-        navigate({
-            search: updateSearch as any,
-        })
-    }
-
-    useEffect(() => {
-        if (data?.results?.length && !search.region && country_id) {
-            const firstRegion = data.results[0]
-
-            const updateSearch = (
-                prev: typeof search,
-            ): Partial<typeof search> => ({
-                ...prev,
-                region: firstRegion.id,
-            })
-
-            navigate({
-                search: updateSearch as any,
-            })
-        }
-    }, [data, search.region, country_id, navigate])
+    // const handleRowClick = (row: RegionsType) => {
+    //     const isCurrentlySelected = search.region === row.id
+    //     const updateSearch = (prev: typeof search): Partial<typeof search> => ({
+    //         ...prev,
+    //         region: isCurrentlySelected ? undefined : row.id,
+    //     })
+    //     navigate({ search: updateSearch as any })
+    // }
 
     const simpleColumns = useColumnsRegionsTable()
     return (
@@ -94,26 +69,11 @@ const RegionsTable = ({ country_id }: { country_id: number }) => {
                     data={data?.results}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onRowClick={handleRowClick}
                     className="min-w-[400px]"
                     numeration={true}
                     viewAll={true}
                     paginationProps={{ totalPages: 1 }}
                     wrapperClassName="!bg-transparent"
-                    rowColor={(r: any) => {
-                        const rowId = Number(r?.original?.id ?? r?.id)
-                        const isSelected = selectedRegionId === rowId
-
-                        return isSelected ?
-                                [
-                                    "[&>td]:!bg-primary/10",
-                                    "hover:[&>td]:!bg-primary/15",
-                                    "[&>td]:border-y-2 [&>td]:border-primary/60",
-                                    "[&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2",
-                                    "[&>td]:!rounded-none",
-                                ].join(" ")
-                            :   ""
-                    }}
                 />
             </div>
             <DeleteModal

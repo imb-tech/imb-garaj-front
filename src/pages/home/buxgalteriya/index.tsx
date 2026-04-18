@@ -1,3 +1,4 @@
+import Modal from "@/components/custom/modal"
 import { DataTable } from "@/components/ui/datatable"
 import {
     MANAGERS_REYS,
@@ -6,16 +7,21 @@ import {
     SETTINGS_SELECTABLE_CARGO_TYPE,
 } from "@/constants/api-endpoints"
 import { useGet } from "@/hooks/useGet"
+import { useModal } from "@/hooks/useModal"
+import { useGlobalStore } from "@/store/global-store"
 import { useSearch } from "@tanstack/react-router"
 import ParamDateRange from "@/components/as-params/date-picker-range"
 import { ParamCombobox } from "@/components/as-params/combobox"
 import ParamInput from "@/components/as-params/input"
 import { useAccountingCols, ReysOrder } from "./cols"
+import EditReysModal from "./edit-reys"
 
 type SelectItem = { id: number | string; name: string }
 
 const BuxgalteriyaPage = () => {
     const search: any = useSearch({ strict: false })
+    const { setData } = useGlobalStore()
+    const { openModal } = useModal("edit-reys")
 
     const currentDate = new Date()
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
@@ -52,6 +58,11 @@ const BuxgalteriyaPage = () => {
         className: "!bg-background dark:!bg-secondary min-w-44 justify-start",
     }
 
+    const handleEdit = (row: { original: ReysOrder }) => {
+        setData(MANAGERS_REYS, row.original)
+        openModal()
+    }
+
     return (
         <div className="space-y-3">
             <DataTable
@@ -59,6 +70,7 @@ const BuxgalteriyaPage = () => {
                 loading={isLoading}
                 data={data?.results || []}
                 numeration
+                onEdit={handleEdit}
                 paginationProps={{
                     totalPages: data?.total_pages,
                     paramName: "page",
@@ -109,6 +121,14 @@ const BuxgalteriyaPage = () => {
                     </div>
                 }
             />
+
+            <Modal
+                modalKey="edit-reys"
+                title="Reys tahrirlash"
+                size="max-w-2xl"
+            >
+                <EditReysModal />
+            </Modal>
         </div>
     )
 }
