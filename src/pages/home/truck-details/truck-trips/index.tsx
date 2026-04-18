@@ -9,7 +9,7 @@ import ExpenseDialog from "./expense-dialog"
 const VehicleTrips = () => {
     const params = useParams({ strict: false })
     const search: any = useSearch({ strict: false })
-    const [expenseTripId, setExpenseTripId] = useState<number | null>(null)
+    const [expenseTrip, setExpenseTrip] = useState<{ id: number; total: number | null } | null>(null)
 
     const { data, isLoading } = useGet<TripDailyStatisticType[]>(OWNER_TRIP_DAILY_STATISTIC, {
         params: {
@@ -20,7 +20,8 @@ const VehicleTrips = () => {
     })
 
     const columns = useOrderCols({
-        onExpenseClick: (tripId) => setExpenseTripId(tripId),
+        onExpenseClick: (tripId, totalExpense) =>
+            setExpenseTrip({ id: tripId, total: totalExpense ?? null }),
     })
 
     const trips = (data || []).map(trip => {
@@ -84,9 +85,10 @@ const VehicleTrips = () => {
             )}
 
             <ExpenseDialog
-                tripId={expenseTripId}
-                open={expenseTripId !== null}
-                onClose={() => setExpenseTripId(null)}
+                tripId={expenseTrip?.id ?? null}
+                totalExpense={expenseTrip?.total ?? null}
+                open={expenseTrip !== null}
+                onClose={() => setExpenseTrip(null)}
             />
         </div>
     )

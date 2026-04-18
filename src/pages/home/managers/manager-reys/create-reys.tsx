@@ -72,6 +72,11 @@ const AddTripOrders = () => {
         },
     })
 
+    const [existingImages, setExistingImages] = useState<
+        { id: number; image: string }[]
+    >(currentTripOrder?.images ?? [])
+    const [removedImageIds, setRemovedImageIds] = useState<number[]>([])
+
     const { handleSubmit, control, reset, watch, setValue } = form
 
     const loadingValue = watch("loading")
@@ -218,6 +223,9 @@ const AddTripOrders = () => {
         formData.append("direction", String(matchedDirection.id))
         formData.append("incomes", JSON.stringify(incomes))
         images.forEach((file) => formData.append("images", file))
+        removedImageIds.forEach((imgId) =>
+            formData.append("removed_images", String(imgId)),
+        )
 
         if (currentTripOrder?.id) {
             update(`${MANAGERS_ORDERS}/${currentTripOrder.id}`, formData)
@@ -236,9 +244,28 @@ const AddTripOrders = () => {
         imagesField.onChange([...images, ...newFiles])
     }
 
-    const removeImage = (index: number) => {
+    const removeNewImage = (index: number) => {
         imagesField.onChange(images.filter((_, i) => i !== index))
     }
+
+    const removeExistingImage = (imgId: number) => {
+        setExistingImages((prev) => prev.filter((img) => img.id !== imgId))
+        setRemovedImageIds((prev) => [...prev, imgId])
+    }
+
+    const previewItems = useMemo(
+        () => [
+            ...existingImages.map((img) => ({
+                key: `e-${img.id}`,
+                url: img.image,
+            })),
+            ...images.map((file, idx) => ({
+                key: `n-${idx}`,
+                url: URL.createObjectURL(file),
+            })),
+        ],
+        [existingImages, images],
+    )
 
     return (
         <>
@@ -319,13 +346,38 @@ const AddTripOrders = () => {
             </div>
 
             {/* Yuklangan rasmlar */}
-            {images.length > 0 && (
+            {previewItems.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                    {images.map((file, index) => (
+                    {existingImages.map((img, index) => (
                         <div
-                            key={index}
+                            key={`e-${img.id}`}
                             className="relative w-20 h-20 rounded-lg overflow-hidden border cursor-pointer"
                             onClick={() => setPreviewIndex(index)}
+                        >
+                            <img
+                                src={img.image}
+                                alt={`rasm-${img.id}`}
+                                className="w-full h-full object-cover"
+                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    removeExistingImage(img.id)
+                                }}
+                                className="absolute top-1 right-1 bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-destructive hover:text-white transition-colors"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    ))}
+                    {images.map((file, index) => (
+                        <div
+                            key={`n-${index}`}
+                            className="relative w-20 h-20 rounded-lg overflow-hidden border cursor-pointer"
+                            onClick={() =>
+                                setPreviewIndex(existingImages.length + index)
+                            }
                         >
                             <img
                                 src={URL.createObjectURL(file)}
@@ -336,7 +388,7 @@ const AddTripOrders = () => {
                                 type="button"
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    removeImage(index)
+                                    removeNewImage(index)
                                 }}
                                 className="absolute top-1 right-1 bg-background/80 backdrop-blur-sm rounded-full p-0.5 hover:bg-destructive hover:text-white transition-colors"
                             >
@@ -396,15 +448,15 @@ const AddTripOrders = () => {
             onOpenChange={() => setPreviewIndex(null)}
         >
             <DialogContent className="max-w-2xl p-2">
-                {previewIndex !== null && images[previewIndex] && (
+                {previewIndex !== null && previewItems[previewIndex] && (
                     <div className="relative flex items-center justify-center">
-                        {images.length > 1 && (
+                        {previewItems.length > 1 && (
                             <button
                                 type="button"
                                 onClick={() =>
                                     setPreviewIndex(
-                                        (previewIndex - 1 + images.length) %
-                                            images.length,
+                                        (previewIndex - 1 + previewItems.length) %
+                                            previewItems.length,
                                     )
                                 }
                                 className="absolute left-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"
@@ -413,16 +465,16 @@ const AddTripOrders = () => {
                             </button>
                         )}
                         <img
-                            src={URL.createObjectURL(images[previewIndex])}
+                            src={previewItems[previewIndex].url}
                             alt="preview"
                             className="w-full h-auto rounded-lg"
                         />
-                        {images.length > 1 && (
+                        {previewItems.length > 1 && (
                             <button
                                 type="button"
                                 onClick={() =>
                                     setPreviewIndex(
-                                        (previewIndex + 1) % images.length,
+                                        (previewIndex + 1) % previewItems.length,
                                     )
                                 }
                                 className="absolute right-2 z-10 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-accent transition-colors"

@@ -223,14 +223,14 @@ function AddFinanceForm({
         params: { page_size: 1000000 },
     })
 
-    const { data: ordersData } = useGet<ListResponse<{ id: number; loading_name: string; unloading_name: string }>>(
+    const { data: ordersData } = useGet<ListResponse<{ id: number; loading_name: string; unloading_name: string; date?: string }>>(
         MANAGERS_ORDERS,
         { params: { trip: tripId, page_size: 100 }, enabled: isOrderCategory && !!tripId },
     )
     const orderOptions = useMemo(() =>
         (ordersData?.results ?? []).map((o) => ({
             ...o,
-            label: `${o.loading_name} → ${o.unloading_name}`,
+            label: `${o.date ? `${o.date} · ` : ""}${o.loading_name} → ${o.unloading_name}`,
         })),
         [ordersData],
     )
@@ -392,7 +392,6 @@ function AddFinanceForm({
 const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: (item: FinanceRow) => void }) => {
     return useMemo<ColumnDef<FinanceRow>[]>(
         () => [
-            { header: "Izoh", accessorKey: "comment", enableSorting: true },
             {
                 header: "Yuklash",
                 accessorKey: "loading_name",
@@ -414,6 +413,7 @@ const useIncomeCols = (opts?: { onEdit?: (item: FinanceRow) => void; onDelete?: 
                 ),
             },
             { header: "To'lov turi", accessorKey: "payment_type_name", enableSorting: true },
+            { header: "Izoh", accessorKey: "comment", enableSorting: true },
             { header: "Yaratilgan sana", accessorKey: "created", enableSorting: true, cell: ({ row }) => formatDateTime(row.original.created) },
             {
                 id: "actions",

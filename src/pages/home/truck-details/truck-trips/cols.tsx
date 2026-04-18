@@ -23,7 +23,7 @@ export interface TripDailyStatisticType {
     orders_trip: OrderTripType[]
 }
 
-export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void }) => {
+export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number, totalExpense?: number | null) => void }) => {
     return useMemo<ColumnDef<any>[]>(
         () => [
             {
@@ -112,13 +112,13 @@ export const useOrderCols = (opts?: { onExpenseClick?: (tripId: number) => void 
                     if (!data.is_summary) return null;
                     return (
                         <span
-                            className="font-bold text-white underline cursor-pointer hover:text-primary"
+                            className="font-bold text-red-500 underline cursor-pointer hover:text-primary"
                             onClick={(e) => {
                                 e.stopPropagation()
-                                opts?.onExpenseClick?.(data.trip_id)
+                                opts?.onExpenseClick?.(data.trip_id, data.total_expense)
                             }}
                         >
-                            {formatMoney(data.total_expense ?? 0)}
+                            - {formatMoney(data.total_expense ?? 0)}
                         </span>
                     )
                 },

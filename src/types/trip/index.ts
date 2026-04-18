@@ -101,6 +101,7 @@ type TripOrdersRow = {
             payment_type: number | null
         },
     ]
+    images?: { id: number; image: string }[]
 }
 
 type CashflowRow = {
