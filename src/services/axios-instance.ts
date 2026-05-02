@@ -26,7 +26,6 @@ axiosInstance.interceptors.response.use(
     (response) => response,
 
     async (error) => {
-        const originalRequest = error.config
         const status = error.response?.status
         
         const isLoginPage = window.location.pathname === '/auth';
@@ -34,15 +33,10 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        if (status === 401 && originalRequest._retry) {
-            originalRequest._retry = true
-
-            try {
-                return axiosInstance(originalRequest)
-            } catch (refreshError) {
-                location.href = "/auth"
-                return Promise.reject(refreshError)
-            }
+        if (status === 401) {
+            localStorage.removeItem("token")
+            window.location.href = "/auth"
+            return Promise.reject(error)
         }
         if (status === 403) {
             toast.error("Sizga ruxsat berilmagan" + ": " + error?.config?.url)
