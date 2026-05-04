@@ -72,6 +72,8 @@ const AddTripOrders = () => {
         },
     })
 
+    const directionPrefilledRef = useRef(false)
+
     const [existingImages, setExistingImages] = useState<
         { id: number; image: string }[]
     >(currentTripOrder?.images ?? [])
@@ -160,6 +162,21 @@ const AddTripOrders = () => {
         cargoTypeValue,
         currentTripOrder?.direction,
     ])
+
+    useEffect(() => {
+        if (directionPrefilledRef.current) return
+        if (!directions.length) return
+        const dirId = currentTripOrder?.direction
+        if (!dirId) return
+        const dir = directions.find((d) => d.id === Number(dirId))
+        if (!dir) return
+        setValue("loading", dir.load)
+        setValue("unloading", dir.unload)
+        setValue("cargo_type", dir.cargo_type)
+        prevLoadingRef.current = dir.load
+        prevUnloadingRef.current = dir.unload
+        directionPrefilledRef.current = true
+    }, [directions, currentTripOrder?.direction, setValue])
 
     useEffect(() => {
         if (prevLoadingRef.current !== loadingValue) {
