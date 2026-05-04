@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
+import { Route as MainHaydovchilarIdRouteImport } from './routes/_main/haydovchilar/$id'
 import { Route as MainTrucksTruckDetailIdRouteImport } from './routes/_main/_trucks/truck-detail/$id'
 import { Route as MainTrucksOrdersIdRouteImport } from './routes/_main/_trucks/orders/$id'
 import { Route as MainManagersManagerTripsIdRouteImport } from './routes/_main/_managers/manager-trips/$id'
@@ -28,6 +29,9 @@ const MainTexnikCheckIndexLazyRouteImport = createFileRoute(
 )()
 const MainMoliyaIndexLazyRouteImport = createFileRoute('/_main/moliya/')()
 const MainKassaIndexLazyRouteImport = createFileRoute('/_main/kassa/')()
+const MainHaydovchilarIndexLazyRouteImport = createFileRoute(
+  '/_main/haydovchilar/',
+)()
 const MainBuxgalteriyaIndexLazyRouteImport = createFileRoute(
   '/_main/buxgalteriya/',
 )()
@@ -131,6 +135,14 @@ const MainKassaIndexLazyRoute = MainKassaIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_main/kassa/index.lazy').then((d) => d.Route),
 )
+const MainHaydovchilarIndexLazyRoute =
+  MainHaydovchilarIndexLazyRouteImport.update({
+    id: '/haydovchilar/',
+    path: '/haydovchilar/',
+    getParentRoute: () => MainRoute,
+  } as any).lazy(() =>
+    import('./routes/_main/haydovchilar/index.lazy').then((d) => d.Route),
+  )
 const MainBuxgalteriyaIndexLazyRoute =
   MainBuxgalteriyaIndexLazyRouteImport.update({
     id: '/buxgalteriya/',
@@ -147,6 +159,11 @@ const MainManagersManagersLazyRoute =
   } as any).lazy(() =>
     import('./routes/_main/_managers/managers.lazy').then((d) => d.Route),
   )
+const MainHaydovchilarIdRoute = MainHaydovchilarIdRouteImport.update({
+  id: '/haydovchilar/$id',
+  path: '/haydovchilar/$id',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainTrucksTruckIndexLazyRoute =
   MainTrucksTruckIndexLazyRouteImport.update({
     id: '/_trucks/truck/',
@@ -341,8 +358,10 @@ export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
+  '/haydovchilar/$id': typeof MainHaydovchilarIdRoute
   '/managers': typeof MainManagersManagersLazyRoute
   '/buxgalteriya/': typeof MainBuxgalteriyaIndexLazyRoute
+  '/haydovchilar/': typeof MainHaydovchilarIndexLazyRoute
   '/kassa/': typeof MainKassaIndexLazyRoute
   '/moliya/': typeof MainMoliyaIndexLazyRoute
   '/texnik-check/': typeof MainTexnikCheckIndexLazyRoute
@@ -374,8 +393,10 @@ export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
   '/auth': typeof AuthAuthLazyRoute
   '/dashboard': typeof MainDashboardLazyRoute
+  '/haydovchilar/$id': typeof MainHaydovchilarIdRoute
   '/managers': typeof MainManagersManagersLazyRoute
   '/buxgalteriya': typeof MainBuxgalteriyaIndexLazyRoute
+  '/haydovchilar': typeof MainHaydovchilarIndexLazyRoute
   '/kassa': typeof MainKassaIndexLazyRoute
   '/moliya': typeof MainMoliyaIndexLazyRoute
   '/texnik-check': typeof MainTexnikCheckIndexLazyRoute
@@ -410,8 +431,10 @@ export interface FileRoutesById {
   '/_auth/auth': typeof AuthAuthLazyRoute
   '/_main/dashboard': typeof MainDashboardLazyRoute
   '/_main/': typeof MainIndexRoute
+  '/_main/haydovchilar/$id': typeof MainHaydovchilarIdRoute
   '/_main/_managers/managers': typeof MainManagersManagersLazyRoute
   '/_main/buxgalteriya/': typeof MainBuxgalteriyaIndexLazyRoute
+  '/_main/haydovchilar/': typeof MainHaydovchilarIndexLazyRoute
   '/_main/kassa/': typeof MainKassaIndexLazyRoute
   '/_main/moliya/': typeof MainMoliyaIndexLazyRoute
   '/_main/texnik-check/': typeof MainTexnikCheckIndexLazyRoute
@@ -445,8 +468,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/haydovchilar/$id'
     | '/managers'
     | '/buxgalteriya/'
+    | '/haydovchilar/'
     | '/kassa/'
     | '/moliya/'
     | '/texnik-check/'
@@ -478,8 +503,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/haydovchilar/$id'
     | '/managers'
     | '/buxgalteriya'
+    | '/haydovchilar'
     | '/kassa'
     | '/moliya'
     | '/texnik-check'
@@ -513,8 +540,10 @@ export interface FileRouteTypes {
     | '/_auth/auth'
     | '/_main/dashboard'
     | '/_main/'
+    | '/_main/haydovchilar/$id'
     | '/_main/_managers/managers'
     | '/_main/buxgalteriya/'
+    | '/_main/haydovchilar/'
     | '/_main/kassa/'
     | '/_main/moliya/'
     | '/_main/texnik-check/'
@@ -606,6 +635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainKassaIndexLazyRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/haydovchilar/': {
+      id: '/_main/haydovchilar/'
+      path: '/haydovchilar'
+      fullPath: '/haydovchilar/'
+      preLoaderRoute: typeof MainHaydovchilarIndexLazyRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/buxgalteriya/': {
       id: '/_main/buxgalteriya/'
       path: '/buxgalteriya'
@@ -618,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/managers'
       fullPath: '/managers'
       preLoaderRoute: typeof MainManagersManagersLazyRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/haydovchilar/$id': {
+      id: '/_main/haydovchilar/$id'
+      path: '/haydovchilar/$id'
+      fullPath: '/haydovchilar/$id'
+      preLoaderRoute: typeof MainHaydovchilarIdRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/_trucks/truck/': {
@@ -797,8 +840,10 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface MainRouteChildren {
   MainDashboardLazyRoute: typeof MainDashboardLazyRoute
   MainIndexRoute: typeof MainIndexRoute
+  MainHaydovchilarIdRoute: typeof MainHaydovchilarIdRoute
   MainManagersManagersLazyRoute: typeof MainManagersManagersLazyRoute
   MainBuxgalteriyaIndexLazyRoute: typeof MainBuxgalteriyaIndexLazyRoute
+  MainHaydovchilarIndexLazyRoute: typeof MainHaydovchilarIndexLazyRoute
   MainKassaIndexLazyRoute: typeof MainKassaIndexLazyRoute
   MainMoliyaIndexLazyRoute: typeof MainMoliyaIndexLazyRoute
   MainTexnikCheckIndexLazyRoute: typeof MainTexnikCheckIndexLazyRoute
@@ -830,8 +875,10 @@ interface MainRouteChildren {
 const MainRouteChildren: MainRouteChildren = {
   MainDashboardLazyRoute: MainDashboardLazyRoute,
   MainIndexRoute: MainIndexRoute,
+  MainHaydovchilarIdRoute: MainHaydovchilarIdRoute,
   MainManagersManagersLazyRoute: MainManagersManagersLazyRoute,
   MainBuxgalteriyaIndexLazyRoute: MainBuxgalteriyaIndexLazyRoute,
+  MainHaydovchilarIndexLazyRoute: MainHaydovchilarIndexLazyRoute,
   MainKassaIndexLazyRoute: MainKassaIndexLazyRoute,
   MainMoliyaIndexLazyRoute: MainMoliyaIndexLazyRoute,
   MainTexnikCheckIndexLazyRoute: MainTexnikCheckIndexLazyRoute,

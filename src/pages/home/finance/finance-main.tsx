@@ -130,12 +130,12 @@ const FinanceStatisticMain = () => {
                                 </CardContent>
                             </Card>
 
-                            {/* Daromat */}
+                            {/* Daromad */}
                             <Card className="relative overflow-hidden border-none shadow-none bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400">
                                 <CardHeader className="pb-2">
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-sm font-medium opacity-80">
-                                            Daromat
+                                            Daromad
                                         </CardTitle>
                                         <div className="rounded-full bg-green-100 dark:bg-green-900/50 p-2">
                                             <ArrowUpCircle className="h-4 w-4" />
