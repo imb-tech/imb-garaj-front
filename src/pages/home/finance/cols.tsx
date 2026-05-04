@@ -14,6 +14,7 @@ export interface OwnerStatistic {
     fuel_consume: number | null
     fuel_per_km: number
     income: string | number | null
+    income_with_vat: string | number | null
     expense: string | number | null
     cargo_type_name: string | null
 }
@@ -109,10 +110,10 @@ export const useCostCols = () => {
             },
             {
                 header: "Tushum",
-                accessorKey: "income",
+                accessorKey: "income_with_vat",
                 enableSorting: true,
                 cell: ({ row }) => {
-                    const v = toNum(row.original.income)
+                    const v = toNum(row.original.income_with_vat)
                     return <span className="text-green-600 font-medium">{v ? formatMoney(v) : "—"}</span>
                 },
             },
