@@ -13,6 +13,8 @@ import {
 import { cn } from "@/lib/utils"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
+import { useDelete } from "@/hooks/useDelete"
+import { usePatch } from "@/hooks/usePatch"
 import { usePost } from "@/hooks/usePost"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
@@ -29,6 +31,7 @@ type VehicleOption = {
 type OtherVehicleOption = {
     id: number
     number: string
+    fuel: "methane" | "diesel" | string
 }
 
 type OrderOption = {
@@ -90,7 +93,11 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
     const [isAdding, setIsAdding] = useState(false)
     const [newNumber, setNewNumber] = useState("")
     const [newComment, setNewComment] = useState("")
+    const [newFuel, setNewFuel] = useState<"methane" | "diesel">("methane")
     const [addError, setAddError] = useState("")
+    // Set while an existing car is being corrected; the same panel serves
+    // both jobs so a wrong fuel type is fixed where it was chosen.
+    const [editingId, setEditingId] = useState<number | null>(null)
     const vehicleOptions = (vehiclesData?.results ?? []).map((v) => ({
         id: v.id,
         name: `${v.truck_number} (${UNIT_LABEL[v.fuel] ?? "litr"})`,
@@ -98,7 +105,16 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
     const selectedVehicle = vehiclesData?.results?.find(
         (v) => v.id === vehicleId,
     )
-    const unitLabel = UNIT_LABEL[selectedVehicle?.fuel ?? ""] ?? "litr"
+    const otherVehicleId = watch("other_vehicle")
+    const selectedOtherVehicle = otherVehicles?.find(
+        (v) => v.id === otherVehicleId,
+    )
+    // Methane is sold by the cubic metre and diesel by the litre; the label
+    // follows whichever vehicle is actually selected.
+    const unitLabel =
+        UNIT_LABEL[
+            (isOther ? selectedOtherVehicle?.fuel : selectedVehicle?.fuel) ?? ""
+        ] ?? "litr"
 
     const { data: ordersData } = useGet<ListResponse<OrderOption>>(
         MANAGERS_ORDERS,
@@ -116,14 +132,48 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
         setValue("order", "")
     }, [vehicleId, setValue])
 
+    const closeVehiclePanel = (row: any) => {
+        setIsAdding(false)
+        setEditingId(null)
+        setNewNumber("")
+        setNewComment("")
+        setNewFuel("methane")
+        setAddError("")
+        refetchOtherVehicles().then(() => setValue("other_vehicle", row.id))
+    }
+
+    const { mutate: deleteOtherVehicle, isPending: isDeleting } = useDelete({
+        onSuccess: () => {
+            toast.success("Mashina o'chirildi")
+            setIsAdding(false)
+            setEditingId(null)
+            setAddError("")
+            refetchOtherVehicles().then(() => setValue("other_vehicle", ""))
+        },
+        onError: (error: any) => {
+            // The server refuses while refuels still point at the car and says
+            // why; showing that beats a generic failure.
+            setAddError(
+                error?.response?.data?.detail || "O'chirib bo'lmadi",
+            )
+        },
+    })
+
+    const { mutate: updateOtherVehicle, isPending: isUpdating } = usePatch({
+        onSuccess: (row: any) => {
+            toast.success("Mashina yangilandi")
+            closeVehiclePanel(row)
+        },
+        onError: (error: any) => {
+            const data = error?.response?.data
+            setAddError(data?.number?.[0] || data?.fuel?.[0] || "Saqlab bo'lmadi")
+        },
+    })
+
     const { mutate: createOtherVehicle, isPending: isCreating } = usePost({
         onSuccess: (row: any) => {
             toast.success("Mashina qo'shildi")
-            setIsAdding(false)
-            setNewNumber("")
-            setNewComment("")
-            setAddError("")
-            refetchOtherVehicles().then(() => setValue("other_vehicle", row.id))
+            closeVehiclePanel(row)
         },
         onError: (error: any) => {
             setAddError(error?.response?.data?.number?.[0] || "Saqlab bo'lmadi")
@@ -209,9 +259,12 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
                         control={control}
                         label="Mashina raqami"
                         name="other_vehicle"
-                        options={otherVehicles}
+                        options={(otherVehicles ?? []).map((v) => ({
+                            ...v,
+                            label: `${v.number} (${UNIT_LABEL[v.fuel] ?? "litr"})`,
+                        }))}
                         valueKey="id"
-                        labelKey="number"
+                        labelKey="label"
                         placeholder="Raqamni tanlang"
                     />
                     {isAdding ?
@@ -219,13 +272,44 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
                             <Input
                                 fullWidth
                                 autoFocus
-                                placeholder="Masalan: 01 198 LMA"
+                                placeholder="Masalan: 01 777 AAA"
                                 value={newNumber}
                                 onChange={(event) => {
                                     setNewNumber(event.target.value)
                                     setAddError("")
                                 }}
                             />
+                            <div className="flex flex-col gap-1">
+                                <span className="text-sm font-medium">
+                                    Yoqilg'i turi
+                                </span>
+                                <div className="flex gap-2">
+                                    {[
+                                        { value: "methane", label: "Metan (m³)" },
+                                        { value: "diesel", label: "Dizel (litr)" },
+                                    ].map((choice) => (
+                                        <button
+                                            key={choice.value}
+                                            type="button"
+                                            onClick={() =>
+                                                setNewFuel(
+                                                    choice.value as
+                                                        | "methane"
+                                                        | "diesel",
+                                                )
+                                            }
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-md text-sm border transition-colors",
+                                                newFuel === choice.value
+                                                    ? "bg-primary text-primary-foreground border-primary"
+                                                    : "bg-background text-muted-foreground hover:text-foreground",
+                                            )}
+                                        >
+                                            {choice.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <Input
                                 fullWidth
                                 placeholder="Izoh (ixtiyoriy)"
@@ -240,11 +324,27 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
                                 </span>
                             )}
                             <div className="flex gap-2 justify-end">
+                                {!!editingId && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        loading={isDeleting}
+                                        className="text-destructive mr-auto"
+                                        onClick={() =>
+                                            deleteOtherVehicle(
+                                                `${PETROL_STATIONS_OTHER_VEHICLES}/${editingId}`,
+                                            )
+                                        }
+                                    >
+                                        O'chirish
+                                    </Button>
+                                )}
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     onClick={() => {
                                         setIsAdding(false)
+                                        setEditingId(null)
                                         setAddError("")
                                     }}
                                 >
@@ -252,30 +352,69 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
                                 </Button>
                                 <Button
                                     type="button"
-                                    loading={isCreating}
+                                    loading={isCreating || isUpdating}
                                     disabled={!newNumber.trim()}
-                                    onClick={() =>
-                                        createOtherVehicle(
-                                            PETROL_STATIONS_OTHER_VEHICLES,
-                                            {
-                                                number: newNumber.trim(),
-                                                comment:
-                                                    newComment.trim() || null,
-                                            } as any,
-                                        )
-                                    }
+                                    onClick={() => {
+                                        const payload = {
+                                            number: newNumber.trim(),
+                                            fuel: newFuel,
+                                            ...(newComment.trim()
+                                                ? { comment: newComment.trim() }
+                                                : {}),
+                                        } as any
+                                        if (editingId) {
+                                            updateOtherVehicle(
+                                                `${PETROL_STATIONS_OTHER_VEHICLES}/${editingId}`,
+                                                payload,
+                                            )
+                                        } else {
+                                            createOtherVehicle(
+                                                PETROL_STATIONS_OTHER_VEHICLES,
+                                                payload,
+                                            )
+                                        }
+                                    }}
                                 >
-                                    Qo'shish
+                                    {editingId ? "Saqlash" : "Qo'shish"}
                                 </Button>
                             </div>
                         </div>
-                    :   <button
-                            type="button"
-                            onClick={() => setIsAdding(true)}
-                            className="text-sm text-primary w-max hover:underline"
-                        >
-                            + Yangi mashina qo'shish
-                        </button>
+                    :   <div className="flex gap-4">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setEditingId(null)
+                                    setNewNumber("")
+                                    setNewComment("")
+                                    setNewFuel("methane")
+                                    setAddError("")
+                                    setIsAdding(true)
+                                }}
+                                className="text-sm text-primary w-max hover:underline"
+                            >
+                                + Yangi mashina qo'shish
+                            </button>
+                            {!!selectedOtherVehicle && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEditingId(selectedOtherVehicle.id)
+                                        setNewNumber(selectedOtherVehicle.number)
+                                        setNewFuel(
+                                            selectedOtherVehicle.fuel === "diesel"
+                                                ? "diesel"
+                                                : "methane",
+                                        )
+                                        setNewComment("")
+                                        setAddError("")
+                                        setIsAdding(true)
+                                    }}
+                                    className="text-sm text-muted-foreground w-max hover:underline"
+                                >
+                                    Tahrirlash
+                                </button>
+                            )}
+                        </div>
                     }
                 </div>
             :   <>
