@@ -3,16 +3,19 @@ import FileUpload from "@/components/form/file-upload"
 import { FormNumberInput } from "@/components/form/number-input"
 import FormTextarea from "@/components/form/textarea"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     MANAGERS_ORDERS,
+    PETROL_STATIONS_OTHER_VEHICLES,
     SETTINGS_PETROL_STATIONS,
     VEHICLES,
 } from "@/constants/api-endpoints"
+import { cn } from "@/lib/utils"
 import { useGet } from "@/hooks/useGet"
 import { useModal } from "@/hooks/useModal"
 import { usePost } from "@/hooks/usePost"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -20,6 +23,12 @@ type VehicleOption = {
     id: number
     truck_number: string
     fuel: "methane" | "diesel" | string
+}
+
+// Garaj yuritmaydigan firma mashinasi: faqat raqami saqlanadi.
+type OtherVehicleOption = {
+    id: number
+    number: string
 }
 
 type OrderOption = {
@@ -39,6 +48,7 @@ const CURRENCY_OPTIONS = [
 
 type FormValues = {
     vehicle: number | ""
+    other_vehicle: number | ""
     amount: string | number | ""
     quantity: string | number | ""
     currency: 1 | 2
@@ -55,6 +65,7 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
     const form = useForm<FormValues>({
         defaultValues: {
             vehicle: "",
+            other_vehicle: "",
             amount: "",
             quantity: "",
             currency: 1,
@@ -72,6 +83,14 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
         VEHICLES,
         { params: { page_size: 1000 } },
     )
+    const { data: otherVehicles, refetch: refetchOtherVehicles } =
+        useGet<OtherVehicleOption[]>(PETROL_STATIONS_OTHER_VEHICLES)
+
+    const [isOther, setIsOther] = useState(false)
+    const [isAdding, setIsAdding] = useState(false)
+    const [newNumber, setNewNumber] = useState("")
+    const [newComment, setNewComment] = useState("")
+    const [addError, setAddError] = useState("")
     const vehicleOptions = (vehiclesData?.results ?? []).map((v) => ({
         id: v.id,
         name: `${v.truck_number} (${UNIT_LABEL[v.fuel] ?? "litr"})`,
@@ -97,6 +116,20 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
         setValue("order", "")
     }, [vehicleId, setValue])
 
+    const { mutate: createOtherVehicle, isPending: isCreating } = usePost({
+        onSuccess: (row: any) => {
+            toast.success("Mashina qo'shildi")
+            setIsAdding(false)
+            setNewNumber("")
+            setNewComment("")
+            setAddError("")
+            refetchOtherVehicles().then(() => setValue("other_vehicle", row.id))
+        },
+        onError: (error: any) => {
+            setAddError(error?.response?.data?.number?.[0] || "Saqlab bo'lmadi")
+        },
+    })
+
     const { mutate, isPending } = usePost({
         onSuccess: () => {
             toast.success("Chiqim qo'shildi")
@@ -111,7 +144,9 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
 
     const onSubmit = (values: FormValues) => {
         const fields: Record<string, any> = {
-            vehicle: values.vehicle,
+            ...(isOther
+                ? { other_vehicle: values.other_vehicle }
+                : { vehicle: values.vehicle }),
             amount: Number(values.amount),
             quantity: Number(values.quantity),
             currency: values.currency,
@@ -120,7 +155,7 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
                     ? Number(values.currency_course)
                     : null,
             comment: values.comment || null,
-            order: values.order || null,
+            order: isOther ? null : values.order || null,
         }
 
         if (values.receipt instanceof File) {
@@ -138,27 +173,137 @@ const AddExpenseModal = ({ stationId }: { stationId: number }) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-            <FormCombobox
-                required
-                control={control}
-                label="Mashina"
-                name="vehicle"
-                options={vehicleOptions}
-                valueKey="id"
-                labelKey="name"
-                placeholder="Mashinani tanlang"
-            />
-            <FormCombobox
-                control={control}
-                label="Buyurtma (ixtiyoriy)"
-                name="order"
-                options={orderOptions}
-                valueKey="id"
-                labelKey="name"
-                placeholder={
-                    vehicleId ? "Buyurtmani tanlang" : "Avval mashina tanlang"
-                }
-            />
+            <div className="flex flex-col gap-1.5">
+                <span className="font-medium text-sm">Mashina turi</span>
+                <div className="flex gap-2">
+                    {[
+                        { value: false, label: "Garaj furasi" },
+                        { value: true, label: "Boshqa mashina" },
+                    ].map((choice) => (
+                        <button
+                            key={String(choice.value)}
+                            type="button"
+                            onClick={() => {
+                                setIsOther(choice.value)
+                                setValue("vehicle", "")
+                                setValue("other_vehicle", "")
+                                setValue("order", "")
+                            }}
+                            className={cn(
+                                "px-3 py-1.5 rounded-md text-sm border transition-colors",
+                                isOther === choice.value
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-background text-muted-foreground hover:text-foreground",
+                            )}
+                        >
+                            {choice.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {isOther ?
+                <div className="flex flex-col gap-2">
+                    <FormCombobox
+                        required
+                        control={control}
+                        label="Mashina raqami"
+                        name="other_vehicle"
+                        options={otherVehicles}
+                        valueKey="id"
+                        labelKey="number"
+                        placeholder="Raqamni tanlang"
+                    />
+                    {isAdding ?
+                        <div className="flex flex-col gap-2 rounded-md border p-3">
+                            <Input
+                                fullWidth
+                                autoFocus
+                                placeholder="Masalan: 01 198 LMA"
+                                value={newNumber}
+                                onChange={(event) => {
+                                    setNewNumber(event.target.value)
+                                    setAddError("")
+                                }}
+                            />
+                            <Input
+                                fullWidth
+                                placeholder="Izoh (ixtiyoriy)"
+                                value={newComment}
+                                onChange={(event) =>
+                                    setNewComment(event.target.value)
+                                }
+                            />
+                            {!!addError && (
+                                <span className="text-destructive text-xs">
+                                    {addError}
+                                </span>
+                            )}
+                            <div className="flex gap-2 justify-end">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => {
+                                        setIsAdding(false)
+                                        setAddError("")
+                                    }}
+                                >
+                                    Bekor qilish
+                                </Button>
+                                <Button
+                                    type="button"
+                                    loading={isCreating}
+                                    disabled={!newNumber.trim()}
+                                    onClick={() =>
+                                        createOtherVehicle(
+                                            PETROL_STATIONS_OTHER_VEHICLES,
+                                            {
+                                                number: newNumber.trim(),
+                                                comment:
+                                                    newComment.trim() || null,
+                                            } as any,
+                                        )
+                                    }
+                                >
+                                    Qo'shish
+                                </Button>
+                            </div>
+                        </div>
+                    :   <button
+                            type="button"
+                            onClick={() => setIsAdding(true)}
+                            className="text-sm text-primary w-max hover:underline"
+                        >
+                            + Yangi mashina qo'shish
+                        </button>
+                    }
+                </div>
+            :   <>
+                    <FormCombobox
+                        required
+                        control={control}
+                        label="Mashina"
+                        name="vehicle"
+                        options={vehicleOptions}
+                        valueKey="id"
+                        labelKey="name"
+                        placeholder="Mashinani tanlang"
+                    />
+                    <FormCombobox
+                        control={control}
+                        label="Buyurtma (ixtiyoriy)"
+                        name="order"
+                        options={orderOptions}
+                        valueKey="id"
+                        labelKey="name"
+                        placeholder={
+                            vehicleId ?
+                                "Buyurtmani tanlang"
+                            :   "Avval mashina tanlang"
+                        }
+                    />
+                </>
+            }
             <FormNumberInput
                 required
                 control={control}

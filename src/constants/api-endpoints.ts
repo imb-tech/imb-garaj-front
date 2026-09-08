@@ -36,6 +36,7 @@ export const DRIVERS_BALANCE = "users/drivers/balance"
 
 /** ===== REFERENCE DATA (moved from /common/ to dedicated domains) ===== */
 export const SETTINGS_PETROL_STATIONS = "petrol-stations"
+export const PETROL_STATIONS_OTHER_VEHICLES = "petrol-stations/other-vehicles"
 export const SETTINGS_CUSTOMERS = "clients"
 export const SETTINTS_PAYMENT_TYPE = "payment-types"
 export const SETTINGS_VEHICLE_TYPE = "vehicle-types"
